@@ -45,11 +45,8 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Install Docker Compose
-        run: sudo apt-get update && sudo apt-get install -y docker-compose
-
       - name: Start Docker services
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Wait for database to be ready
         run: |
