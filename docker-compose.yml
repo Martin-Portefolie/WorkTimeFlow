@@ -39,6 +39,6 @@ services:
       MYSQL_USER: db_user
       MYSQL_PASSWORD: db_password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     networks:
       - app
