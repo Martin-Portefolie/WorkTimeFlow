@@ -1,0 +1,44 @@
+networks:
+  frontend:
+    external: true
+  app:
+    driver: bridge
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - app
+    depends_on:
+      - php
+
+
+  php:
+    build: .
+    image: php:8.3-fpm
+    container_name: php-fpm
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app
+
+  database:
+    image: mariadb:10.11.2
+    container_name: mariadb_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: db
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: db_password
+    ports:
+      - "3306:3306"
+    networks:
+      - app
