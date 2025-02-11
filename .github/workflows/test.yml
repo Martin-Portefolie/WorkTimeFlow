@@ -23,7 +23,7 @@ jobs:
           MYSQL_USER: db_user
           MYSQL_PASSWORD: db_password
         ports:
-          - 3307:3306
+          - "0:3306"
 
     steps:
       - name: Checkout repository
@@ -53,6 +53,9 @@ jobs:
       - name: Start Docker services
         run: docker compose up -d
 
+      - name: Get assigned MariaDB port
+        run: echo "DB_PORT=$(docker inspect -f '{{ (index .NetworkSettings.Ports "3306/tcp" 0).HostPort }}' mariadb_container)" >> $GITHUB_ENV
+
       - name: Wait for database to be ready
         run: |
           until docker exec mariadb_container mysqladmin ping -h "127.0.0.1" --silent; do
@@ -67,7 +70,7 @@ jobs:
 
       - name: Run PHPUnit tests
         env:
-          DATABASE_URL: "mysql://db_user:db_password@127.0.0.1:3307/db"
+          DATABASE_URL: "mysql://db_user:db_password@127.0.0.1:${{ env.DB_PORT }}/db"
         run: vendor/bin/phpunit
 
   changelog:
