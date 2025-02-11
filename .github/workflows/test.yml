@@ -45,6 +45,11 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      - name: Stop any process using port 3307
+        run: |
+          sudo lsof -i :3307 || true
+          sudo fuser -k 3307/tcp || true
+
       - name: Start Docker services
         run: docker compose up -d
 
