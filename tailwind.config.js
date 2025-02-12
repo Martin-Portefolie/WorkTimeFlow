@@ -21,7 +21,8 @@ module.exports = {
       },
     fontFamily:{
         sans: ["inter", "sans-serif"],
-        display: ["Poppins", "sans-serif"]
+        display: ["Poppins", "sans-serif"],
+        logo: ["Pacifico", "cursive"]
     },
       fontsize:{
         sm: "0.875rem",
