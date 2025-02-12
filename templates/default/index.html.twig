@@ -1,20 +1,176 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello DefaultController!{% endblock %}
+{% block title %}Hest test Calender {% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+   <!-- Top Menu -->
+    <nav class="bg-primary text-white px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <!-- Logo -->
+            <a href="/" class="text-2xl font-bold flex items-center">
+                <img src="{{ asset('images/logo.svg') }}" alt="Logo" class="h-8 mr-2">
+                Hest Test Calender
+            </a>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+            <!-- Language Selector -->
+            <div class="flex items-center space-x-4">
+                <a href="#" class="border border-white px-4 py-2 rounded-lg text-white hover:bg-white hover:text-primary transition">Prøv gratis</a>
+                <a href="#" class="flex items-center space-x-1">
+                    <img src="{{ asset('icons/globe.svg') }}" alt="Globe" class="h-5">
+                    <span>Dansk</span>
+                </a>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/src/Controller/DefaultController.php</code></li>
-        <li>Your template at <code>/var/www/html/templates/default/index.html.twig</code></li>
-    </ul>
-</div>
+                <!-- Mobile Menu Button -->
+                <button id="menu-toggle" class="md:hidden">
+                    <img src="{{ asset('icons/menu.svg') }}" alt="Menu" class="h-6">
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-primary text-white text-center py-4">
+            <a href="#" class="block py-2">Produkt</a>
+            <a href="#" class="block py-2">Pris</a>
+            <a href="#" class="block py-2">Ressourcer</a>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <section class="bg-secondary text-white text-left py-16 px-6">
+        <h1 class="text-4xl font-bold font-display leading-tight">Hest test Calender - Et simpelt tids registrerings værktøj</h1>
+        <p class="mt-4 text-xl">Host selv løsning - Kvit og frit</p>
+
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-[25%_75%] gap-4 items-center justify-center mt-12">
+            <button class="btn btn-primary w-full sm:w-3/4 mx-auto">PRØV GRATIS!</button>
+            <a href="">
+                <img src="{{ asset('images/demo.jpg') }}" alt="Step 2" class="w-full sm:w-3/4 rounded-lg mx-auto">
+            </a>
+        </div>
+    </section>
+
+    <!-- Feature Highlights Section -->
+    <section class="bg-white py-16 px-6 ">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+            <!-- Feature 1 -->
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="Ease of Use" class="h-12 mx-auto mb-4">
+                <h3 class="text-xl font-bold">Download</h3>
+                <p class="text-neutral-600">Kan hentes kvit og frit fra github</p>
+            </div>
+            <!-- Feature 2 -->
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="All-in-One Platform" class="h-12 mx-auto mb-4">
+                <h3 class="text-xl font-bold">Server</h3>
+                <p class="text-neutral-600">Køb eller host din egen server</p>
+            </div>
+            <!-- Feature 3 -->
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="Support" class="h-12 mx-auto mb-4">
+                <h3 class="text-xl font-bold">Installere</h3>
+                <p class="text-neutral-600">Installere Hest Test Calender, og du er færdig.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cards in Sections -->
+            <!-- Card 1 -->
+    <section class="py-16 px-6 bg-neutral-100">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+            <div>
+                <p class="text-blue-500 uppercase text-sm font-semibold">Et simplet admin system</p>
+                <h2 class="text-2xl font-bold">Hirakisk, og overskuelig måde at oprette dine opgaver på</h2>
+                <ul class="mt-4 space-y-2 text-neutral-700">
+                    <li>✅ Opret Klienter, opgaver, todos </li>
+                    <li>✅ Nem brugerstyring igenem teams</li>
+                    <li>✅ Download din data til csv</li>
+                </ul>
+            </div>
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="Email & Calendar Integration" class="w-full rounded-lg shadow-lg">
+            </div>
+        </div>
+    </section>
+
+    <!-- Card 2 -->
+    <section class="py-16 px-6 bg-white">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="Customer Overview" class="w-full rounded-lg shadow-lg">
+            </div>
+            <div>
+                <p class="text-blue-500 uppercase text-sm font-semibold">Den enkle tidsregistreing</p>
+                <h2 class="text-2xl font-bold">Hurtigt UI ?</h2>
+                <ul class="mt-4 space-y-2 text-neutral-700">
+                    <li>✅ Find, eller opret en todo på en opgave</li>
+                    <li>✅ Sæt status</li>
+                    <li>✅ Knyt en kommentar</li>
+                    <li>✅ Sæt tid for opgave</li>
+                    <li>✅ Bum du er færdig !</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Card 3 -->
+    <section class="py-16 px-6 bg-neutral-100">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+            <div>
+                <p class="text-blue-500 uppercase text-sm font-semibold">11 Febuar 2025</p>
+                <h2 class="text-2xl font-bold"> Developer nyheder </h2>
+                <ul class="mt-4 space-y-2 text-neutral-700">
+                    <li>✅ Der arbejdes på ny forside</li>
+                    <li>✅ Nyt kalender registreings system</li>
+                    <li>✅ Nyt admin  system</li>
+                </ul>
+            </div>
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="CRM Visualization" class="w-full rounded-lg shadow-lg">
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Login Button -->
+    <div class="fixed bottom-5 left-6">
+        <a href="#" class="bg-green-500 p-4 rounded-full shadow-lg text-white text-xl">Login</a>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-secondary text-white text-center py-12 px-6 ">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+
+            <!-- Contact Information -->
+            <div>
+                <h2 class="text-xl font-bold">Kontakt</h2>
+                <p class="mt-2 text-lg">Hest Test Calender</p>
+                <p class="mt-1 text-sm">Østerbrogade 100, 2100 København Ø, Denmark</p>
+                <p class="mt-1 text-sm">Email: <a href="mailto:kontakt@hesttest.dk" class="underline">kontakt@hesttest.dk</a></p>
+                <p class="mt-1 text-sm">Telefon: +45 1234 5678</p>
+            </div>
+
+            <!-- Technologies Used -->
+            <div>
+                <h2 class="text-xl font-bold">Teknologier Vi Bruger</h2>
+                <div class="flex flex-wrap justify-center space-x-4 mt-4">
+                    <a href="https://symfony.com" target="_blank"><img src="{{ asset('icons/symfony.svg') }}" alt="Symfony" class="h-8"></a>
+                    <a href="https://stimulus.hotwired.dev" target="_blank"><img src="{{ asset('icons/stimulus.svg') }}" alt="Stimulus" class="h-8"></a>
+                    <a href="https://turbo.hotwired.dev" target="_blank"><img src="{{ asset('icons/turbo.svg') }}" alt="Turbo" class="h-8"></a>
+                    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank"><img src="{{ asset('icons/javascript.svg') }}" alt="JavaScript" class="h-8"></a>
+                    <a href="https://www.docker.com" target="_blank"><img src="{{ asset('icons/docker.svg') }}" alt="Docker" class="h-8"></a>
+                    <a href="https://github.com" target="_blank"><img src="{{ asset('icons/github.svg') }}" alt="GitHub" class="h-8"></a>
+                </div>
+            </div>
+
+            <!-- Open Source License -->
+            <div>
+                <h2 class="text-xl font-bold">Open Source</h2>
+                <p class="mt-2 text-sm">Hest Test Calender er gratis og open-source software.</p>
+                <p class="mt-1 text-sm">Udgivet under <a href="https://opensource.org/licenses/MIT" class="underline">MIT Licens</a>.</p>
+                <p class="mt-1 text-sm">Bidrag eller se kildekoden på <a href="https://github.com/hesttest" class="underline">GitHub</a>.</p>
+            </div>
+
+        </div>
+
+        <!-- Copyright Notice -->
+        <p class="mt-6 text-sm opacity-75">© 2025 Hest Test Calender. Alle rettigheder forbeholdes.</p>
+    </footer>
+
 {% endblock %}
