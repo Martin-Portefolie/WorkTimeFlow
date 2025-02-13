@@ -7,7 +7,9 @@ A free symfony time-registration project.
 Getting started:  
 
 ```shell
-docker-compose up --build -d #starting the container
-docker compose exec php composer install #installing vendor files
+docker-compose up --build -d # starting the container
+docker compose exec php composer install # installing vendor files (only req if no vendor folder)
+
+docker compose exec php bin/console tailwind:build --watch --poll ## start tailwind service
 ```
 

@@ -1,3 +1,47 @@
-body {
-    background-color: skyblue;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+/* Button Variants */
+.btn {
+    @apply font-bold px-6 py-3 rounded-lg shadow-md transition;
+}
+
+.btn-primary {
+    @apply bg-primary text-white hover:bg-secondary;
+}
+
+.btn-secondary {
+    @apply bg-neutral-100 text-primary hover:bg-neutral-500;
+}
+
+/* Input Fields */
+.input-field {
+    @apply p-3 rounded-lg w-full sm:w-auto text-neutral-900 border border-neutral-300;
+}
+
+/* Section Containers */
+.section {
+    @apply max-w-5xl mx-auto py-10 px-6;
+}
+
+
+/* Global Text Styles */
+.text-heading {
+    @apply text-3xl font-bold font-display text-neutral-900;
+}
+
+.text-subheading {
+    @apply text-xl font-semibold text-neutral-900;
+}
+
+.text-body {
+    @apply text-lg text-neutral-700 leading-relaxed;
+}
+
+.text-small {
+    @apply text-sm text-neutral-600;
 }

@@ -1,0 +1,167 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tidsregistrering{% endblock %}
+
+{% block body %}
+    <div class="max-w-6xl mx-auto p-6">
+
+        <!-- Navigation -->
+        <div class="flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-6">
+            <button class="px-4 py-2 bg-gray-300 rounded-lg">← previous period</button>
+            <span class="text-lg font-semibold">{{ start_date|date("d-m-Y") }} til {{ end_date|date("d-m-Y") }}</span>
+            <button class="px-4 py-2 bg-gray-300 rounded-lg">next period →</button>
+            <button class="px-4 py-2 bg-blue-500 text-white rounded-lg">Show this week</button>
+        </div>
+
+        <!-- Time Registration Table -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <table class="w-full border-collapse">
+                <!-- Table Head -->
+                <thead>
+                <tr class="bg-gray-200 text-left text-sm">
+                    <th class="p-2 border">To-do title</th>
+                    {% for i in 0..6 %}
+                        <th class="p-2 border text-center">
+                            {{ (start_date|date_modify('+' ~ i ~ ' days'))|date("d/n D") }}
+                        </th>
+                    {% endfor %}
+                    <th class="p-2 border text-center">Total</th>
+                </tr>
+                </thead>
+
+                <!-- Table Body -->
+                <tbody>
+                {% set week_total = 0 %}
+
+                {% for todo in todos %}
+                    <tr class="border-t">
+                        <td class="p-2 border">
+                            <span class="text-blue-600 font-semibold">{{ todo.name }}</span>
+                            <br>
+                            <span class="text-gray-500 text-xs">{{ todo.project ?? 'Ingen projekt' }}</span>
+                        </td>
+
+                        {% set total_hours = 0 %}
+                        {% for i in 0..6 %}
+                            {% set date = (start_date|date_modify('+' ~ i ~ ' days'))|date("Y-m-d") %}
+                            {% set daily_hours = todo.hours[date] ?? 0 %}
+
+                            {% if daily_hours is not same as(false) and daily_hours is not same as('-') %}
+                                {% set total_hours = total_hours + daily_hours %}
+                                {% set week_total = week_total + daily_hours %}
+                            {% endif %}
+
+                            <td class="p-2 border text-center">{{ daily_hours }}</td>
+                        {% endfor %}
+
+                        <td class="p-2 border text-center font-bold">{{ total_hours }}</td>
+                    </tr>
+                {% endfor %}
+
+                <!-- New -->
+                <tr class="border-t bg-gray-100">
+                    <td class="p-2 border text-blue-500 font-semibold">
+                        <a href="#">+ New registration</a>
+                    </td>
+                    {% for i in 0..6 %}
+                        <td class="p-2 border text-center">-</td>
+                    {% endfor %}
+                    <td class="p-2 border text-center">-</td>
+                </tr>
+
+                <!-- Total Row  -->
+                <tr class="border-t bg-gray-200 font-bold">
+                    <td class="p-2 border">Total</td>
+                    {% for i in 0..6 %}
+                        {% set date = (start_date|date_modify('+' ~ i ~ ' days'))|date("Y-m-d") %}
+                        {% set daily_total = 0 %}
+
+                        {% for todo in todos %}
+                            {% set daily_hours = todo.hours[date] ?? 0 %}
+                            {% if daily_hours is not same as(false) and daily_hours is not same as('-') %}
+                                {% set daily_total = daily_total + daily_hours %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <td class="p-2 border text-center">{{ daily_total }}</td>
+                    {% endfor %}
+                    <td class="p-2 border text-center">{{ week_total }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Calendar View Toggle -->
+
+        <div class="flex justify-center space-x-4 mt-6 bg-gray-100 p-4 rounded-lg ">
+            <button class="px-4 py-2 bg-blue-500 text-white rounded-lg">Vis 7 Dage</button>
+            <button class="px-4 py-2 bg-gray-300 rounded-lg">Vis 30 Dage</button>
+        </div>
+
+        <!-- 7-Days Calendar -->
+        <div class="bg-white shadow-md rounded-lg p-6 mt-6">
+            <h3 class="text-xl font-bold mb-4">7-Dages Kalender</h3>
+            <div class="grid grid-cols-7 gap-4">
+                {% for i in 1..7 %}
+                    <div class="p-4 border rounded-lg bg-gray-100 text-center">
+                        {{ "%02d"|format(i) }}
+                        <br>
+                        <a href="#" class="text-blue-500">+ Tilføj TODO</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 30-Days Calendar -->
+        <div class="bg-white shadow-md rounded-lg p-6 mt-6">
+            <h3 class="text-xl font-bold mb-4">30-Dages Kalender (Februar)</h3>
+            <div class="grid grid-cols-7 gap-4">
+                {% for i in 1..30 %}
+                    <div class="p-4 border rounded-lg bg-gray-100 text-center">
+                        {{ "%02d"|format(i) }}
+                        <br>
+                        <a href="#" class="text-blue-500">+ Tilføj TODO</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Mine Projekter Section (Restored) -->
+        <div class="bg-white shadow-md rounded-lg p-6 mt-6">
+            <h3 class="text-xl font-bold mb-4">Mine Projekter</h3>
+            <ul>
+                {% for project in projects %}
+                    <li class="border-b py-2">{{ project.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Mine Todos Section (Restored) -->
+        <div class="bg-white shadow-md rounded-lg p-6 mt-6">
+            <h3 class="text-xl font-bold mb-4">Mine Todos</h3>
+            <ul>
+                {% for todo in todos %}
+                    <li class="flex justify-between border-b py-2">
+                        <span>{{ todo.name }}</span>
+                        <select class="border rounded-lg px-2 py-1">
+                            <option>Åben</option>
+                            <option>I gang</option>
+                            <option>Færdig</option>
+                        </select>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Create New Todo (Restored) -->
+        <div class="bg-white shadow-md rounded-lg p-6 mt-6">
+            <h3 class="text-xl font-bold mb-4">Opret ny Todo</h3>
+            <form>
+                <input type="text" placeholder="Todo navn" class="border p-2 w-full mb-2 rounded-lg">
+                <textarea placeholder="Beskrivelse" class="border p-2 w-full mb-2 rounded-lg"></textarea>
+                <button class="bg-primary text-white px-4 py-2 rounded-lg">Opret</button>
+            </form>
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,20 +1,107 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello DefaultController!{% endblock %}
+{% block title %}Hest test Calender {% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <!-- Hero Section -->
+    <section class="bg-secondary text-white text-left py-16 px-6">
+        <h1 class="text-4xl font-bold font-display leading-tight">Hest test Calender - Et simpelt tids registrerings værktøj</h1>
+        <p class="mt-4 text-xl">Host selv løsning - Kvit og frit</p>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-[25%_75%] gap-4 items-center justify-center mt-12">
+            <button class="btn btn-primary w-full sm:w-3/4 mx-auto">HENT GRATIS!</button>
+            <a href="">
+                <img src="{{ asset('images/demo.jpg') }}" alt="Step 2" class="w-full sm:w-3/4 rounded-lg mx-auto">
+            </a>
+        </div>
+    </section>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/src/Controller/DefaultController.php</code></li>
-        <li>Your template at <code>/var/www/html/templates/default/index.html.twig</code></li>
-    </ul>
-</div>
+    <!-- Feature Highlights Section -->
+    <section class="bg-white py-16 px-6 ">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+            <!-- Feature 1 -->
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="Ease of Use" class="h-12 mx-auto mb-4">
+                <h3 class="text-xl font-bold">Download</h3>
+                <p class="text-neutral-600">Kan hentes kvit og frit fra github</p>
+            </div>
+            <!-- Feature 2 -->
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="All-in-One Platform" class="h-12 mx-auto mb-4">
+                <h3 class="text-xl font-bold">Server</h3>
+                <p class="text-neutral-600">Køb eller host din egen server</p>
+            </div>
+            <!-- Feature 3 -->
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="Support" class="h-12 mx-auto mb-4">
+                <h3 class="text-xl font-bold">Installere</h3>
+                <p class="text-neutral-600">Installere Hest Test Calender, og du er færdig.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cards in Sections -->
+            <!-- Card 1 -->
+    <section class="py-16 px-6 bg-neutral-100">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+            <div>
+                <p class="text-blue-500 uppercase text-sm font-semibold">Et simplet admin system</p>
+                <h2 class="text-2xl font-bold">Hirakisk, og overskuelig måde at oprette dine opgaver på</h2>
+                <ul class="mt-4 space-y-2 text-neutral-700">
+                    <li>✅ Opret Klienter, opgaver, todos </li>
+                    <li>✅ Nem brugerstyring igenem teams</li>
+                    <li>✅ Download din data til csv</li>
+                </ul>
+            </div>
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="Email & Calendar Integration" class="w-full rounded-lg shadow-lg">
+            </div>
+        </div>
+    </section>
+
+    <!-- Card 2 -->
+    <section class="py-16 px-6 bg-white">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="Customer Overview" class="w-full rounded-lg shadow-lg">
+            </div>
+            <div>
+                <p class="text-blue-500 uppercase text-sm font-semibold">Den enkle tidsregistreing</p>
+                <h2 class="text-2xl font-bold">Hurtigt UI ?</h2>
+                <ul class="mt-4 space-y-2 text-neutral-700">
+                    <li>✅ Find, eller opret en todo på en opgave</li>
+                    <li>✅ Sæt status</li>
+                    <li>✅ Knyt en kommentar</li>
+                    <li>✅ Sæt tid for opgave</li>
+                    <li>✅ Bum du er færdig !</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Card 3 -->
+    <section class="py-16 px-6 bg-neutral-100">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+            <div>
+                <p class="text-blue-500 uppercase text-sm font-semibold">11 Febuar 2025</p>
+                <h2 class="text-2xl font-bold"> Developer nyheder </h2>
+                <ul class="mt-4 space-y-2 text-neutral-700">
+                    <li>✅ Der arbejdes på ny forside</li>
+                    <li>✅ Nyt kalender registreings system</li>
+                    <li>✅ Nyt admin  system</li>
+                </ul>
+            </div>
+            <div>
+                <img src="{{ asset('images/demo.jpg') }}" alt="CRM Visualization" class="w-full rounded-lg shadow-lg">
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Login Button -->
+    <div class="fixed bottom-5 left-6">
+        <a href="#" class="bg-green-500 p-4 rounded-full shadow-lg text-white text-xl">Login</a>
+    </div>
+
+
+
 {% endblock %}
