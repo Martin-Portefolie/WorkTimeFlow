@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -30,6 +32,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $username = null;
+
+    /**
+     * @var Collection<int, Team>
+     */
+    #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'users')]
+    private Collection $teams;
+
+    /**
+     * @var Collection<int, Timelog>
+     */
+    #[ORM\OneToMany(targetEntity: Timelog::class, mappedBy: 'user')]
+    private Collection $timelogs;
+
+    public function __construct()
+    {
+        $this->teams = new ArrayCollection();
+        $this->timelogs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -104,5 +127,71 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(string $username): static
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Team>
+     */
+    public function getTeams(): Collection
+    {
+        return $this->teams;
+    }
+
+    public function addTeam(Team $team): static
+    {
+        if (!$this->teams->contains($team)) {
+            $this->teams->add($team);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): static
+    {
+        $this->teams->removeElement($team);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Timelog>
+     */
+    public function getTimelogs(): Collection
+    {
+        return $this->timelogs;
+    }
+
+    public function addTimelog(Timelog $timelog): static
+    {
+        if (!$this->timelogs->contains($timelog)) {
+            $this->timelogs->add($timelog);
+            $timelog->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTimelog(Timelog $timelog): static
+    {
+        if ($this->timelogs->removeElement($timelog)) {
+            // set the owning side to null (unless already changed)
+            if ($timelog->getUser() === $this) {
+                $timelog->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
