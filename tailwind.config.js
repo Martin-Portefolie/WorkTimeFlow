@@ -11,6 +11,7 @@ module.exports = {
         secondary: "#A78BFA",
         alternate: "#2563EB",
         background: "#F5EFFF",
+        section: "#E6E6FA",
         neutral: {
           100: "#FAF5FF",
           500: "#6B7280",

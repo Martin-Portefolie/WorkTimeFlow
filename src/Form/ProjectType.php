@@ -27,8 +27,8 @@ class ProjectType extends AbstractType
             ->add('client', EntityType::class, [
                 'class' => Client::class,
                 'choice_label' => 'name',
-                'label' => 'Select ClientFixtures',
-                'placeholder' => 'Choose a ClientFixtures',
+                'label' => 'Select Client',
+                'placeholder' => 'Choose a Client',
             ])
             ->add('teams', EntityType::class, [
                 'class' => Team::class,
