@@ -1,20 +1,38 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello LoginController!{% endblock %}
+
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    {% if error %}
+        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="flex items-center justify-center min-h-screen bg-background">
+        <div class="w-full max-w-md p-6 bg-neutral-100 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold text-center mb-6">Hest Test Calender - Login </h2>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/src/Controller/LoginController.php</code></li>
-        <li>Your template at <code>/var/www/html/templates/login/index.html.twig</code></li>
-    </ul>
-</div>
+            <form action="{{ path('app_login') }}" method="post">
+                <!-- Email  -->
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                    <input type="text" id="username" name="_username" value="{{ last_username }}" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <!-- Password  -->
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password:</label>
+                    <input type="password" id="password" name="_password" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <!-- Submit  -->
+                <button type="submit"
+                        class="w-full py-2.5 text-sm font-medium text-white bg-primary rounded-md hover:bg-secondary focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
 {% endblock %}
