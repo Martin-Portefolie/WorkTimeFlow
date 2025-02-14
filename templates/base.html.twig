@@ -16,52 +16,96 @@
     <!-- Profile Menu -->
 
     <nav class="bg-primary text-white px-6 py-4">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
 
-            <!-- Left: Logo -->
-            <a href="#" class="flex items-center space-x-3">
-                <img src="{{ asset('images/logo.svg') }}" alt="Logo" class="h-12">
-                <span class="font-logo text-4xl hidden sm:inline">Hest Test Calender</span>
+            <!-- Left: Logo (Stacks on Mobile) -->
+            <a href="#" class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 text-center">
+                <img src="{{ asset('images/logo.svg') }}" alt="Logo" class="h-12 mx-auto sm:mx-0">
+                <span class="font-logo text-2xl sm:text-4xl">Hest Test Calender</span>
             </a>
-            {% if app.user %}
+
             <!-- Center: Mid-Section Menu -->
-                <div class="hidden md:flex space-x-8 text-base font-medium">
-                    <a href="{{ path('app_profile') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                        <img src="{{ asset('icons/profile_menu/time-fill.svg') }}" alt="Tidsregistrering" class="h-5 w-5">
-                        <span>Tidsregistrering</span>
-                    </a>
-                    <a href="{{ path('app_profile') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                        <img src="{{ asset('icons/profile_menu/todo.svg') }}" alt="Projekter og Todos" class="h-5 w-5">
-                        <span>Projekter og Todos</span>
-                    </a>
-                    <a href="{{ path('app_profile') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                        <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="Bruger og Teams" class="h-5 w-5">
-                        <span>Bruger og Teams</span>
-                    </a>
-                </div>
+            {% if app.user %}
+            <div class="flex flex-col sm:flex-row sm:space-x-6 text-base font-medium text-center sm:text-left">
+                <a href="{{ path('app_profile') }}" class="flex items-center justify-center sm:justify-start space-x-2 hover:text-gray-300 transition py-2">
+                    <img src="{{ asset('icons/profile_menu/time-fill.svg') }}" alt="Tidsregistrering" class="h-5 w-5">
+                    <span class="">Tidsregistrering</span> <!-- Hide text on tablets -->
+                </a>
+                <a href="{{ path('app_profile') }}" class="flex items-center justify-center sm:justify-start space-x-2 hover:text-gray-300 transition py-2">
+                    <img src="{{ asset('icons/profile_menu/todo.svg') }}" alt="Projekter og Todos" class="h-5 w-5">
+                    <span class="">Projekter og Todos</span> <!-- Hide text on tablets -->
+                </a>
+                <a href="{{ path('app_profile') }}" class="flex items-center justify-center sm:justify-start space-x-2 hover:text-gray-300 transition py-2">
+                    <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="Bruger og Teams" class="h-5 w-5">
+                    <span class="">Bruger og Teams</span> <!-- Hide text on tablets -->
+                </a>
+            </div>
             {% endif %}
             <!-- Right: User/Login & Language -->
-            <div class="flex items-center space-x-6 text-base font-medium">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-6 space-y-4 sm:space-y-0 text-center sm:text-left">
                 {% if app.user %}
-                    <div class="flex items-center space-x-3">
-                        <img src="{{ asset('icons/user-avatar.svg') }}" alt="User Avatar" class="h-8 w-8 rounded-full">
-                        <span>{{ app.user.username }}</span>
-                        <a href="{{ path('app_logout') }}" class="px-4 py-2 hover:text-gray-300 transition">Logout</a>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
+                        <div class="flex items-center justify-center sm:justify-start space-x-3">
+                            <img src="{{ asset('icons/user-avatar.svg') }}" alt="User Avatar" class="h-8 w-8 rounded-full">
+                            <span class="hover:text-gray-300">{{ app.user.username }}</span>
+                        </div>
+                        <a href="{{ path('app_logout') }}" class="px-4 py-2 text-white hover:text-gray-300 ">
+                            Logout
+                        </a>
                     </div>
                 {% else %}
-                    <a href="{{ path('app_login') }}" class="px-4 py-2 hover:bg-white hover:text-primary transition">Login</a>
+                    <a href="{{ path('app_login') }}" class="px-4 py-2 text-white ">
+                        Login
+                    </a>
                 {% endif %}
 
-                <!-- Language Selector -->
-                <a href="#" class="flex items-center space-x-1 hover:text-gray-300 transition">
-                    <img src="{{ asset('icons/profile_menu/globe.svg') }}" alt="Globe" class="h-4">
-                    <span>Dansk</span>
-                </a>
+                <!-- Language Selector  -->
+                <div class="flex justify-center sm:justify-start">
+                    <a href="#" class="flex items-center space-x-1 hover:text-gray-300 transition">
+                        <img src="{{ asset('icons/profile_menu/globe.svg') }}" alt="Globe" class="h-4">
+                        <span>Dansk</span>
+                    </a>
+                </div>
             </div>
 
         </div>
     </nav>
 
+<!-- Admin menu -->
+    {% if is_granted('ROLE_ADMIN') %}
+    <nav class="bg-alternate text-white px-6 py-3">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+
+            <!-- Left: Admin Panel Title -->
+            <div class="text-lg font-semibold">Admin Panel</div>
+
+            <!-- Center: Admin Menu -->
+            <div class="flex flex-wrap justify-center space-x-4">
+                <a href="{{ path('app_login') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                    <img src="{{ asset('icons/admin_menu/client.svg') }}" alt="Clients" class="h-5 w-5">
+                    <span>Clients</span>
+                </a>
+                <a href="{{ path('app_login') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                    <img src="{{ asset('icons/admin_menu/project.svg') }}" alt="Projects" class="h-5 w-5">
+                    <span>Projects</span>
+                </a>
+                <a href="{{ path('app_login') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                    <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="Teams" class="h-5 w-5">
+                    <span>Teams</span>
+                </a>
+                <a href="{{ path('app_login') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                    <img src="{{ asset('icons/admin_menu/todo.svg') }}" alt="Todos" class="h-5 w-5">
+                    <span>Todos</span>
+                </a>
+                <a href="{{ path('app_login') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                    <img src="{{ asset('icons/admin_menu/user.svg') }}" alt="Users" class="h-5 w-5">
+                    <span>Users</span>
+                </a>
+            </div>
+
+        </div>
+    </nav>
+    {% endif %}
 
 
 
