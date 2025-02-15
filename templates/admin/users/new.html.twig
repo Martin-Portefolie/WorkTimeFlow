@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New User{% endblock %}
+
+{% block body %}
+    <section class="relative bg-background py-10">
+        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+            <h1 class="text-xl text-text-headline mb-8">Create New User</h1>
+
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                {{ form_start(form) }}
+
+                <!-- Username -->
+                <div class="mb-4">
+                    <label class="block text-lg text-text-headline">{{ form_label(form.username) }}</label>
+                    {{ form_widget(form.username, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border rounded-md shadow-sm'}}) }}
+                </div>
+
+                <!-- Email -->
+                <div class="mb-4">
+                    <label class="block text-lg text-text-headline">{{ form_label(form.email) }}</label>
+                    {{ form_widget(form.email, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border rounded-md shadow-sm'}}) }}
+                </div>
+
+                <!-- Password -->
+                <div class="mb-4">
+                    <label class="block text-lg text-text-headline">{{ form_label(form.password) }}</label>
+                    {{ form_widget(form.password, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border rounded-md shadow-sm'}}) }}
+                </div>
+
+                <!-- Roles -->
+                <div class="mb-4">
+                    <label class="block text-lg text-text-headline">{{ form_label(form.roles) }}</label>
+                    {{ form_widget(form.roles, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border rounded-md shadow-sm'}}) }}
+                </div>
+
+                <!-- Teams (Selection) -->
+                <div class="mb-4">
+                    <label class="block text-lg text-text-headline">{{ form_label(form.teams) }}</label>
+                    {{ form_widget(form.teams, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border rounded-md shadow-sm'}}) }}
+                </div>
+
+                <div class="flex justify-end mt-6">
+                    <button type="submit"
+                            class="inline-flex justify-center py-3 px-6 border shadow-sm text-lg font-medium rounded-md text-white bg-success hover:bg-primary focus:outline-none">
+                        Create User
+                    </button>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </section>
+{% endblock %}

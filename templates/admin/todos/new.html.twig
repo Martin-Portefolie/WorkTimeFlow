@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New Todo{% endblock %}
+
+{% block body %}
+    <section class="relative bg-background py-10">
+        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+            <h1 class="text-lg text-text-standard mb-5">Create New Todo</h1>
+
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                {{ form_start(form) }}
+
+                <div class="mb-4">
+                    <label class="block text-sm text-text-standard">{{ form_label(form.name) }}</label>
+                    {{ form_widget(form.name, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm'}}) }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm text-text-standard">{{ form_label(form.dateStart) }}</label>
+                    {{ form_widget(form.dateStart, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm'}}) }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm text-text-standard">{{ form_label(form.dateEnd) }}</label>
+                    {{ form_widget(form.dateEnd, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm'}}) }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm text-text-standard">{{ form_label(form.project) }}</label>
+                    {{ form_widget(form.project, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm'}}) }}
+                </div>
+
+                <div class="flex justify-end mt-6">
+                    <button type="submit" class="py-2 px-4 shadow-sm text-base rounded-md text-white bg-success hover:bg-primary focus:outline-none">
+                        Create Todo
+                    </button>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </section>
+{% endblock %}

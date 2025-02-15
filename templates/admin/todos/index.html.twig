@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello TodosController!{% endblock %}
+
+{% block body %}
+    <section class="relative bg-background py-10">
+        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+            <!-- Header Section -->
+            <div class="flex items-center justify-between mb-5">
+                <h1 class="text-lg text-text-standard">Todo Management</h1>
+                <a href="{{ path('admin_todo_new') }}"
+                   class="inline-flex justify-center py-2 px-4 shadow-sm text-base rounded-md text-white bg-alternate hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                    Create New Todo
+                </a>
+            </div>
+
+            <!-- Todo List -->
+            <div class="space-y-6">
+                {% for todo in todoDataArray %}
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <form action="{{ path('admin_todo_update', { id: todo.id }) }}" method="post">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Todo Name -->
+                                <div>
+                                    <label for="name_{{ todo.id }}" class="block text-sm text-text-standard">Name</label>
+                                    <input type="text" name="name" id="name_{{ todo.id }}" value="{{ todo.name }}"
+                                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-text-standard">
+                                </div>
+
+                                <!-- Project -->
+                                <div>
+                                    <label class="block text-sm text-text-standard">Project</label>
+                                    <p class="mt-1 px-4 py-2 bg-background-muted rounded-md">{{ todo.project }}</p>
+                                </div>
+
+                                <!-- Start Date -->
+                                <div>
+                                    <label for="dateStart_{{ todo.id }}" class="block text-sm text-text-standard">Start Date</label>
+                                    <input type="date" name="dateStart" id="dateStart_{{ todo.id }}" value="{{ todo.dateStart|date('Y-m-d') }}"
+                                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-text-paragraph">
+                                </div>
+
+                                <!-- End Date -->
+                                <div>
+                                    <label for="dateEnd_{{ todo.id }}" class="block text-sm text-text-standard">End Date</label>
+                                    <input type="date" name="dateEnd" id="dateEnd_{{ todo.id }}" value="{{ todo.dateEnd|date('Y-m-d') }}"
+                                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-text-paragraph">
+                                </div>
+
+                            </div>
+
+                            <div class="flex justify-end space-x-3 mt-4">
+                                <!-- Save Button -->
+                                <button type="submit" class="py-2 px-4 shadow-sm text-base rounded-md text-white bg-success hover:bg-primary focus:outline-none">
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

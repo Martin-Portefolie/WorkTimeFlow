@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Team Management{% endblock %}
+
+{% block body %}
+    <section class="relative bg-background py-10">
+        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+            <!-- Header Section -->
+            <div class="flex items-center justify-between mb-5">
+                <h1 class="text-2xl font-semibold text-gray-900">Team Management</h1>
+
+                <!-- Create New Team Button -->
+                <a href="{{ path('admin_team_new') }}"
+                   class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-alternate hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Create New Team
+                </a>
+            </div>
+
+            <!-- Team List -->
+            <div class="space-y-6">
+                {% for team in teams %}
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <form action="{{ path('admin_team_update', { id: team.id }) }}" method="post">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Team Name -->
+                                <div>
+                                    <label for="name_{{ team.id }}" class="block text-sm font-medium text-gray-700">Name</label>
+                                    <input type="text" name="name" id="name_{{ team.id }}" value="{{ team.name }}"
+                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-gray-900">
+                                </div>
+
+                                <!-- Users in Team (editable) -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Assign Users</label>
+                                    <div class="mt-1 bg-gray-100 rounded-md p-2 space-y-2">
+                                        {% for user in allUsers %}
+                                            <label class="inline-flex items-center">
+                                                <input type="checkbox" name="user_ids[]" value="{{ user.id }}"
+                                                       {% if user in team.users %}checked{% endif %}
+                                                       class="form-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                                                <span class="ml-2 text-gray-800">{{ user.username }}</span>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <!-- Projects Associated with Team (non-editable) -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Projects</label>
+                                    <ul class="mt-1 text-sm text-gray-800 bg-gray-100 rounded-md p-2">
+                                        {% for project in team.projects %}
+                                            <li class="py-1">{{ project.name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end space-x-3 mt-4">
+                                <!-- Save Button -->
+                                <button type="submit"
+                                        class="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-success hover:bg-primary focus:outline-none">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
