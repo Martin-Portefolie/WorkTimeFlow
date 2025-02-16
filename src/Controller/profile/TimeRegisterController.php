@@ -13,7 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class TimeRegisterController extends AbstractController
-{ private $entityManager;
+{
+    private $entityManager;
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -119,7 +120,7 @@ class TimeRegisterController extends AbstractController
     /**
      * @throws \Exception
      */
-    #[Route('/profile/todo-handler/save-time', name: 'app_todo_handler_save_time', methods: ['POST'])]
+    #[Route('/profile/time-register/save-time', name: 'app_time_register_save_time', methods: ['POST'])]
     public function saveTime(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);

@@ -19,7 +19,7 @@
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
 
             <!-- Left: Logo (Stacks on Mobile) -->
-            <a href="" class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 text-center">
+            <a href="{{ path('home') }}" class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 text-center">
                 <img src="{{ asset('images/logo.svg') }}" alt="Logo" class="h-12 mx-auto sm:mx-0">
                 <span class="font-logo text-2xl sm:text-4xl">Hest Test Calender</span>
             </a>
@@ -108,9 +108,9 @@
     {% endif %}
 
 
-
+    <main class="flex-grow bg-background">
     {% block body %}{% endblock %}
-
+    </main>
     <!-- Footer Section -->
     <footer class="bg-secondary text-white text-center py-12 px-6 ">
         <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-left">

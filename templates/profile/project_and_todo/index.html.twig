@@ -26,12 +26,20 @@
             <h3 class="text-xl font-bold mb-4">Månedsoversigt</h3>
             <div class="grid grid-cols-7 gap-2">
                 {% for day in monthlyData %}
-                    <div class="p-4 border rounded-lg bg-gray-100 text-center">
-                        {{ day.date|date('d') }}
+                    <div class="p-4 border rounded-lg bg-background text-center">
+                        {{ day.date|date('d ') }}
                         <br>
-                        <a href="#" class="text-blue-500">+ Tilføj TODO</a>
+
+                        {% for todo in day.todo %}  {# Explicitly loop over "todo" array inside "day" #}
+                            <p>{{ todo.title }}</p> {# Print the title of the todo #}
+                        {% else %}
+                            <p class="text-gray-400"
+                            ></p> {# Optional: Show message if no todos #}
+                        {% endfor %}
                     </div>
+
                 {% endfor %}
+
             </div>
         </div>
     </div>
