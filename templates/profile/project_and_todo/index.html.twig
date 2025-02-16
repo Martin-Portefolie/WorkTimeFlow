@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tidsregistrering{% endblock %}
+
+{% block body %}
+    <div class="max-w-6xl mx-auto p-6">
+        <!-- Month Navigation -->
+        <div class="flex justify-between items-center bg-gray-100 p-4 rounded-lg mb-6">
+            <a href="{{ path('app_profile', { 'year': month == 1 ? year - 1 : year, 'month': month == 1 ? 12 : month - 1 }) }}"
+               class="px-4 py-2 bg-gray-300 rounded-lg">
+                ← Forrige måned
+            </a>
+
+            <span class="text-lg font-semibold">
+            {{ (year ~ '-' ~ month ~ '-01')|date("F") }} {{ year }}
+            </span>
+
+            <a href="{{ path('app_profile', { 'year': month == 12 ? year + 1 : year, 'month': month == 12 ? 1 : month + 1 }) }}"
+               class="px-4 py-2 bg-gray-300 rounded-lg">
+                Næste måned →
+            </a>
+        </div>
+
+        <!-- Monthly Calendar -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">Månedsoversigt</h3>
+            <div class="grid grid-cols-7 gap-2">
+                {% for day in monthlyData %}
+                    <div class="p-4 border rounded-lg bg-gray-100 text-center">
+                        {{ day.date|date('d') }}
+                        <br>
+                        <a href="#" class="text-blue-500">+ Tilføj TODO</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
