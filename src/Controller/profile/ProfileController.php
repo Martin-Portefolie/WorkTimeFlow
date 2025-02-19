@@ -2,7 +2,9 @@
 
 namespace App\Controller\profile;
 
+use App\Entity\Project;
 use App\Entity\Todo;
+use App\Entity\User;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
@@ -39,12 +41,11 @@ final class ProfileController extends AbstractController
             $month = (int)$currentDate->format('m');
         }
 
-        // Get the number of days in the selected month
-// Correct calculation of the start of the month
         $startOfMonth = new DateTimeImmutable("$year-$month-01", $timezone);
-        $daysInMonth = (int) $startOfMonth->format('t'); // Correct number of days in the selected month
+        $daysInMonth = (int) $startOfMonth->format('t');
 
         $monthlyData = [];
+        # TODO, this for loop, should be redesigned.
         for ($i = 1; $i < $daysInMonth +1 ; $i++) {
             $currentDay = $startOfMonth->modify("+$i days");
 
@@ -56,14 +57,18 @@ final class ProfileController extends AbstractController
         }
 
 
-        // Fetch all todos
+        $users = $this->entityManager->getRepository(User::class)->findAll();
         $todos = $this->entityManager->getRepository(Todo::class)->findAll();
         $this->assignTodosAndTimelogs($monthlyData, $todos);
+
+        $projects = $this->entityManager->getRepository(Project::class)->findAll();
 
         return $this->render('profile/project_and_todo/index.html.twig', [
             'year' => $year,
             'month' => $month,
             'monthlyData' => $monthlyData,
+            'projects' => $projects,
+            'users' => $users
         ]);
     }
 
