@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+{% block title %}Time Register - Week {{ week }}{% endblock %}
+
+
+{% block body %}
+
+
+{#    {{dump(_context|keys) }}#}
+{#    {{dump(todos) }}#}
+    <section class="relative bg-background py-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <!-- Week Navigation -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-2">
+                    <a href="{{ path('app_time_register', { week: week == 1 ? 53 : week - 1, year: week == 1 ? year - 1 : year }) }}"
+                       class="py-2 px-4 bg-gray-200 text-black rounded-md hover:bg-gray-300">Previous week</a>
+                    <a href="{{ path('app_time_register') }}" class="py-2 px-4 bg-alternate text-white rounded-md hover:bg-indigo-700"> Today</a>
+                    <a href="{{ path('app_time_register', { week: week == 53 ? 1 : week + 1, year: week == 53 ? year + 1 : year }) }}"
+                       class="py-2 px-4 bg-gray-200 text-black rounded-md hover:bg-gray-300">Next week</a>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto border rounded-lg shadow-sm" data-controller="timelog-autosave">
+                <table class="min-w-full w-full table-auto bg-white">
+
+                    <!-- Table Head -->
+                    <thead>
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-medium text-black bg-gray-300">{{ year }} | Week: {{ week }}</th>
+                        {% for day in weeklyData %}
+                            <th class="py-3 px-4 text-center text-sm font-medium text-black {% if day.date|date('N') in [6, 7] %}bg-gray-100{% else %}bg-blue-100{% endif %}">
+                                {{ day.date|date('d/m') }}<br>{{ day.date|date('D') }}
+                            </th>
+                        {% endfor %}
+                        <th class="py-3 px-4 text-center text-sm font-medium text-black bg-gray-300">Total</th>
+                    </tr>
+                    </thead>
+
+                    <!-- Table Body -->
+                    <tbody>
+                    {% for todo in todos %}
+                        {% set row_total = 0 %}
+                        <tr>
+                            <!-- Todo Name -->
+                            <td class="py-3 px-4 border-b text-sm bg-gray-50">
+                                <a href="#" class="text-black hover:underline">{{ todo.name }}</a>
+                            </td>
+
+                            <!-- Time Logs -->
+                            {% for day in weeklyData %}
+                                {% set day_total = 0 %}
+                                <td class="py-3 px-4 border-b text-center text-sm {% if day.date|date('N') in [6, 7] %}bg-gray-100{% else %}bg-blue-50{% endif %}">
+                                    {% for timelog in day.timelog %}
+                                        {% if timelog.todo_id == todo.id %}
+                                            {% set day_total = day_total + timelog.hours * 60 + timelog.minutes %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% set row_total = row_total + day_total %}
+
+                                    <!-- Display Input Field with Auto-Save Logic -->
+                                    <label>
+                                        <input
+                                                type="time"
+                                                name="time_{{ day.date|date('Ymd') }}_{{ todo.id }}"
+                                                value="{% if day_total > 0 %}{{ '%02d:%02d'|format((day_total / 60)|round(0, 'floor'), day_total % 60) }}{% else %}00:00{% endif %}"
+                                                class="block mx-auto border-gray-300 rounded-md shadow-sm autosave-input"
+                                                data-todo-id="{{ todo.id }}"
+                                                data-date="{{ day.date|date('Y-m-d') }}"
+                                        />
+                                    </label>
+
+                                </td>
+                            {% endfor %}
+
+                            <!-- Row Total -->
+                            <td class="py-3 px-4 border-b text-center text-sm  bg-gray-50">
+                                {{ (row_total / 60)|round(0, 'floor') }}h {{ row_total % 60 }}m
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+
+                    <!-- Table Footer -->
+                    <tfoot>
+                    <tr>
+                        <td class="py-3 px-4  bg-gray-300 text-black">Total</td>
+                        {% for day in weeklyData %}
+                            <td class="py-3 px-4 text-center  {% if day.date|date('N') in [6, 7] %}bg-gray-100{% else %}bg-blue-100{% endif %}">
+                                {{ (day.dayTotal / 60)|round(0, 'floor') }}h {{ day.dayTotal % 60 }}m
+                            </td>
+                        {% endfor %}
+                        <td class="py-3 px-4 text-center  bg-gray-300 text-black">
+                            {{ (weeklyTotal / 60)|round(0, 'floor') }}h {{ weeklyTotal % 60 }}m
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </section>
+{% endblock %}

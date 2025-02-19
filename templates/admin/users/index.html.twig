@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Management{% endblock %}
+
+{% block body %}
+    <section class="relative bg-background py-10">
+        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+            <div class="flex items-center justify-between mb-5">
+                <h1 class="text-lg text-text-standard">User Management</h1>
+                <a href="{{ path('admin_user_new') }}" class="inline-flex justify-center py-2 px-4 bg-alternate text-white rounded-md">
+                    Create New User
+                </a>
+            </div>
+
+            <div class="space-y-6">
+                {% for user in userDataArray %}
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <form action="{{ path('admin_user_update', { id: user.id }) }}" method="post">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Username -->
+                                <div>
+                                    <label for="name_{{ user.id }}" class="block text-sm text-text-standard">Name</label>
+                                    <input type="text" name="name" id="name_{{ user.id }}" value="{{ user.name }}"
+                                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-text-standard">
+                                </div>
+
+                                <!-- Email -->
+                                <div>
+                                    <label for="email_{{ user.id }}" class="block text-sm text-text-standard">Email</label>
+                                    <input type="email" name="email" id="email_{{ user.id }}" value="{{ user.email }}"
+                                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-text-paragraph">
+                                </div>
+
+                                <!-- Reset Password -->
+                                <div class="col-span-2">
+                                    <label for="password_{{ user.id }}" class="block text-sm text-text-standard">New Password</label>
+                                    <input type="password" name="new_password" id="password_{{ user.id }}"
+                                           placeholder="Enter new password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-text-standard">
+                                </div>
+
+                                <!-- Roles -->
+                                <div class="col-span-2">
+                                    <label class="block text-sm text-text-standard">Roles</label>
+                                    <div class="flex space-x-4 mt-1">
+                                        <label>
+                                            <input type="checkbox" name="roles[]" value="ROLE_USER" {% if 'ROLE_USER' in user.roles %}checked{% endif %}> User
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="roles[]" value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}checked{% endif %}> Admin
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Teams -->
+                                <div class="col-span-2">
+                                    <label class="block text-sm text-text-standard">Teams</label>
+                                    <div class="flex flex-wrap gap-4 mt-1">
+                                        {% for team in allTeams %}
+                                            <label>
+                                                <input type="checkbox" name="team_ids[]" value="{{ team.id }}" {% if team in user.teams %}checked{% endif %}>
+                                                {{ team.name }}
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end space-x-3 mt-4">
+                                <button type="submit" class="py-2 px-4 shadow-sm text-base rounded-md text-white bg-success hover:bg-primary focus:outline-none">
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
