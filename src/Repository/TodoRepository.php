@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Todo;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,20 @@ class TodoRepository extends ServiceEntityRepository
         parent::__construct($registry, Todo::class);
     }
 
-    //    /**
-    //     * @return Todo[] Returns an array of Todo objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Get todos for projects where the user is assigned to a team.
+     */
+    public function findTodosByUserProjects(User $user, array $projects): array
+    {
+        return $this->createQueryBuilder('todo')
+            ->leftJoin('todo.timelogs', 'timelog')
+            ->select('todo, COALESCE(SUM(timelog.totalMinutes), 0) AS totalMinutesLogged')
+            ->where('todo.project IN (:projects)')
+            ->setParameter('projects', $projects)
+            ->groupBy('todo.id')
+            ->getQuery()
+            ->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT); // ✅ Ensures Doctrine returns objects
 
-    //    public function findOneBySomeField($value): ?Todo
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    }
+
 }

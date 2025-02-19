@@ -39,19 +39,19 @@ class CreateProjectCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        // Find the client "Heste-test aps"
+        // Find the client "Heste-status aps"
         $client = $this->entityManager->getRepository(Client::class)
-            ->findOneBy(['name' => 'Heste-test aps']);
+            ->findOneBy(['name' => 'Heste-status aps']);
 
         if (!$client) {
-            $io->error('ClientFixtures "Heste-test aps" not found. Please create the client first.');
+            $io->error('ClientFixtures "Heste-status aps" not found. Please create the client first.');
             return Command::FAILURE;
         }
 
         // Create Project and link it to the client
         $project = new Project();
         $project->setName('Project Pegasus');
-        $project->setDescription('A new project owned by Heste-test aps');
+        $project->setDescription('A new project owned by Heste-status aps');
         $project->setClient($client);
         $project->setActive(true);
 
@@ -59,7 +59,7 @@ class CreateProjectCommand extends Command
         $this->entityManager->persist($project);
         $this->entityManager->flush();
 
-        $io->success('Project "Project Pegasus" created for client "Heste-test aps".');
+        $io->success('Project "Project Pegasus" created for client "Heste-status aps".');
 
         return Command::SUCCESS;
     }

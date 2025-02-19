@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <section class="relative bg-gray-100 py-12 px-6 mt-6">
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Opret en ny Todo</h2>
+
+            {{ form_start(form, { 'attr': {'class': 'space-y-6'} }) }}
+
+            <!-- Todo Name -->
+            <div>
+                {{ form_label(form.name, null, { 'attr': {'class': 'block text-sm font-medium text-gray-700'} }) }}
+                {{ form_widget(form.name, { 'attr': {'class': 'w-full p-2 border rounded-md focus:ring focus:ring-indigo-300'} }) }}
+            </div>
+
+            <!-- Select Project -->
+            <div>
+                {{ form_label(form.project, null, { 'attr': {'class': 'block text-sm font-medium text-gray-700'} }) }}
+                {{ form_widget(form.project, { 'attr': {'class': 'w-full p-2 border rounded-md focus:ring focus:ring-indigo-300'} }) }}
+            </div>
+
+            <!-- Start Date -->
+            <div>
+                {{ form_label(form.dateStart, null, { 'attr': {'class': 'block text-sm font-medium text-gray-700'} }) }}
+                {{ form_widget(form.dateStart, { 'attr': {'class': 'w-full p-2 border rounded-md focus:ring focus:ring-indigo-300'} }) }}
+            </div>
+
+            <!-- End Date -->
+            <div>
+                {{ form_label(form.dateEnd, null, { 'attr': {'class': 'block text-sm font-medium text-gray-700'} }) }}
+                {{ form_widget(form.dateEnd, { 'attr': {'class': 'w-full p-2 border rounded-md focus:ring focus:ring-indigo-300'} }) }}
+            </div>
+
+            <!-- Status Selection -->
+            <div>
+                {{ form_label(form.status, null, { 'attr': {'class': 'block text-sm font-medium text-gray-700'} }) }}
+                {{ form_widget(form.status, { 'attr': {'class': 'w-full p-2 border rounded-md focus:ring focus:ring-indigo-300'} }) }}
+            </div>
+
+
+
+            {{ form_end(form) }}
+        </div>
+    </section>
+{% endblock %}
