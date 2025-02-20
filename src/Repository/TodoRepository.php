@@ -29,7 +29,7 @@ class TodoRepository extends ServiceEntityRepository
             ->setParameter('projects', $projects)
             ->groupBy('todo.id')
             ->getQuery()
-            ->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT); // ✅ Ensures Doctrine returns objects
+            ->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
 
     }
 

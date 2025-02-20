@@ -7,6 +7,7 @@ use App\Entity\Todo;
 use App\Entity\User;
 use App\Enum\TodoStatus;
 use App\Form\Profile\TodoType;
+use App\Service\UserProjectService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -18,36 +19,45 @@ use Symfony\Component\Routing\Attribute\Route;
 final class StatusController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+    private UserProjectService $userProjectService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, UserProjectService $userProjectService)
     {
         $this->entityManager = $entityManager;
+        $this->userProjectService = $userProjectService;
     }
 
     #[Route('/profile/status/{year?}/{month?}', name: 'app_status', defaults: ['year' => null, 'month' => null])]
     public function index(?int $year = null, ?int $month = null): Response
     {
-        # 1.0 User check
+        # 1.0 User, y
         $user = $this->getAuthenticatedUser();
         if (!$user) {
             return $this->json(['error' => 'User not logged in'], 403);
         }
 
+
         # 2.0 Get teams and projects
-        $teams = $this->getUserTeams($user);
-        $projects = $this->getProjectsByUser($user);
-        $teamProjects = $this->mapTeamsToProjects($teams, $projects);
+        $teams = $this->userProjectService->getUserTeams($user);
+        $projects = $this->userProjectService->getProjectsByUser($user);
+        $teamProjects = $this->userProjectService->mapTeamsToProjects($teams, $projects);
+
 
         # 3.0 Get Todos
-        $todos = $this->getTodosByUserProjects($user, $projects);
+        $todos = $this->userProjectService->getTodosByUserProjects($user, $projects);
         $todoData = [];
         foreach ($todos as $todo) {
+            if (!is_array($todo) || !isset($todo[0])) {
+                continue; // Skip invalid todos
+            }
+
             $todoData[] = [
                 'id' => $todo[0]->getId(),
                 'name' => $todo[0]->getName(),
-                'status' => $todo[0]->getStatus()->value, // Ensure we get the status as a string
+                'status' => $todo[0]->getStatus()->value,
                 'project_id' => $todo[0]->getProject()->getId(),
                 'project_name' => $todo[0]->getProject()->getName(),
+                'totalMinutesLogged' => $todo['totalMinutesLogged'] ?? 0, // Ensure this is always available
             ];
         }
 
@@ -148,54 +158,6 @@ final class StatusController extends AbstractController
         return $this->getUser();
     }
 
-    /**
-     *  2.0 Get teams the user belongs to.
-     */
-    private function getUserTeams(User $user): array
-    {
-        return $user->getTeams()->toArray();
-    }
-
-     /**
-     * 2.1 Maps teams to their assigned projects.
-     *
-     * This function takes an array of teams and an array of projects,
-     * then organizes the projects under each team they belong to.
-     */
-    private function mapTeamsToProjects(array $teams, array $projects): array
-    {
-        $teamProjects = [];
-
-        foreach ($teams as $team) {
-            $teamProjects[$team->getName()] = [];
-            foreach ($projects as $project) {
-                if ($project->getTeams()->contains($team)) {
-                    $teamProjects[$team->getName()][] = [
-                        'id' => $project->getId(),
-                        'name' => $project->getName(),
-                    ];
-                }
-            }
-        }
-
-        return $teamProjects;
-    }
-
-    /**
-     *  3.0 Fetch projects for user.
-     */
-    private function getProjectsByUser(User $user): array
-    {
-        return $this->entityManager->getRepository(Project::class)->findProjectsByUser($user);
-    }
-
-    /**
-     *  4.0 Fetch todos linked to user’s projects.
-     */
-    private function getTodosByUserProjects(User $user, array $projects): array
-    {
-        return $this->entityManager->getRepository(Todo::class)->findTodosByUserProjects($user, $projects);
-    }
 
     /**
      *  5.0 Generate calendar data for the given month.
