@@ -13,7 +13,7 @@
         {% endblock %}
     </head>
     <body>
-    <!-- #TODO FIX Language -->
+
     <!-- #TODO Restyle -->
     <!-- #TODO Rethink colors if time be -->
 
@@ -39,10 +39,7 @@
                     <img src="{{ asset('icons/profile_menu/todo.svg') }}" alt="Projekter og Todos" class="h-5 w-5">
                     <span class="">Status</span>
                 </a>
-                <a href="{{ path('app_user') }}" class="flex items-center justify-center sm:justify-start space-x-2 hover:text-gray-300 transition py-2">
-                    <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="Bruger og Teams" class="h-5 w-5">
-                    <span class=""> Bruger: {{ app.user.username }}</span>
-                </a>
+
             </div>
             {% endif %}
             <!-- Right: User/Login & Language -->
@@ -61,11 +58,23 @@
                 {% endif %}
 
                 <!-- Language Selector  -->
+{#                <div class="flex justify-center sm:justify-start">#}
+{#                    <a href="#" class="flex items-center space-x-1 hover:text-gray-300 transition">#}
+{#                        <img src="{{ asset('icons/profile_menu/globe.svg') }}" alt="Globe" class="h-4">#}
+{#                        <span>Dansk</span>#}
+{#                    </a>#}
+{#                </div>#}
+                <!-- #DELETE ONLY FOR TESTING PURPOSE   -->
                 <div class="flex justify-center sm:justify-start">
-                    <a href="#" class="flex items-center space-x-1 hover:text-gray-300 transition">
-                        <img src="{{ asset('icons/profile_menu/globe.svg') }}" alt="Globe" class="h-4">
-                        <span>Dansk</span>
+                    <a href="{{ path('app_test') }}" class="flex items-center space-x-1 hover:text-gray-300 transition">
+                        <span>Test</span>
                     </a>
+                </div>
+                <div class="flex justify-center sm:justify-start">
+                <a href="{{ path('app_user') }}" class="flex items-center justify-center sm:justify-start space-x-2 hover:text-gray-300 transition py-2">
+                    <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="Bruger og Teams" class="h-5 w-5">
+                    <span class=""> Bruger: {{ app.user }}</span>
+                </a>
                 </div>
             </div>
 
