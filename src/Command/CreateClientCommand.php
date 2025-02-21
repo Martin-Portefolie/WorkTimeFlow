@@ -35,7 +35,7 @@ class CreateClientCommand extends Command
 
         // Create ClientFixtures Entity
         $client = new Client();
-        $client->setName('Heste-test Aps');
+        $client->setName('Heste-status Aps');
         $client->setContactPhone('12345678');
         $client->setContactEmail('MrHorse@Test.com');
 
@@ -43,7 +43,7 @@ class CreateClientCommand extends Command
         $this->entityManager->persist($client);
         $this->entityManager->flush();
 
-        $io->success('ClientFixtures "Heste-test aps" created with contact person "Mr Horse".');
+        $io->success('ClientFixtures "Heste-status aps" created with contact person "Mr Horse".');
 
         return Command::SUCCESS;
     }

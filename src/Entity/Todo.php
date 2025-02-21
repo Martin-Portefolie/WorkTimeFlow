@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\TodoStatus;
 use App\Repository\TodoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -33,6 +34,9 @@ class Todo
      */
     #[ORM\OneToMany(targetEntity: Timelog::class, mappedBy: 'todo')]
     private Collection $timelogs;
+
+    #[ORM\Column(type: 'string', length: 50, enumType: TodoStatus::class, options: ['default' => 'Pending'])]
+    private TodoStatus $status = TodoStatus::PENDING;
 
     public function __construct()
     {
@@ -120,6 +124,18 @@ class Todo
                 $timelog->setTodo(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStatus(): TodoStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(TodoStatus $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

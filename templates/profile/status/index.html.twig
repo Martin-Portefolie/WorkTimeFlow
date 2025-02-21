@@ -1,0 +1,152 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <!-- #TODO Calender Section should show the correct days -->
+    <!-- #TODO When updating status on todos, should update status on the callender aswell  -->
+
+    <!-- 🔹 Calendar Section -->
+    <section class="relative bg-section py-10">
+        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+
+            <!-- Month Header -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-neutral-900">
+                    {{ "now"|date("F") }} {{ year }}
+                </h2>
+                <div class="flex items-center gap-2 bg-neutral-100 p-2 rounded-lg shadow-sm">
+                    <a href="{{ path('app_status', { 'month': month - 1, 'year': year }) }}"
+                       class="px-4 py-2 text-sm font-medium text-neutral-500 hover:bg-white hover:text-primary rounded-md">
+                        ◀ Forrige Måned
+                    </a>
+                    <a href="{{ path('app_status', { 'month': month + 1, 'year': year }) }}"
+                       class="px-4 py-2 text-sm font-medium text-neutral-500 hover:bg-white hover:text-primary rounded-md">
+                        Næste Måned ▶
+                    </a>
+                </div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="grid grid-cols-7 border-t border-gray-300 text-center">
+                {% for day in ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'] %}
+                    <div class="p-4 font-semibold bg-gray-200 text-neutral-900">
+                        {{ day }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Calendar Days -->
+            <div class="grid grid-cols-7 gap-1">
+                {% for day in calendar %}
+                    <div class="min-h-[8rem] p-3 border rounded-md bg-white hover:bg-gray-100 transition">
+                        <p class="text-neutral-800 font-semibold text-sm">
+                            {{ day.date|date("j") }}
+                        </p>
+
+                        {% if day.todos is not empty %}
+                            <ul class="mt-2">
+                                {% for todo in day.todos %}
+                                    <li class="bg-background p-2 rounded-md shadow-sm hover:bg-gray-200 transition">
+                                        <p class="text-sm font-semibold">
+                                            {{ todo.name }}
+                                        </p>
+                                        <p class="text-blue-500 text-xs">
+                                            {{ todo.project_name }}
+                                        </p>
+                                        <p class="text-red-500 text-xs">
+                                            {{ todo.logged_time }}
+                                        </p>
+                                        <p class="text-green-500 text-xs">
+                                            {{ todo.status }}
+                                        </p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-gray-500 text-xs mt-1">n/a</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 🔹 Teams & Projects Section -->
+    <section class="relative bg-background py-10 px-6 mt-6">
+        <h2 class="text-2xl font-bold text-neutral-900 mb-6">Mine Teams & Projekter</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+            {% for teamName, projects in teamProjects %}
+                <div class="border p-5 rounded-lg shadow-md {% if loop.index is even %}bg-gray-50{% else %}bg-white{% endif %}">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        {{ teamName }}
+                    </h3>
+                    {% if projects is not empty %}
+                        <ul class="list-disc pl-5">
+                            {% for project in projects %}
+                                <li class="text-gray-700 font-medium">
+                                    {{ project.name }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-gray-500 text-sm">Ingen Projekter</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- 🔹 Todos Section -->
+    <section class="relative bg-gray-100 py-12 px-6 mt-6">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Mine Todos</h2>
+                <a href="{{ path('new_todo') }}" class="bg-primary text-white px-4 py-2 rounded-lg shadow-md hover:bg-secondary transition">
+                    + Add New Todo
+                </a>
+            </div>
+
+            <!-- Todos Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {% for todo in todos %}
+                    <div class="bg-white border p-5 rounded-lg shadow-md hover:shadow-lg transition">
+
+                        <!-- Todo Title -->
+                        <h3 class="text-lg font-semibold text-neutral-900">
+                            {{ todo.name }}
+                        </h3>
+
+                        <!-- Project Name -->
+                        <p class="text-sm text-neutral-500">
+                            <span class="font-medium text-indigo-600">Projekt:</span> {{ todo.project_name }}
+                        </p>
+
+                        <!-- Status Form -->
+                        <form action="{{ path('update_todo_status', { 'id': todo.id }) }}" method="POST" class="mt-3">
+                            <label for="status-{{ todo.id }}" class="block text-sm font-medium text-gray-700">
+                                Status
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <select name="status" id="status-{{ todo.id }}" class="w-full p-2 border rounded-md focus:ring focus:ring-indigo-300">
+                                    {% for status in ['pending', 'in_progress', 'completed', 'paused', 'review'] %}
+                                        <option value="{{ status }}" {% if todo.status == status %}selected{% endif %}>
+                                            {{ status|title }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">
+                                    ✓
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
