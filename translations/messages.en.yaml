@@ -8,6 +8,9 @@ client_management:
     phone: "Contact Phone"
     projects: "Projects"
     save: "Save"
+    previous: "Previous"
+    next: "Next"
+    page: "Page"
   new:
     title: "Create New Client"
     client_name: "Client Name (firm)"

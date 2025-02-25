@@ -38,6 +38,7 @@ class CreateClientCommand extends Command
         $client->setName('Heste-status Aps');
         $client->setContactPhone('12345678');
         $client->setContactEmail('MrHorse@Test.com');
+        $client->setContactPerson('Test Hest');
 
         // Save ClientFixtures to Database
         $this->entityManager->persist($client);

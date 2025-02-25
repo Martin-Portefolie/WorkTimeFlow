@@ -18,7 +18,7 @@
 
             <!-- Client List -->
             <div class="space-y-6">
-                {% for client in clientDataArray %}
+                {% for client in pager.currentPageResults %}
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <form action="#" method="post">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -35,29 +35,26 @@
                                     <label for="contact_person_{{ client.id }}" class="block text-sm">
                                         {{ 'client_management.index.contact_person'|trans }}
                                     </label>
-                                    <input type="text" name="contact_person" id="contact_person_{{ client.id }}" value="{{ client.contact }}"
+                                    <input type="text" name="contact_person" id="contact_person_{{ client.id }}" value="{{ client.contactPerson }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
-
                                 <!-- Contact Email -->
                                 <div>
                                     <label for="email_{{ client.id }}" class="block text-sm text-text-standard">
                                         {{ 'client_management.index.email'|trans }}
                                     </label>
-                                    <input type="email" name="email" id="email_{{ client.id }}" value="{{ client.email }}"
+                                    <input type="email" name="email" id="email_{{ client.id }}" value="{{ client.contactEmail }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none text-text-paragraph">
                                 </div>
-
                                 <!-- Contact Phone -->
                                 <div>
                                     <label for="phone_{{ client.id }}" class="block text-sm text-text-standard">
                                         {{ 'client_management.index.phone'|trans }}
                                     </label>
-                                    <input type="text" name="phone" id="phone_{{ client.id }}" value="{{ client.phone }}"
+                                    <input type="text" name="phone" id="phone_{{ client.id }}" value="{{ client.contactPhone }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none text-text-paragraph">
                                 </div>
                             </div>
-
                             {% if client.projects is not empty %}
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
                                     <!-- Projects -->
@@ -73,11 +70,10 @@
                                     </div>
                                 </div>
                             {% endif %}
-
                             <div class="flex justify-end space-x-3 mt-4">
                                 <!-- Save Button -->
                                 <button type="submit"
-                                        class="py-2 px-4 shadow-sm rounded-md text-white bg-save hover:bg-button-hover-update focus:outline-none">
+                                        class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-save hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
                                     {{ 'client_management.index.save'|trans }}
                                 </button>
                             </div>
@@ -85,6 +81,31 @@
                     </div>
                 {% endfor %}
             </div>
+
+            <!-- Pagination Controls -->
+            {% if pager.nbPages > 1 %}
+                <div class="flex items-center mt-6 space-x-4">
+                    {% if pager.hasPreviousPage %}
+                        <a href="{{ pagerfanta_page_url(pager, pager.previousPage) }}"
+                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-pagination hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                            {{ 'client_management.index.previous'|trans }}
+                        </a>
+                    {% endif %}
+                    {% if pager.hasNextPage %}
+                        <a href="{{ pagerfanta_page_url(pager, pager.nextPage) }}"
+                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-pagination hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                            {{ 'client_management.index.next'|trans }}
+                        </a>
+                    {% endif %}
+                    <div class="ml-4">
+                        {{ 'client_management.index.page'|trans }} {{ pager.currentPage }}/{{ pager.nbPages }}
+                    </div>
+                </div>
+            {% endif %}
+
+
+
+
         </div>
     </section>
 {% endblock %}

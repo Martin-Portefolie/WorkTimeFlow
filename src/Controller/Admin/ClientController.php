@@ -55,6 +55,8 @@ final class ClientController extends AbstractController{
         return $this->render('admin/client/index.html.twig', [
             'controller_name' => 'ClientController',
             'clientDataArray' => $clientDataArray,
+            'pager' => $pagerfanta,
+
         ]);
     }
 
