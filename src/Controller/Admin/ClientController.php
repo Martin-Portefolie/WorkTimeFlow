@@ -22,6 +22,7 @@ final class ClientController extends AbstractController{
     public function index(): Response
     {
         $clientdata = $this->entityManager->getRepository(Client::class)->findAll();
+        $clientDataArray = [];
 
         foreach ($clientdata as $clients){
             $clientDataArray[] = [
@@ -40,7 +41,7 @@ final class ClientController extends AbstractController{
         ]);
     }
 
-    // Create a new client
+
     #[Route('/admin/new', name: 'admin_client_new')]
     public function new(Request $request): Response
     {
