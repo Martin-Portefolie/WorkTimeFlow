@@ -5,10 +5,19 @@ namespace App\Controller\Admin;
 use App\Entity\Client;
 use App\Form\ClientType;
 use Doctrine\ORM\EntityManagerInterface;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+
+
+
+
+
+
 
 final class ClientController extends AbstractController{
 
@@ -19,8 +28,15 @@ final class ClientController extends AbstractController{
     }
 
     #[Route('/admin/client', name: 'admin_client')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
+
+        $queryBuilder = $this->entityManager->getRepository(Client::class)->createQueryBuilder('c');
+        $pagerfanta = new Pagerfanta(new QueryAdapter($queryBuilder));
+        $pagerfanta->setMaxPerPage(10);
+        $pagerfanta->setCurrentPage($request->query->getInt('page', 1));
+
+
         $clientdata = $this->entityManager->getRepository(Client::class)->findAll();
         $clientDataArray = [];
 
