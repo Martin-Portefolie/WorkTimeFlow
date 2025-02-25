@@ -56,6 +56,7 @@ module.exports = {
         new: custom_colors.green,
         muted: grey[200],
         pagination: custom_colors.dark_purple,
+        search: custom_colors.purple,
 
         success: "#10B981", // Green (active)
         warning: "#F59E0B", // Yellow (pending)
