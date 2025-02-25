@@ -3,15 +3,15 @@
 {% block title %}Client Management{% endblock %}
 
 {% block body %}
-    <section class="relative bg-background py-10">
+    <section class="relative bg-section_2 py-10">
         <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
             <!-- Header Section -->
             <div class="flex items-center justify-between mb-5">
-                <h1 class=" text-lg text-text-standard">Client Management</h1>
+                <h1 class=" text-2xl text-dark">Client Management</h1>
 
                 <!-- Create New ClientFixtures Button -->
                 <a href="{{ path('admin_client_new') }}"
-                   class="inline-flex justify-center py-2 px-4 shadow-sm text-base  rounded-md text-white bg-alternate hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                   class="inline-flex justify-center py-2 px-4 shadow-sm   rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
                     Create New Client
                 </a>
             </div>
@@ -24,9 +24,9 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <!-- ClientFixtures Name -->
                                 <div>
-                                    <label for="name_{{ client.id }}" class="block text-sm text-text-standard ">Name</label>
+                                    <label for="name_{{ client.id }}" class="block text-sm  ">Name</label>
                                     <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.name }}"
-                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none text-text-standard">
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none ">
                                 </div>
 
                                 <!-- ClientFixtures Email -->
@@ -43,7 +43,8 @@
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none text-text-paragraph">
                                 </div>
 
-                                <!-- Projects (non-editable) -->
+                                {% if client.projects is not empty %}
+                                <!-- Projects  -->
                                 <div>
                                     <label class="block text-sm text-text-standard ">Projects</label>
                                     <ul class="mt-1 text-sm text-text-standard bg-background-muted rounded-md p-2 border border">
@@ -53,11 +54,12 @@
                                     </ul>
                                 </div>
                             </div>
+                            {% endif %}
 
                             <div class="flex justify-end space-x-3 mt-4">
                                 <!-- Save Button -->
                                 <button type="submit"
-                                        class="py-2 px-4 shadow-sm text-base  rounded-md text-white bg-success hover:bg-button-hover-update focus:outline-none">
+                                        class="py-2 px-4 shadow-sm   rounded-md text-white bg-save hover:bg-button-hover-update focus:outline-none">
                                     Save
                                 </button>
                             </div>

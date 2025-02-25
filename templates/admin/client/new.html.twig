@@ -3,30 +3,30 @@
 {% block title %}Create New Client{% endblock %}
 
 {% block body %}
-    <section class="relative bg-neutral-100 py-10">
+    <section class="relative bg-background py-10">
         <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
             <div class="flex items-center justify-between mb-5">
-                <h1 class="text-2xl font-semibold text-gray-900">Create New Client</h1>
+                <h1 class="text-2xl  text-dark">Create New Client</h1>
             </div>
 
             {{ form_start(form) }}
-            <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
+            <div class="bg-section_1 p-6 rounded-lg shadow-md space-y-4">
                 <!-- ClientFixtures Name -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">{{ form_label(form.name, 'Client Name') }}</label>
-                    {{ form_widget(form.name, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900' } }) }}
+                    <label class="block text-sm  text-dark">{{ form_label(form.name, 'Client Name') }}</label>
+                    {{ form_widget(form.name, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
                 </div>
 
                 <!-- Contact Email -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">{{ form_label(form.contactEmail, 'Client Email') }}</label>
-                    {{ form_widget(form.contactEmail, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900' } }) }}
+                    <label class="block text-sm text-dark">{{ form_label(form.contactEmail, 'Client Email') }}</label>
+                    {{ form_widget(form.contactEmail, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
                 </div>
 
                 <!-- Contact Phone -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">{{ form_label(form.contactPhone, 'Client Phone') }}</label>
-                    {{ form_widget(form.contactPhone, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900' } }) }}
+                    {{ form_widget(form.contactPhone, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
                 </div>
 
                 <!-- Submit Button -->

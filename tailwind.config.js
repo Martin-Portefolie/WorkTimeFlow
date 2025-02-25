@@ -17,9 +17,11 @@ const custom_colors = {
   dark_purple: "#7C3AED",
       purple: "#A78BFA",
       blue: "#2563EB",
+      green: "#10B981",
       blue_hoover: "#4F8FF7",
       pastel_rosa: "#F5EFFF",
       pastel_green: "#EFFFF5"
+
 };
 
 module.exports = {
@@ -48,8 +50,10 @@ module.exports = {
           900: "#1F2937",
         },
 
-        white: grey[0],  // ✅ White
-        dark: grey[900], // ✅ Darkest Grey
+        white: grey[0],
+        dark: grey[900],
+        save: custom_colors.blue,
+        new: custom_colors.green,
 
         success: "#10B981", // Green (active)
         warning: "#F59E0B", // Yellow (pending)
