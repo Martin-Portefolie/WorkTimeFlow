@@ -5,6 +5,8 @@ namespace App\Controller\profile;
 use App\Entity\Timelog;
 use App\Entity\Todo;
 use App\Entity\User;
+use App\Service\DateService;
+use App\Service\UserProjectService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,56 +17,40 @@ use Symfony\Component\Routing\Attribute\Route;
 class TimeRegisterController extends AbstractController
 {
     private $entityManager;
-    public function __construct(EntityManagerInterface $entityManager)
+    private $dateService;
+    private UserProjectService $userProjectService;
+
+    public function __construct(EntityManagerInterface $entityManager, DateService $dateService, UserProjectService $userProjectService)
     {
         $this->entityManager = $entityManager;
+        $this->dateService = $dateService;
+        $this->userProjectService = $userProjectService;
     }
 
     /**
      * @throws \Exception
      */
-    #[Route('/profile/time-register/{week?}-{year?}', name: 'app_time_register', methods: ['GET'])]
+
+    #[Route('/profile/time-register/{week<\d+>?}/{year<\d+>?}', name: 'app_time_register', methods: ['GET'])]
     public function index(Request $request, int $week = null, int $year = null): Response
     {
+
         $timezone = new \DateTimeZone($_ENV['APP_TIMEZONE'] ?? 'Europe/Copenhagen');
-        $currentDate = new \DateTime('now', $timezone);
+        $yearWeekData = $this->dateService->getWeekYear($timezone, $week, $year);
+        $week = $yearWeekData['week'];
+        $year = $yearWeekData['year'];
+        $weekData = $this->dateService->getWeek($week, $year);
+        $data = $weekData['data'];
 
-        if (!$week || !$year) {
-            $week = (int)$currentDate->format('W');
-            $year = (int)$currentDate->format('Y');
-        }
 
-        if ($week < 1) {
-            $week = 53;
-            $year--;
-        } elseif ($week > 53) {
-            $week = 1;
-            $year++;
-        }
-
-        $startOfWeek = new \DateTime();
-        $startOfWeek->setISODate($year, $week)->setTime(0, 0, 0);
-
-        $data = [];
-        for ($i = 0; $i < 7; $i++) {
-            $day = clone $startOfWeek;
-            $day->modify("+$i day");
-
-            $data[] = [
-                'date' => $day,
-                'todo' => [],
-                'timelog' => [],
-            ];
-        }
-
-        // Fetch the current user
-        /** @var User|null $user */
         $user = $this->getUser();
+        if (!$user instanceof \App\Entity\User) {
+            return $this->json(['error' => 'User not logged in'], 403);
+        }
 
-        // Get the user's teams
         $userTeams = $user->getTeams();
 
-        // Fetch Todos associated with Projects linked to the user's teams
+        #TODO Should go into repository
         $todos = $this->entityManager->getRepository(Todo::class)->createQueryBuilder('t')
             ->join('t.project', 'p')
             ->join('p.teams', 'team')
@@ -73,30 +59,44 @@ class TimeRegisterController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        foreach ($todos as $todo) {
+
+
+//        $weeklyTotal = 0;
+//        foreach ($data as &$day) {
+//            $dayTotal = 0;
+//            foreach ($day['timelog'] as $timelog) {
+//                $dayTotal += $timelog['hours'] * 60 + $timelog['minutes'];
+//            }
+//            $day['dayTotal'] = $dayTotal;
+//            $weeklyTotal += $dayTotal;
+//        }
+
+
+
+
+        // ✅ Fetch timelogs for the current user & week
+        $timelogs = $this->entityManager->getRepository(Timelog::class)
+            ->findTimelogsByUserAndWeek($user, $week, $year);
+
+
+
+        // ✅ Assign timelogs to the correct day in weeklyData
+        foreach ($timelogs as $timelog) {
             foreach ($data as &$day) {
-                $dayStart = (clone $day['date'])->setTime(0, 0);
-                $dayEnd = (clone $day['date'])->setTime(23, 59, 59);
-
-                if ($todo->getDateStart() <= $dayEnd && $todo->getDateEnd() >= $dayStart) {
-                    $day['todo'][] = $todo;
-                }
-
-                foreach ($todo->getTimelogs() as $timelog) {
-                    if ($timelog->getDate() >= $dayStart && $timelog->getDate() <= $dayEnd) {
-                        $day['timelog'][] = [
-                            'id' => $timelog->getId(),
-                            'todo_id' => $todo->getId(),
-                            'description' => $timelog->getDescription(),
-                            'hours' => $timelog->getHours(),
-                            'minutes' => $timelog->getMinutes(),
-                            'date' => $timelog->getDate()->format('Y-m-d H:i:s'),
-                        ];
-                    }
+                if ($timelog->getDate()->format('Y-m-d') === $day['date']->format('Y-m-d')) {
+                    $day['timelog'][] = [
+                        'id' => $timelog->getId(),
+                        'todo_id' => $timelog->getTodo()->getId(),
+                        'description' => $timelog->getDescription(),
+                        'hours' => $timelog->getHours(),
+                        'minutes' => $timelog->getMinutes(),
+                        'date' => $timelog->getDate()->format('Y-m-d H:i:s'),
+                    ];
                 }
             }
         }
 
+        // ✅ Calculate weekly total
         $weeklyTotal = 0;
         foreach ($data as &$day) {
             $dayTotal = 0;
@@ -107,22 +107,26 @@ class TimeRegisterController extends AbstractController
             $weeklyTotal += $dayTotal;
         }
 
-        return $this->render('profile/time_register/index.html.twig', [
+        return $this->render('/profile/time_register/index.html.twig', [
             'week' => $week,
             'year' => $year,
-            'weeklyData' => $data,
-            'weeklyTotal' => $weeklyTotal,
             'todos' => $todos,
-
+            'weeklyData' => $data,
+            'weeklyTotal' => $weeklyTotal
         ]);
     }
 
     /**
      * @throws \Exception
      */
-    #[Route('/profile/time-register/save-time', name: 'app_time_register_save_time', methods: ['POST'])]
+    #[Route('/profile/save-time', name: 'app_save_time', methods: ['POST'])]
     public function saveTime(Request $request): JsonResponse
     {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'User not authenticated.'], JsonResponse::HTTP_FORBIDDEN);
+        }
+
         $data = json_decode($request->getContent(), true);
         $todoId = $data['todoId'] ?? null;
         $date = $data['date'] ?? null;
@@ -146,6 +150,7 @@ class TimeRegisterController extends AbstractController
         if (!$timelog) {
             $timelog = new Timelog();
             $timelog->setTodo($todo);
+            $timelog->setUser($user);
             $timelog->setDate(new \DateTime($date));
             $this->entityManager->persist($timelog);
         }
@@ -156,9 +161,11 @@ class TimeRegisterController extends AbstractController
         return new JsonResponse([
             'status' => 'success',
             'todoId' => $todoId,
+            'userId' => $user->getId(),
             'date' => $date,
             'hours' => $timelog->getHours(),
             'minutes' => $timelog->getMinutes(),
         ]);
     }
+
 }

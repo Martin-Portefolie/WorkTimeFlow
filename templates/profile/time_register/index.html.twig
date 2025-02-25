@@ -1,33 +1,105 @@
 {% extends 'base.html.twig' %}
-{% block title %}Time Register - Week {{ week }}{% endblock %}
-
+{% block title %}Time Register - Week {{ week}}{% endblock %}
 
 {% block body %}
-
-
-
     <section class="relative bg-background py-10">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
+
             <!-- Week Navigation -->
             <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center gap-2">
                     <a href="{{ path('app_time_register', { week: week == 1 ? 53 : week - 1, year: week == 1 ? year - 1 : year }) }}"
                        class="py-2 px-4 bg-gray-200 text-black rounded-md hover:bg-gray-300">Previous week</a>
-                    <a href="{{ path('app_time_register') }}" class="py-2 px-4 bg-alternate text-white rounded-md hover:bg-indigo-700"> Today</a>
+                    <a href="{{ path('app_time_register') }}" class="py-2 px-4 bg-alternate text-white rounded-md hover:bg-indigo-700">Today</a>
                     <a href="{{ path('app_time_register', { week: week == 53 ? 1 : week + 1, year: week == 53 ? year + 1 : year }) }}"
                        class="py-2 px-4 bg-gray-200 text-black rounded-md hover:bg-gray-300">Next week</a>
                 </div>
             </div>
 
-            <div class="overflow-x-auto border rounded-lg shadow-sm" data-controller="timelog-autosave">
-                <table class="min-w-full w-full table-auto bg-white">
 
-                    <!-- Table Head -->
+            <!-- Dropdown for Todos -->
+            <div class="mb-6" data-controller="dropdown">
+                <form name="todos" id="form" class="w-full">
+                    <div class="relative">
+                        <label for="todo" class="block text-sm font-medium text-gray-700 mb-1">Add Todo</label>
+                        <div class="relative">
+                            <select name="todo"
+                                    id="todo"
+                                    data-dropdown-target="select"
+                                    data-action="change->dropdown#addTodoToTable"
+                                    class="block w-full px-4 py-2 border border-gray-300 bg-white rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900">
+
+                                <option disabled selected class="text-gray-400">Select your Todo</option>
+
+                                {% for todo in todos %}
+                                    <option value="{{ todo.name }}"
+                                            data-id="{{ todo.id }}"
+                                            data-start="{{ todo.dateStart|date('Y-m-d') }}"
+                                            data-end="{{ todo.dateEnd|date('Y-m-d') }}">
+                                        {{ todo.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            <!-- Dropdown Icon -->
+                            <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                    <i class="bx bx-chevron-down text-gray-500 text-lg"></i>
+                </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            {#            <div class="mb-6" data-controller="dropdown">#}
+{#                <form name="todos" id="form" class="w-full">#}
+{#                    <div class="relative">#}
+{#                        <label for="todo" class="block text-sm font-medium text-gray-700 mb-1">Add Todo</label>#}
+{#                        <div class="relative">#}
+{#                            <select name="todo"#}
+{#                                    id="todo"#}
+{#                                    data-dropdown-target="select"#}
+{#                                    data-action="change->dropdown#addTodoToTable"#}
+{#                                    class="block w-full px-4 py-2 border border-gray-300 bg-white rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900">#}
+
+{#                                <option disabled selected class="text-gray-400">Select your Todo</option>#}
+
+{#                                {% for todo in todos %}#}
+{#                                    #}{# Check if the todo.name exists in the timetable #}
+{#                                    {% set exists_in_table = false %}#}
+{#                                    {% for table_todo in todos %}#}
+{#                                        {% if table_todo.timelogs|length > 0 and table_todo.name == todo.name %}#}
+{#                                            {% set exists_in_table = true %}#}
+{#                                        {% endif %}#}
+{#                                    {% endfor %}#}
+{#                                    #}{# If not in the timetable, show in the dropdown #}
+{#                                    {% if not exists_in_table %}#}
+{#                                        <option value="{{ todo.name }}" data-id="{{ todo.id }}">{{ todo.name }}</option>#}
+{#                                    {% endif %}#}
+{#                                {% endfor %}#}
+{#                            </select>#}
+
+{#                            <!-- Dropdown Icon -->#}
+{#                            <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none">#}
+{#                              <i class="bx bx-chevron-down text-gray-500 text-lg"></i>#}
+{#                            </span>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </form>#}
+{#            </div>#}
+
+            <!-- Timelog Table -->
+            <div class="overflow-x-auto border rounded-lg shadow-sm"
+                 data-controller="timelog-autosave"
+                 data-weekly-data="{{ weeklyData|json_encode }}">
+                <table class="min-w-full w-full table-auto bg-white">
                     <thead>
                     <tr>
-                        <th class="py-3 px-4 text-left text-sm font-medium text-black bg-gray-300">{{ year }} | Week: {{ week }}</th>
+                        <th class="py-3 px-4 text-left text-sm font-medium text-black bg-gray-300">
+                            {{ year }} | Week: {{ week }}
+                        </th>
                         {% for day in weeklyData %}
-                            <th class="py-3 px-4 text-center text-sm font-medium text-black {% if day.date|date('N') in [6, 7] %}bg-gray-100{% else %}bg-blue-100{% endif %}">
+                            <th class="py-3 px-4 text-center text-sm font-medium text-black
+                                    {% if day.date|date('N') in [6, 7] %}bg-gray-100{% else %}bg-blue-100{% endif %}">
                                 {{ day.date|date('d/m') }}<br>{{ day.date|date('D') }}
                             </th>
                         {% endfor %}
@@ -35,60 +107,82 @@
                     </tr>
                     </thead>
 
-                    <!-- Table Body -->
-                    <tbody>
+                    <tbody id="todo-table-body">
                     {% for todo in todos %}
-                        {% set row_total = 0 %}
-                        <tr>
-                            <!-- Todo Name -->
-                            <td class="py-3 px-4 border-b text-sm bg-gray-50">
-                                <a href="#" class="text-black hover:underline">{{ todo.name }}</a>
-                            </td>
+                        {% set showTodo = false %}
 
-                            <!-- Time Logs -->
-                            {% for day in weeklyData %}
-                                {% set day_total = 0 %}
-                                <td class="py-3 px-4 border-b text-center text-sm {% if day.date|date('N') in [6, 7] %}bg-gray-100{% else %}bg-blue-50{% endif %}">
-                                    {% for timelog in day.timelog %}
-                                        {% if timelog.todo_id == todo.id %}
-                                            {% set day_total = day_total + timelog.hours * 60 + timelog.minutes %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% set row_total = row_total + day_total %}
+                        {% for day in weeklyData %}
+                            {% if todo.dateStart <= day.date and todo.dateEnd >= day.date %}
+                                {% set showTodo = true %}
+                            {% endif %}
+                        {% endfor %}
 
-                                    <!-- Display Input Field with Auto-Save Logic -->
-                                    <label>
-                                        <input
-                                                type="time"
-                                                name="time_{{ day.date|date('Ymd') }}_{{ todo.id }}"
-                                                value="{% if day_total > 0 %}{{ '%02d:%02d'|format((day_total / 60)|round(0, 'floor'), day_total % 60) }}{% else %}00:00{% endif %}"
-                                                class="block mx-auto border-gray-300 rounded-md shadow-sm autosave-input"
-                                                data-todo-id="{{ todo.id }}"
-                                                data-date="{{ day.date|date('Y-m-d') }}"
-                                        />
-                                    </label>
-
-                                </td>
+                        {% for day in weeklyData %}
+                            {% for timelog in day.timelog %}
+                                {% if timelog.todo_id == todo.id %}
+                                    {% set showTodo = true %}
+                                {% endif %}
                             {% endfor %}
+                        {% endfor %}
 
-                            <!-- Row Total -->
-                            <td class="py-3 px-4 border-b text-center text-sm  bg-gray-50">
-                                {{ (row_total / 60)|round(0, 'floor') }}h {{ row_total % 60 }}m
-                            </td>
-                        </tr>
+                        {% if showTodo %}
+                            {% set row_total = 0 %}
+                            <tr data-todo-id="{{ todo.id }}">
+                                <!-- Todo Name -->
+                                <td class="py-3 px-4 border-b text-sm bg-gray-50">
+                                    <a href="#" class="text-black hover:underline">{{ todo.name }}</a>
+                                </td>
+
+                                <!-- Time Logs -->
+                                {% for day in weeklyData %}
+                                    {% set day_total = 0 %}
+                                    <td class="py-3 px-4 border-b text-center text-sm
+                            {% if day.date|date('N') in [6, 7] %}bg-gray-100{% else %}bg-blue-50{% endif %}">
+
+                                        {% for timelog in day.timelog %}
+                                            {% if timelog.todo_id == todo.id %}
+                                                {% set day_total = day_total + timelog.hours * 60 + timelog.minutes %}
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        {% set row_total = row_total + day_total %}
+                                        <input type="time"
+                                               name="time_{{ day.date|date('Ymd') }}_{{ todo.id }}"
+                                               value="{% if day_total > 0 %}{{ '%02d:%02d'|format((day_total / 60)|round(0, 'floor'), day_total % 60) }}{% else %}00:00{% endif %}"
+                                               data-todo-id="{{ todo.id }}"
+                                               data-date="{{ day.date|date('Y-m-d') }}"
+                                               class="autosave-input block mx-auto border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        />
+                                    </td>
+                                {% endfor %}
+
+                                <!-- Row Total -->
+                                <td class="py-3 px-4 border-b text-center text-sm bg-gray-50 row-total"
+                                    data-row-total="{{ todo.id }}">
+                                    {{ (row_total / 60)|round(0, 'floor') }}h {{ row_total % 60 }}m
+                                </td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                     </tbody>
+
 
                     <!-- Table Footer -->
                     <tfoot>
                     <tr>
-                        <td class="py-3 px-4  bg-gray-300 text-black">Total</td>
+                        <td class="py-3 px-4 bg-gray-300 text-black">Total</td>
+
                         {% for day in weeklyData %}
-                            <td class="py-3 px-4 text-center  {% if day.date|date('N') in [6, 7] %}bg-gray-100{% else %}bg-blue-100{% endif %}">
+                            <td class="py-3 px-4 text-center
+                                    {% if day.date|date('N') in [6, 7] %}bg-gray-100{% else %}bg-blue-100{% endif %}"
+                                data-day-total="{{ day.date|date('Y-m-d') }}">
                                 {{ (day.dayTotal / 60)|round(0, 'floor') }}h {{ day.dayTotal % 60 }}m
                             </td>
                         {% endfor %}
-                        <td class="py-3 px-4 text-center  bg-gray-300 text-black">
+
+                        <!-- Weekly Total Column -->
+                        <td class="py-3 px-4 text-center bg-gray-300 text-black weekly-total"
+                            id="weekly-total">
                             {{ (weeklyTotal / 60)|round(0, 'floor') }}h {{ weeklyTotal % 60 }}m
                         </td>
                     </tr>
