@@ -28,6 +28,7 @@ final class ClientController extends AbstractController{
             $clientDataArray[] = [
                 'id' => $clients->getId(),
                 'name' => $clients->getName(),
+                'contact' => $clients->getContactPerson(),
                 'email' => $clients->getContactEmail(),
                 'phone' => $clients->getContactPhone(),
                 'projects' => $clients->getProjects(),

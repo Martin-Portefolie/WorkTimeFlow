@@ -1,66 +1,84 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Client Management{% endblock %}
+{% block title %}{{ 'client_management.index.title'|trans }}{% endblock %}
 
 {% block body %}
     <section class="relative bg-section_2 py-10">
         <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
             <!-- Header Section -->
             <div class="flex items-center justify-between mb-5">
-                <h1 class=" text-2xl text-dark">Client Management</h1>
+                <h1 class="text-2xl text-dark">{{ 'client_management.index.title'|trans }}</h1>
 
-                <!-- Create New ClientFixtures Button -->
+                <!-- Create New Client Button -->
                 <a href="{{ path('admin_client_new') }}"
-                   class="inline-flex justify-center py-2 px-4 shadow-sm   rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
-                    Create New Client
+                   class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                    {{ 'client_management.index.create_new_client'|trans }}
                 </a>
             </div>
 
-            <!-- ClientFixtures List -->
+            <!-- Client List -->
             <div class="space-y-6">
                 {% for client in clientDataArray %}
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <form action="#" method="post">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- ClientFixtures Name -->
+                                <!-- Client Name -->
                                 <div>
-                                    <label for="name_{{ client.id }}" class="block text-sm  ">Name</label>
+                                    <label for="name_{{ client.id }}" class="block text-sm">
+                                        {{ 'client_management.index.name'|trans }}
+                                    </label>
                                     <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.name }}"
-                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none ">
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
+                                </div>
+                                <!-- Contact Person -->
+                                <div>
+                                    <label for="contact_person_{{ client.id }}" class="block text-sm">
+                                        {{ 'client_management.index.contact_person'|trans }}
+                                    </label>
+                                    <input type="text" name="contact_person" id="contact_person_{{ client.id }}" value="{{ client.contact }}"
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
-                                <!-- ClientFixtures Email -->
+                                <!-- Contact Email -->
                                 <div>
-                                    <label for="email_{{ client.id }}" class="block text-sm text-text-standard ">Email</label>
+                                    <label for="email_{{ client.id }}" class="block text-sm text-text-standard">
+                                        {{ 'client_management.index.email'|trans }}
+                                    </label>
                                     <input type="email" name="email" id="email_{{ client.id }}" value="{{ client.email }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none text-text-paragraph">
                                 </div>
 
-                                <!-- ClientFixtures Phone -->
+                                <!-- Contact Phone -->
                                 <div>
-                                    <label for="phone_{{ client.id }}" class="block text-sm text-text-standard ">Phone</label>
+                                    <label for="phone_{{ client.id }}" class="block text-sm text-text-standard">
+                                        {{ 'client_management.index.phone'|trans }}
+                                    </label>
                                     <input type="text" name="phone" id="phone_{{ client.id }}" value="{{ client.phone }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none text-text-paragraph">
                                 </div>
-
-                                {% if client.projects is not empty %}
-                                <!-- Projects  -->
-                                <div>
-                                    <label class="block text-sm text-text-standard ">Projects</label>
-                                    <ul class="mt-1 text-sm text-text-standard bg-background-muted rounded-md p-2 border border">
-                                        {% for project in client.projects %}
-                                            <li class="py-1"> <a href="#">{{ project.name }}</a></li> <!-- TODO add path -->
-                                        {% endfor %}
-                                    </ul>
-                                </div>
                             </div>
+
+                            {% if client.projects is not empty %}
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+                                    <!-- Projects -->
+                                    <div>
+                                        <label class="block text-sm text-text-standard">
+                                            {{ 'client_management.index.projects'|trans }}
+                                        </label>
+                                        <ul class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border border">
+                                            {% for project in client.projects %}
+                                                <li class="py-1"><a href="#">{{ project.name }}</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
                             {% endif %}
 
                             <div class="flex justify-end space-x-3 mt-4">
                                 <!-- Save Button -->
                                 <button type="submit"
-                                        class="py-2 px-4 shadow-sm   rounded-md text-white bg-save hover:bg-button-hover-update focus:outline-none">
-                                    Save
+                                        class="py-2 px-4 shadow-sm rounded-md text-white bg-save hover:bg-button-hover-update focus:outline-none">
+                                    {{ 'client_management.index.save'|trans }}
                                 </button>
                             </div>
                         </form>
@@ -69,5 +87,4 @@
             </div>
         </div>
     </section>
-
 {% endblock %}

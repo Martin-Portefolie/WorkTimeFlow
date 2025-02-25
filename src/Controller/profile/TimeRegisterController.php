@@ -74,13 +74,13 @@ class TimeRegisterController extends AbstractController
 
 
 
-        // ✅ Fetch timelogs for the current user & week
+
         $timelogs = $this->entityManager->getRepository(Timelog::class)
             ->findTimelogsByUserAndWeek($user, $week, $year);
 
 
 
-        // ✅ Assign timelogs to the correct day in weeklyData
+
         foreach ($timelogs as $timelog) {
             foreach ($data as &$day) {
                 if ($timelog->getDate()->format('Y-m-d') === $day['date']->format('Y-m-d')) {
@@ -96,7 +96,7 @@ class TimeRegisterController extends AbstractController
             }
         }
 
-        // ✅ Calculate weekly total
+
         $weeklyTotal = 0;
         foreach ($data as &$day) {
             $dayTotal = 0;

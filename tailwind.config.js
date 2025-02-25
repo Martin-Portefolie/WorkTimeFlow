@@ -54,6 +54,7 @@ module.exports = {
         dark: grey[900],
         save: custom_colors.blue,
         new: custom_colors.green,
+        muted: grey[200],
 
         success: "#10B981", // Green (active)
         warning: "#F59E0B", // Yellow (pending)

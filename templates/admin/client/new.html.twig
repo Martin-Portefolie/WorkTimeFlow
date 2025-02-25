@@ -13,19 +13,33 @@
             <div class="bg-section_1 p-6 rounded-lg shadow-md space-y-4">
                 <!-- ClientFixtures Name -->
                 <div>
-                    <label class="block text-sm  text-dark">{{ form_label(form.name, 'Client Name') }}</label>
+                    <label class="block text-sm  text-dark">
+                        {{ form_label(form.name, 'client_management.new.client_name'|trans) }}
+                    </label>
                     {{ form_widget(form.name, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
+                </div>
+
+                <!-- Contact Name -->
+                <div>
+                    <label class="block text-sm  text-dark">
+                        {{ form_label(form.contactPerson, 'client_management.new.contact_name'|trans) }}
+                    </label>
+                    {{ form_widget(form.contactPerson, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
                 </div>
 
                 <!-- Contact Email -->
                 <div>
-                    <label class="block text-sm text-dark">{{ form_label(form.contactEmail, 'Client Email') }}</label>
+                    <label class="block text-sm text-dark">
+                        {{ form_label(form.contactEmail, 'client_management.new.client_email'|trans) }}
+                    </label>
                     {{ form_widget(form.contactEmail, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
                 </div>
 
                 <!-- Contact Phone -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">{{ form_label(form.contactPhone, 'Client Phone') }}</label>
+                    <label class="block text-sm font-medium text-gray-700">
+                      {{ form_label(form.contactPhone, 'client_management.new.client_phone'|trans) }}
+                    </label>
                     {{ form_widget(form.contactPhone, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
                 </div>
 
@@ -33,7 +47,7 @@
                 <div class="flex justify-end">
                     <button type="submit"
                             class="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-success hover:bg-primary focus:outline-none">
-                        Save Client
+                        {{ 'client_management.new.save_client'|trans }}
                     </button>
                 </div>
             </div>

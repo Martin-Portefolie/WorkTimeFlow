@@ -57,13 +57,17 @@
                     </a>
                 {% endif %}
 
-                <!-- Language Selector  -->
-{#                <div class="flex justify-center sm:justify-start">#}
-{#                    <a href="#" class="flex items-center space-x-1 hover:text-gray-300 transition">#}
-{#                        <img src="{{ asset('icons/profile_menu/globe.svg') }}" alt="Globe" class="h-4">#}
-{#                        <span>Dansk</span>#}
-{#                    </a>#}
-{#                </div>#}
+                <!-- Language Selector -->
+                <div class="flex justify-center sm:justify-start space-x-4">
+                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'_locale': 'en'})) }}"
+                       class="hover:text-gray-300 transition">
+                        English
+                    </a>
+                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'_locale': 'da'})) }}"
+                       class="hover:text-gray-300 transition">
+                        Dansk
+                    </a>
+                </div>
 
                 <div class="flex justify-center sm:justify-start">
                 <a href="{{ path('app_user') }}" class="flex items-center justify-center sm:justify-start space-x-2 hover:text-gray-300 transition py-2">

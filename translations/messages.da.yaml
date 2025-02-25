@@ -1,0 +1,17 @@
+client_management:
+  index:
+    title: "Kundeadministration"
+    create_new_client: "Opret ny kunde"
+    name: "Navn (firma)"
+    contact_person: "Kontaktperson"
+    email: "Kontakt Email"
+    phone: "Kontakt Telefon"
+    projects: "Projekter"
+    save: "Gem"
+  new:
+    title: "Opret ny kunde"
+    client_name: "Kunde Navn (firma)"
+    contact_name: "Kontakt Person"
+    client_email: "Kontakt Email"
+    client_phone: "Kontakt Telefon"
+    save_client: "Gem Kunde"

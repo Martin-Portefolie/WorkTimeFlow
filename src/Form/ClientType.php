@@ -19,6 +19,10 @@ $builder
 'label' => 'Client Name',
 'attr' => ['class' => 'form-input']
 ])
+->add('contactPerson', TextType::class, [
+'label' => 'Contact Person',
+'attr' => ['class' => 'form-input']
+])
 ->add('contactEmail', EmailType::class, [
 'label' => 'Client Email',
 'attr' => ['class' => 'form-input']

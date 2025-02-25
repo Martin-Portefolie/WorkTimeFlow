@@ -27,7 +27,7 @@ final class StatusController extends AbstractController
         $this->userProjectService = $userProjectService;
     }
 
-    #[Route('/profile/status/{year?}/{month?}', name: 'app_status', defaults: ['year' => null, 'month' => null])]
+    #[Route('profile/status/{year?}/{month?}', name: 'app_status', defaults: ['year' => null, 'month' => null])]
     public function index(?int $year = null, ?int $month = null): Response
     {
         $user = $this->getUser();

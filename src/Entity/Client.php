@@ -30,6 +30,9 @@ class Client
     #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'client')]
     private Collection $projects;
 
+    #[ORM\Column(length: 255)]
+    private ?string $contactPerson = null;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
@@ -102,6 +105,18 @@ class Client
                 $project->setClient(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getContactPerson(): ?string
+    {
+        return $this->contactPerson;
+    }
+
+    public function setContactPerson(string $contactPerson): static
+    {
+        $this->contactPerson = $contactPerson;
 
         return $this;
     }
