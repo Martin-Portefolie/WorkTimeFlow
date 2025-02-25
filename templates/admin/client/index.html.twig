@@ -9,6 +9,19 @@
             <div class="flex items-center justify-between mb-5">
                 <h1 class="text-2xl text-dark">{{ 'client_management.index.title'|trans }}</h1>
 
+                <!-- Search Form -->
+                <form method="get" action="{{ path('admin_client') }}" class="">
+                    <div class="flex space-x-2">
+                        <input type="text" name="search" value="{{ app.request.query.get('search', '') }}"
+                               placeholder="{{ 'client_management.index.search_placeholder'|trans }}"
+                               class="block w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none">
+                        <button type="submit"
+                                class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-primary hover:bg-highlight focus:outline-none">
+                            {{ 'client_management.index.search'|trans }}
+                        </button>
+                    </div>
+                </form>
+
                 <!-- Create New Client Button -->
                 <a href="{{ path('admin_client_new') }}"
                    class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
@@ -30,6 +43,44 @@
                                     <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.name }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
+
+                                <!-- Client Adress -->
+                                <div>
+                                    <label for="name_{{ client.id }}" class="block text-sm">
+                                        {{ 'client_management.index.adress'|trans }}
+                                    </label>
+                                    <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.adress }}"
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
+                                </div>
+
+                                <!-- Client Postal Code -->
+                                <div>
+                                    <label for="name_{{ client.id }}" class="block text-sm">
+                                        {{ 'client_management.index.postalCode'|trans }}
+                                    </label>
+                                    <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.postalCode }}"
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
+                                </div>
+
+                                <!-- Client City -->
+                                <div>
+                                    <label for="name_{{ client.id }}" class="block text-sm">
+                                        {{ 'client_management.index.city'|trans }}
+                                    </label>
+                                    <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.city }}"
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
+                                </div>
+
+                                <!-- Client Country -->
+                                <div>
+                                    <label for="name_{{ client.id }}" class="block text-sm">
+                                        {{ 'client_management.index.country'|trans }}
+                                    </label>
+                                    <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.country }}"
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
+                                </div>
+
+
                                 <!-- Contact Person -->
                                 <div>
                                     <label for="contact_person_{{ client.id }}" class="block text-sm">

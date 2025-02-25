@@ -31,7 +31,15 @@ final class ClientController extends AbstractController{
     public function index(Request $request): Response
     {
 
+        $searchTerm = $request->query->get('search');
         $queryBuilder = $this->entityManager->getRepository(Client::class)->createQueryBuilder('c');
+
+        if($searchTerm) {
+            $queryBuilder->andWhere('c.name LIKE :search OR c.contactPerson LIKE :search OR c.contactEmail LIKE :search OR c.contactPhone LIKE :search')
+                ->setParameter('search', '%' . $searchTerm . '%');
+
+        }
+
         $pagerfanta = new Pagerfanta(new QueryAdapter($queryBuilder));
         $pagerfanta->setMaxPerPage(10);
         $pagerfanta->setCurrentPage($request->query->getInt('page', 1));

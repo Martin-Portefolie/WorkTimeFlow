@@ -39,6 +39,10 @@ class CreateClientCommand extends Command
         $client->setContactPhone('12345678');
         $client->setContactEmail('MrHorse@Test.com');
         $client->setContactPerson('Test Hest');
+        $client->setAdress('Testvej 11');
+        $client->setCountry('Denmark');
+        $client->setPostalCode('8000');
+        $client->setCity('Aarhus');
 
         // Save ClientFixtures to Database
         $this->entityManager->persist($client);

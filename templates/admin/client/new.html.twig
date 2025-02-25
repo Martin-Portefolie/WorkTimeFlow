@@ -11,13 +11,46 @@
 
             {{ form_start(form) }}
             <div class="bg-section_1 p-6 rounded-lg shadow-md space-y-4">
-                <!-- ClientFixtures Name -->
+                <!-- CLient Name -->
                 <div>
                     <label class="block text-sm  text-dark">
                         {{ form_label(form.name, 'client_management.new.client_name'|trans) }}
                     </label>
                     {{ form_widget(form.name, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
                 </div>
+
+                <!-- CLient Adress -->
+                <div>
+                    <label class="block text-sm  text-dark">
+                        {{ form_label(form.adress, 'client_management.new.adress'|trans) }}
+                    </label>
+                    {{ form_widget(form.adress, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
+                </div>
+
+                <!-- CLient Postal Code -->
+                <div>
+                    <label class="block text-sm  text-dark">
+                        {{ form_label(form.postalCode, 'client_management.new.postalCode'|trans) }}
+                    </label>
+                    {{ form_widget(form.postalCode, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
+                </div>
+
+                <!-- CLient City -->
+                <div>
+                    <label class="block text-sm  text-dark">
+                        {{ form_label(form.city, 'client_management.new.city'|trans) }}
+                    </label>
+                    {{ form_widget(form.city, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
+                </div>
+
+                <!-- CLient Countru -->
+                <div>
+                    <label class="block text-sm  text-dark">
+                        {{ form_label(form.country, 'client_management.new.country'|trans) }}
+                    </label>
+                    {{ form_widget(form.country, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
+                </div>
+
 
                 <!-- Contact Name -->
                 <div>
