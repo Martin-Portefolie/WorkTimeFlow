@@ -1,12 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProjectController!{% endblock %}
+{% block title %}Projects{% endblock %}
 
 {% block body %}
-
-{{ dump(projectDataArray) }}
     <section class="relative bg-section_2 py-10">
         <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+
             <!-- Header Section -->
             <div class="flex items-center justify-between mb-5">
                 <h1 class="text-2xl text-dark">{{ 'project_management.index.title'|trans }}</h1>
@@ -39,7 +38,7 @@
                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-gray-900">
                                 </div>
 
-                                <!-- ClientFixtures (non-editable) -->
+                                <!-- Client (non-editable) -->
                                 <div>
                                     <label for="client_{{ project.id }}" class="block text-sm font-medium text-gray-700">Client</label>
                                     <input type="text" id="client_{{ project.id }}" value="{{ project.client }}" readonly
@@ -70,12 +69,92 @@
                                     </select>
                                 </div>
 
-                                <!-- Active Status -->
+                                <!-- Archived Status (Replaces Active) -->
                                 <div>
-                                    <label for="active_{{ project.id }}" class="block text-sm font-medium text-gray-700">Active</label>
-                                    <input type="checkbox" name="active" id="active_{{ project.id }}" {% if project.active %}checked{% endif %}
+                                    <label for="isArchived_{{ project.id }}" class="block text-sm font-medium text-gray-700">Archived</label>
+                                    <input type="checkbox" name="is_archived" id="isArchived_{{ project.id }}"
+                                           {% if project.is_archived %}checked{% endif %}
                                            class="mt-1 block text-gray-900 focus:ring-indigo-500 h-4 w-4 border-gray-300 rounded">
                                 </div>
+
+                                <!-- Priority Dropdown -->
+                                <div>
+                                    <label for="priority_{{ project.id }}" class="block text-sm font-medium text-gray-700">Priority</label>
+                                    <select name="priority" id="priority_{{ project.id }}"
+                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900">
+                                        {% for priority in ['low', 'medium', 'high', 'critical'] %}
+                                            <option value="{{ priority }}"
+                                                    {% if project.priority == priority %}selected{% endif %}>
+                                                {{ priority|capitalize }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Deadline -->
+                                <div>
+                                    <label for="deadline_{{ project.id }}" class="block text-sm font-medium text-gray-700">Deadline</label>
+                                    <input type="date" name="deadline" id="deadline_{{ project.id }}"
+                                           value="{{ project.deadline ? project.deadline : '' }}"
+                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900">
+                                </div>
+
+                                <!-- Estimated Budget -->
+                                <div>
+                                    <label for="estimatedBudget_{{ project.id }}" class="block text-sm font-medium text-gray-700">Estimated Budget (€)</label>
+                                    <input type="number" name="estimated_budget" id="estimatedBudget_{{ project.id }}"
+                                           value="{{ project.estimated_budget is not null ? project.estimated_budget : '' }}"
+                                           step="0.01"
+                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900">
+                                </div>
+
+                                <!-- Estimated Time Slider -->
+                                <div data-controller="time-slider">
+                                    <label class="block text-sm font-medium text-gray-700">Estimated Time</label>
+
+                                    <div class="flex space-x-4 items-center">
+                                        <!-- Single Slider (for Hours) -->
+                                        <input type="range" name="estimated_hours"
+                                               data-time-slider-target="hours"
+                                               min="0" max="500" step="5"
+                                        value="{{ project.estimated_minutes is not null ? (project.estimated_minutes // 60) : '0' }}"
+                                        class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer">
+
+                                        <!-- Display Selected Hours -->
+                                        <span data-time-slider-target="hoursDisplay" class="text-gray-800">
+                                        {{ project.estimated_minutes is not null ? (project.estimated_minutes // 60) : '0' }}h
+                                        </span>
+                                    </div>
+
+                                    <!-- Hidden Input to Store Total Minutes -->
+                                    <input type="hidden" name="estimated_time"
+                                           data-time-slider-target="hiddenInput"
+                                           value="{{ project.estimated_minutes is not null ? project.estimated_minutes : '0' }}">
+                                </div>
+
+
+
+
+
+
+
+                                <!-- Total Time Used -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Total Time Used</label>
+                                    <p class="mt-1 text-gray-800">
+                                        {% set hours = project.total_minutes // 60 %}
+                                        {% set minutes = project.total_minutes % 60 %}
+                                        {{ hours }}h {{ minutes }}m
+                                    </p>
+                                </div>
+
+                                <!-- Remaining Time -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Remaining Time</label>
+                                    {% set remaining = project.remaining_minutes is not null ? (project.remaining_minutes // 60) ~ 'h ' ~ (project.remaining_minutes % 60) ~ 'm' : 'N/A' %}
+                                    <p class="mt-1 text-gray-800">{{ remaining }}</p>
+                                </div>
+
                             </div>
 
                             <div class="flex justify-end space-x-3 mt-4">

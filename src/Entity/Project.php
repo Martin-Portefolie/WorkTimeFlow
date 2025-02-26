@@ -36,8 +36,8 @@ class Project
     private Collection $todos;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
-    private ?Client $client = null;
-
+    #[ORM\JoinColumn(nullable: false)]
+    private Client $client;
     #[ORM\Column(type: 'boolean')]
     private bool $isArchived = false;
 
@@ -53,7 +53,7 @@ class Project
     private ?float $estimatedBudget = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $estimatedHours = null;
+    private ?int $estimatedMinutes = null;
 
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $lastUpdated;
@@ -220,17 +220,29 @@ class Project
         return $this;
     }
 
-    public function getEstimatedHours(): ?int
+    public function setEstimatedTime(?int $minutes): static
     {
-        return $this->estimatedHours;
-    }
-
-    public function setEstimatedHours(?int $estimatedHours): static
-    {
-        $this->estimatedHours = $estimatedHours;
-
+        $this->estimatedMinutes = $minutes;
         return $this;
     }
+
+    public function getEstimatedMinutes(): ?int
+    {
+        return $this->estimatedMinutes;
+    }
+
+    public function getRemainingMinutes(): ?int
+    {
+        if ($this->estimatedMinutes === null) {
+            return null;
+        }
+
+        $usedMinutes = $this->getTotalMinutesUsed();
+
+        return max(0, $this->estimatedMinutes - $usedMinutes);
+    }
+
+
 
     public function getLastUpdated(): ?\DateTimeInterface
     {
@@ -241,6 +253,17 @@ class Project
     {
         $this->lastUpdated = $lastUpdated;
 
+        return $this;
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->isArchived;
+    }
+
+    public function setArchived(bool $isArchived): static
+    {
+        $this->isArchived = $isArchived;
         return $this;
     }
 }
