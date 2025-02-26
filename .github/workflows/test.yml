@@ -78,17 +78,20 @@ jobs:
         run: vendor/bin/phpunit
 
   changelog:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Generate changelog
-        uses: metcalfc/changelog-generator@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Post changelog as PR comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          message: "### Changelog\n${{ steps.changelog.outputs.changelog }}"
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+  
+        - name: Generate Changelog
+          uses: release-drafter/release-drafter@v5
+          id: changelog
+          with:
+            config-name: release-drafter.yml
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+        - name: Post Changelog as PR Comment
+          uses: marocchino/sticky-pull-request-comment@v2
+          with:
+            message: "### Changelog\n${{ steps.changelog.outputs.changelog }}"
