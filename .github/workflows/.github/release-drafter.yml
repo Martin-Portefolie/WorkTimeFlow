@@ -1,0 +1,18 @@
+name-template: "v$NEXT_PATCH_VERSION"
+tag-template: "v$NEXT_PATCH_VERSION"
+
+categories:
+  - title: "### Added"
+    labels: ["feature", "enhancement"]
+  - title: "### Changed"
+    labels: ["bug", "fix", "refactor"]
+  - title: "### Removed"
+    labels: ["deprecated", "removed"]
+
+change-template: "- $TITLE (#$NUMBER) by @$AUTHOR"
+change-title-escapes: '\<*_&'
+
+template: |
+  ## [Unreleased]
+
+  $CHANGES
