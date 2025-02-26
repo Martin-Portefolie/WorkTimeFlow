@@ -53,3 +53,71 @@ main {
 .text-small {
     @apply text-sm text-neutral-600;
 }
+
+/* calender dropdown */
+/* General Dropdown Styling */
+.dropdown {
+    position: relative;
+    width: 100%;
+    border: 1px solid #D1D5DB; /* Tailwind: border-gray-300 */
+    border-radius: 0.5rem;
+    background: #fff;
+    cursor: pointer;
+}
+
+/* Selected Item */
+.dropdown-select {
+    padding: 0.75rem;
+    font-size: 1rem;
+    color: #374151; /* Tailwind: text-gray-700 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Dropdown Menu #TODO DELETE ME IF NOT USED */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+/* Show dropdown when active */
+/* Apply these styles inside your Tailwind file (app.css) */
+@layer components {
+    .dropdown {
+        @apply relative w-full border border-gray-300 rounded-lg bg-white cursor-pointer shadow-sm;
+    }
+
+    .dropdown-select {
+        @apply px-4 py-3 text-gray-700 flex justify-between items-center rounded-lg;
+    }
+
+    .dropdown-menu {
+        @apply absolute top-full left-0 w-full bg-white rounded-lg shadow-md z-50 max-h-48 overflow-y-auto hidden;
+    }
+
+    .dropdown-menu:not(.hidden) {
+        @apply block;
+    }
+
+    .dropdown-menu-search {
+        @apply w-full p-2 text-sm border-b border-gray-200 outline-none;
+    }
+
+    .dropdown-menu-inner {
+        @apply max-h-40 overflow-y-auto;
+    }
+
+    .dropdown-menu-item {
+        @apply p-2 text-sm text-gray-600 cursor-pointer transition-all duration-150 hover:bg-gray-100;
+    }
+}

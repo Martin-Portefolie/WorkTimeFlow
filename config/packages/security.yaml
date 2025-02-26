@@ -14,11 +14,13 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
+            pattern: ^/
             lazy: true
             provider: app_user_provider
             form_login:
                 login_path: app_login
                 check_path: app_login
+                default_target_path: /
             logout:
                 path: app_logout
                 target: app_login
@@ -31,8 +33,9 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: "^/[a-z]{2}/admin", roles: ROLE_ADMIN } # Corrected: Regex inside quotes
+        - { path: "^/admin", roles: ROLE_ADMIN }          # Fallback for non-localized routes
+        - { path: "^/profile", roles: ROLE_USER }
 
 when@test:
     security:

@@ -37,9 +37,10 @@ docker compose exec php bin/console doctrine:migration:migrate
     docker compose exec php bin/console create-client
     docker compose exec php bin/console create-project
     docker compose exec php bin/console create-team "Pegasus Team" a@a.com b@b.com --projectName="Project Pegasus"
-    docker compose exec php bin/console create-todo 1 "Storyboard Development"  "2024-11-20" "2024-11-21"
+    docker compose exec php bin/console create-todo 1 "Storyboard Development"  "2025-02-20" "2025-02-22"
     docker compose exec php bin/console create-timelog "admin" 1 2 30 "2024-11-22" "Completed the storyboard initial draft"
     docker compose exec php bin/console create-timelog "admin" 1 1 30 "2024-11-20" "Completed the storyboard initial draft 2"
+    docker compose exec php bin/console create-timelog "admin" 1 1 30 "2025-02-20" "Completed the storyboard initial draft 3"
 
 ```
 

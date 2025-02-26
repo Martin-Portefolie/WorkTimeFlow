@@ -27,12 +27,11 @@ final class StatusController extends AbstractController
         $this->userProjectService = $userProjectService;
     }
 
-    #[Route('/profile/status/{year?}/{month?}', name: 'app_status', defaults: ['year' => null, 'month' => null])]
+    #[Route('profile/status/{year?}/{month?}', name: 'app_status', defaults: ['year' => null, 'month' => null])]
     public function index(?int $year = null, ?int $month = null): Response
     {
-        # 1.0 User, y
-        $user = $this->getAuthenticatedUser();
-        if (!$user) {
+        $user = $this->getUser();
+        if (!$user instanceof \App\Entity\User) {
             return $this->json(['error' => 'User not logged in'], 403);
         }
 
@@ -150,13 +149,7 @@ final class StatusController extends AbstractController
         ]);
     }
 
-    /**
-     *  1.0 Get authenticated user.
-     */
-    private function getAuthenticatedUser(): ?User
-    {
-        return $this->getUser();
-    }
+
 
 
     /**
