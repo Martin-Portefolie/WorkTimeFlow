@@ -26,7 +26,7 @@ class TodosController extends AbstractController
     {
 
         $todos = $this->entityManager->getRepository(Todo::class)->findAll();
-
+        $todoDataArray = [];
         foreach ($todos as $todo) {
             $todoDataArray[] = [
                 'id' => $todo->getId(),

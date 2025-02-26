@@ -35,6 +35,7 @@ class ProjectController extends AbstractController
                 'teams' => $project->getTeams(),
                 'todo' => $project->getTodos(),
                 'active' => $project->isActive(),
+                'total_minutes' => $project->getTotalMinutesUsed()
             ];
         }
 
