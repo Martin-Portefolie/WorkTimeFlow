@@ -36,32 +36,11 @@ jobs:
           extensions: ctype, iconv, pdo_mysql
           tools: composer:v2
 
-      - name: Check PHP version
-        run: php -v
-
-      - name: Check Composer version
-        run: composer -V
-
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Stop any process using port 3307
-        run: |
-          sudo lsof -i :3307 || true
-          sudo fuser -k 3307/tcp || true
-
       - name: Start Docker services
         run: docker compose up -d
-
-      - name: Get assigned MariaDB port
-        run: echo "DB_PORT=$(docker inspect -f '{{ (index .NetworkSettings.Ports "3306/tcp" 0).HostPort }}' mariadb_container)" >> $GITHUB_ENV
-
-      - name: Wait for database to be ready
-        run: |
-          until docker exec mariadb_container mysqladmin ping -h "127.0.0.1" --silent; do
-            echo "Waiting for MariaDB..."
-            sleep 2
-          done
 
       - name: Run Symfony console commands
         run: |
@@ -74,24 +53,32 @@ jobs:
 
       - name: Run PHPUnit tests
         env:
-          DATABASE_URL: "mysql://db_user:db_password@127.0.0.1:${{ env.DB_PORT }}/db"
+          DATABASE_URL: "mysql://db_user:db_password@127.0.0.1:3306/db"
         run: vendor/bin/phpunit
 
   changelog:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
-  
-        - name: Generate Changelog
-          uses: release-drafter/release-drafter@v5
-          id: changelog
-          with:
-            config-name: release-drafter.yml
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
-        - name: Post Changelog as PR Comment
-          uses: marocchino/sticky-pull-request-comment@v2
-          with:
-            message: "### Changelog\n${{ steps.changelog.outputs.changelog }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate Changelog
+        uses: release-drafter/release-drafter@v5
+        id: changelog
+        with:
+          config-name: release-drafter.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Format Changelog as Keep a Changelog
+        run: |
+          echo "# Changelog\n\nAll notable changes to this project will be documented in this file.\n" > formatted_changelog.md
+          echo "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)," >> formatted_changelog.md
+          echo "and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n" >> formatted_changelog.md
+          echo "## [Unreleased]\n" >> formatted_changelog.md
+          echo "${{ steps.changelog.outputs.changelog }}" >> formatted_changelog.md
+
+      - name: Post Changelog as PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: "${{ steps.changelog.outputs.changelog }}"
