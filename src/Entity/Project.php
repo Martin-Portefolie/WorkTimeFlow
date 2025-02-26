@@ -154,4 +154,15 @@ class Project
 
         return $this;
     }
+
+    public function getTotalMinutesUsed(): int
+    {
+        $totalMinutes = 0;
+        foreach ($this->todos as $todo) {
+            foreach ($todo->getTimelogs() as $timelog) {
+                $totalMinutes += $timelog->getTotalMinutes();
+            }
+        }
+        return $totalMinutes;
+    }
 }
