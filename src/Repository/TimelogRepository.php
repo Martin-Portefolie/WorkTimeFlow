@@ -39,17 +39,17 @@ class TimelogRepository extends ServiceEntityRepository
     public function findTimelogsByUserAndWeek(User $user, int $week, int $year): array
     {
         $startOfWeek = new \DateTime();
-        $startOfWeek->setISODate($year, $week)->setTime(0, 0, 0); // ✅ First day of the ISO week
+        $startOfWeek->setISODate($year, $week)->setTime(0, 0, 0);
 
         $endOfWeek = clone $startOfWeek;
-        $endOfWeek->modify('+6 days')->setTime(23, 59, 59); // ✅ Last day of the week
+        $endOfWeek->modify('+6 days')->setTime(23, 59, 59);
 
         return $this->createQueryBuilder('timelog')
             ->join('timelog.todo', 'todo')
             ->join('todo.project', 'project')
             ->join('project.teams', 'team')
             ->where('team IN (:teams)')
-            ->andWhere('timelog.date BETWEEN :startOfWeek AND :endOfWeek') // ✅ Works on all databases
+            ->andWhere('timelog.date BETWEEN :startOfWeek AND :endOfWeek')
             ->setParameter('teams', $user->getTeams())
             ->setParameter('startOfWeek', $startOfWeek)
             ->setParameter('endOfWeek', $endOfWeek)
