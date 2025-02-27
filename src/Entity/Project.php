@@ -50,7 +50,7 @@ class Project
 
 
     #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2, nullable: true)]
-    private ?float $estimatedBudget = null;
+    private ?string $estimatedBudget = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $estimatedMinutes = null;
@@ -208,12 +208,12 @@ class Project
     }
 
 
-    public function getEstimatedBudget(): ?float
+    public function getEstimatedBudget(): ?string
     {
         return $this->estimatedBudget;
     }
 
-    public function setEstimatedBudget(?float $estimatedBudget): static
+    public function setEstimatedBudget(?string $estimatedBudget): static
     {
         $this->estimatedBudget = $estimatedBudget;
 

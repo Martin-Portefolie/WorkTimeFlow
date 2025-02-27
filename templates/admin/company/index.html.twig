@@ -5,65 +5,78 @@
 {% block body %}
     <section class="relative bg-section_2 py-10">
         <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
-            <!-- Header Section -->
-            <div class="flex items-center justify-between mb-5">
-                <h1 class="text-2xl text-dark">{{ 'company_management.index.title'|trans }}</h1>
-            </div>
-
-            <!-- Company Details -->
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <form action="#" method="post">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <!-- Company Name -->
-                        <div>
-                            <label for="name_{{ company.id }}" class="block text-sm">
-                                {{ 'company_management.index.name'|trans }}
-                            </label>
-                            <input type="text" name="name" id="name_{{ company.id }}" value="{{ company.name }}"
-                                   class="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none">
-                        </div>
+                {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
 
-                        <!-- Company Logo -->
-                        <div>
-                            <label class="block text-sm">
-                                {{ 'company_management.index.logo'|trans }}
-                            </label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Company Name -->
+                    <div>
+                        <label for="{{ form.name.vars.id }}" class="block text-sm">{{ 'company_management.index.name'|trans }}</label>
+                        {{ form_widget(form.name, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
+                    </div>
+
+                    <!-- Company Logo -->
+                    <div>
+                        <label class="block text-sm">{{ 'company_management.index.logo'|trans }}</label>
+                        <div class="mt-2">
                             {% if company.logo %}
-                                <img src="{{ asset('uploads/logos/' ~ company.logo) }}" alt="Company Logo" class="w-20 h-20 object-cover rounded-md">
+                                <img src="{{ asset(company.logo) }}" alt="Company Logo" class="w-32 h-32 rounded-md shadow-md">
                             {% else %}
-                                <span class="text-gray-500">{{ 'company_management.index.no_logo'|trans }}</span>
+                                <p class="text-gray-500">No logo available</p>
                             {% endif %}
                         </div>
-
-                        <!-- Company Rates (JSON) -->
-                        <div class="col-span-2">
-                            <label class="block text-sm">
-                                {{ 'company_management.index.rates'|trans }}
-                            </label>
-                            <ul class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border">
-                                {% for key, rate in company.rates %}
-                                    <li class="py-1">{{ key }}: {{ rate|number_format(2, '.', ',') }} {{ 'company_management.index.currency'|trans }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                        {{ form_widget(form.logoFile, {'attr': {'class': 'form-control mt-2'}}) }}
                     </div>
-                    <div class="flex justify-end space-x-3 mt-4">
-                        <!-- Edit Button -->
-                        <a href="{{ path('app_company_edit', {id: company.id}) }}"
-                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-edit hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
-                            {{ 'company_management.index.edit'|trans }}
-                        </a>
+                </div>
 
-                        <!-- Delete Button -->
-                        <form method="post" action="{{ path('app_company_delete', {id: company.id}) }}"
-                              onsubmit="return confirm('{{ 'company_management.index.confirm_delete'|trans }}');">
-                            <button type="submit"
-                                    class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-delete hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
-                                {{ 'company_management.index.delete'|trans }}
-                            </button>
-                        </form>
+                <!-- Rates Management -->
+                <div class="mt-6 p-4 bg-gray-100 rounded-lg shadow" data-controller="rates">
+                    <label class="block text-lg font-medium text-gray-700">{{ 'company_management.index.rates'|trans }}</label>
+
+                    <div id="rates-collection"
+                         data-rates-target="collection"
+                         data-prototype="{{ form_widget(form.rates.vars.prototype.key)|e('html_attr') }}{{ form_widget(form.rates.vars.prototype.value)|e('html_attr') }}"
+                         class="space-y-3 mt-3">
+
+                        {% for rateField in form.rates %}
+                            <div class="rate-item flex items-center space-x-3 bg-white p-3 rounded-md shadow-md border border-gray-300">
+                                <!-- Rate Name (Key) -->
+                                <div class="w-1/2">
+                                    <label class="block text-sm font-medium text-gray-700">Rate Name</label>
+                                    {{ form_widget(rateField.key, {'attr': {'class': 'form-control px-3 py-2 border border-gray-300 rounded-md', 'placeholder': 'Rate Name (e.g., rate_for_washing_a_car)'}}) }}
+                                </div>
+                                <!-- Rate Amount (Value) -->
+                                <div class="w-1/2">
+                                    <label class="block text-sm font-medium text-gray-700">Rate Amount</label>
+                                    {{ form_widget(rateField.value, {'attr': {'class': 'form-control px-3 py-2 border border-gray-300 rounded-md', 'placeholder': 'Amount (e.g., 600)'}}) }}
+                                </div>
+                                <!-- Remove Button -->
+                                <button type="button"
+                                        class="remove-rate bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out"
+                                        data-action="click->rates#remove">
+                                    ✕
+                                </button>
+                            </div>
+                        {% endfor %}
                     </div>
-                </form>
+
+                    <!-- Add Rate Button -->
+                    <button type="button"
+                            data-action="click->rates#add"
+                            data-rates-target="addButton"
+                            class="mt-3 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out shadow-md">
+                        {{ 'company_management.index.add_rate'|trans }}
+                    </button>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4">{{ 'company_management.index.save'|trans }}</button>
+
+                {{ form_end(form) }}
+
+                <!-- Display Success Message -->
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success mt-4">{{ message }}</div>
+                {% endfor %}
             </div>
         </div>
     </section>

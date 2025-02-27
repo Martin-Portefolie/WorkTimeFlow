@@ -3,13 +3,15 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Company;
-use App\Entity\Team;
+use App\Form\CompanyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 final class CompanyController extends AbstractController
 {
@@ -20,81 +22,85 @@ final class CompanyController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    #[Route('/admin/company', name: 'app_company_index', methods: ['GET'])]
-    public function index(): Response
+    #[Route('/admin/company', name: 'admin_company', methods: ['GET', 'POST'])]
+    public function index(Request $request, SluggerInterface $slugger): Response
     {
+        # 1 Create new Company if it doesn't exist
+        $company = $this->entityManager->getRepository(Company::class)->find(1);
+
+        if (!$company) {
+            $company = new Company();
+            $this->entityManager->persist($company);
+            $this->entityManager->flush();
+        }
+
+        # 2 Convert existing rates JSON into an array for the form
+        $existingRates = [];
+        $rates = $company->getRates();
+
+        if (!empty($rates) && is_array($rates)) {
+            foreach ($rates as $key => $value) {
+                $existingRates[] = ['key' => $key, 'value' => $value];
+            }
+        }
+
+        # 3 Create Form
+        $form = $this->createForm(CompanyType::class, $company);
+        $form->get('rates')->setData($existingRates); // Pre-fill form with existing rates
+        $form->handleRequest($request);
+
+        # 4 Form validation and submission
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $logoFile */
+            $logoFile = $form->get('logoFile')->getData();
+
+            if ($logoFile) {
+                $filesystem = new Filesystem();
+                $targetDirectory = $this->getParameter('logos_directory');
+
+                // Delete old logo if it exists
+                if ($company->getLogo()) {
+                    $oldLogoPath = $targetDirectory . '/' . basename($company->getLogo());
+                    if ($filesystem->exists($oldLogoPath)) {
+                        $filesystem->remove($oldLogoPath);
+                    }
+                }
+
+                // Generate unique filename
+                $originalFilename = pathinfo($logoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $logoFile->guessExtension();
+
+                // Move the file to assets/images/logo/
+                $filesystem->mkdir($targetDirectory);
+                $logoFile->move($targetDirectory, $newFilename);
+
+                // Save the relative path
+                $company->setLogo($this->getParameter('logos_public_path') . '/' . $newFilename);
+            }
+
+            # 5 Process rates as key-value pairs
+            $submittedRates = $form->get('rates')->getData();
+            $rates = [];
+            foreach ($submittedRates as $rate) {
+                if (!empty($rate['key']) && !empty($rate['value'])) {
+                    $rates[$rate['key']] = $rate['value'];
+                }
+            }
+
+            $company->setRates($rates);
 
 
-        // Ensure the user is linked to a company
-        $company  = $this->entityManager->getRepository(Company::class)->findAll();
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'Company updated successfully.');
+
+            return $this->redirectToRoute('admin_company');
+        }
 
         return $this->render('admin/company/index.html.twig', [
             'company' => $company,
+            'form' => $form->createView(),
         ]);
     }
-
-    #[Route('/admin/company/create', name: 'app_company_create', methods: ['POST'])]
-    public function create(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-
-        if (!$data || !isset($data['name'], $data['logo'], $data['rates'])) {
-            return $this->json(['error' => 'Invalid data'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $company = new Company();
-        $company->setName($data['name']);
-        $company->setLogo($data['logo']);
-        $company->setRates($data['rates']);
-
-        $this->entityManager->persist($company);
-        $this->entityManager->flush();
-
-        return $this->json(['message' => 'Company created successfully'], Response::HTTP_CREATED);
-    }
-
-    #[Route('/admin/company/{id}', name: 'app_company_show', methods: ['GET'])]
-    public function show(int $id): JsonResponse
-    {
-        $company = $this->entityManager->getRepository(Company::class)->find($id);
-
-        if (!$company) {
-            return $this->json(['error' => 'Company not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        return $this->json([
-            'id' => $company->getId(),
-            'name' => $company->getName(),
-            'logo' => $company->getLogo(),
-            'rates' => $company->getRates(),
-        ]);
-    }
-
-    #[Route('/admin/company/{id}/edit', name: 'app_company_edit', methods: ['PUT'])]
-    public function edit(int $id, Request $request): JsonResponse
-    {
-        $company = $this->entityManager->getRepository(Company::class)->find($id);
-
-        if (!$company) {
-            return $this->json(['error' => 'Company not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        $data = json_decode($request->getContent(), true);
-
-        if (isset($data['name'])) {
-            $company->setName($data['name']);
-        }
-        if (isset($data['logo'])) {
-            $company->setLogo($data['logo']);
-        }
-        if (isset($data['rates'])) {
-            $company->setRates($data['rates']);
-        }
-
-        $this->entityManager->flush();
-
-        return $this->json(['message' => 'Company updated successfully']);
-    }
-
-
 }

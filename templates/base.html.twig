@@ -72,7 +72,7 @@
                 <div class="flex justify-center sm:justify-start">
                 <a href="{{ path('app_user') }}" class="flex items-center justify-center sm:justify-start space-x-2 hover:text-gray-300 transition py-2">
                     <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="Bruger og Teams" class="h-5 w-5">
-{#                    <span class=""> Bruger: {{ app.user.username }}</span>#}{# # NEEDS TO ENSURE CHECK IF USER IS LOGGED IN OR NOT#}
+{#                    <span class=""> Bruger: {{ app.user.username }}</span>#}
                 </a>
                 </div>
             </div>
@@ -90,6 +90,10 @@
 
             <!-- Right: Admin Menu -->
             <div class="flex flex-wrap justify-center space-x-4">
+                <a href="{{ path('admin_company') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                    <img src="{{ asset('icons/admin_menu/client.svg') }}" alt="Clients" class="h-5 w-5">
+                    <span>Our Company</span>
+                </a>
                 <a href="{{ path('admin_client') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
                     <img src="{{ asset('icons/admin_menu/client.svg') }}" alt="Clients" class="h-5 w-5">
                     <span>Clients</span>
