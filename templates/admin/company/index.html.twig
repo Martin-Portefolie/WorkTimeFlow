@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'company_management.index.title'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="relative bg-section_2 py-10">
+        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+            <!-- Header Section -->
+            <div class="flex items-center justify-between mb-5">
+                <h1 class="text-2xl text-dark">{{ 'company_management.index.title'|trans }}</h1>
+            </div>
+
+            <!-- Company Details -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <form action="#" method="post">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Company Name -->
+                        <div>
+                            <label for="name_{{ company.id }}" class="block text-sm">
+                                {{ 'company_management.index.name'|trans }}
+                            </label>
+                            <input type="text" name="name" id="name_{{ company.id }}" value="{{ company.name }}"
+                                   class="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none">
+                        </div>
+
+                        <!-- Company Logo -->
+                        <div>
+                            <label class="block text-sm">
+                                {{ 'company_management.index.logo'|trans }}
+                            </label>
+                            {% if company.logo %}
+                                <img src="{{ asset('uploads/logos/' ~ company.logo) }}" alt="Company Logo" class="w-20 h-20 object-cover rounded-md">
+                            {% else %}
+                                <span class="text-gray-500">{{ 'company_management.index.no_logo'|trans }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Company Rates (JSON) -->
+                        <div class="col-span-2">
+                            <label class="block text-sm">
+                                {{ 'company_management.index.rates'|trans }}
+                            </label>
+                            <ul class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border">
+                                {% for key, rate in company.rates %}
+                                    <li class="py-1">{{ key }}: {{ rate|number_format(2, '.', ',') }} {{ 'company_management.index.currency'|trans }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-4">
+                        <!-- Edit Button -->
+                        <a href="{{ path('app_company_edit', {id: company.id}) }}"
+                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-edit hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                            {{ 'company_management.index.edit'|trans }}
+                        </a>
+
+                        <!-- Delete Button -->
+                        <form method="post" action="{{ path('app_company_delete', {id: company.id}) }}"
+                              onsubmit="return confirm('{{ 'company_management.index.confirm_delete'|trans }}');">
+                            <button type="submit"
+                                    class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-delete hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                                {{ 'company_management.index.delete'|trans }}
+                            </button>
+                        </form>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}
