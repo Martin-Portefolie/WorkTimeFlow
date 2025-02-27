@@ -14,10 +14,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class ProjectController extends AbstractController
 {
     private $entityManager;
+
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
     }
+
     #[Route('/admin/project', name: 'admin_project')]
     public function index(): Response
     {
@@ -40,8 +42,6 @@ class ProjectController extends AbstractController
                 'estimated_budget' => $project->getEstimatedBudget(),
                 'estimated_minutes' => $project->getEstimatedMinutes() ?? 0,
                 'remaining_minutes' => $project->getRemainingMinutes() ?? 0,
-
-
             ];
         }
 
@@ -98,16 +98,13 @@ class ProjectController extends AbstractController
 
         // Budget
         $budgetValue = $request->request->get('estimated_budget');
-        $project->setEstimatedBudget($budgetValue !== null ? (float) $budgetValue : null);
+        $project->setEstimatedBudget(null !== $budgetValue ? (float) $budgetValue : null);
 
         // Estimated hours
 
         $estimatedTime = $request->request->get('estimated_time');
 
-
-        $project->setEstimatedTime($estimatedTime !== null ? (int) $estimatedTime : 0);
-
-
+        $project->setEstimatedTime(null !== $estimatedTime ? (int) $estimatedTime : 0);
 
         // Manage team associations
         $selectedTeamIds = $request->request->all('team_ids', []);
@@ -131,5 +128,4 @@ class ProjectController extends AbstractController
 
         return $this->redirectToRoute('admin_project');
     }
-
 }

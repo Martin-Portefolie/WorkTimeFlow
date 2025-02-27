@@ -6,12 +6,12 @@ use App\Entity\Company;
 use App\Form\CompanyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 final class CompanyController extends AbstractController
 {
@@ -25,7 +25,7 @@ final class CompanyController extends AbstractController
     #[Route('/admin/company', name: 'admin_company', methods: ['GET', 'POST'])]
     public function index(Request $request, SluggerInterface $slugger): Response
     {
-        # 1 Create new Company if it doesn't exist
+        // 1 Create new Company if it doesn't exist
         $company = $this->entityManager->getRepository(Company::class)->find(1);
 
         if (!$company) {
@@ -34,7 +34,7 @@ final class CompanyController extends AbstractController
             $this->entityManager->flush();
         }
 
-        # 2 Convert existing rates JSON into an array for the form
+        // 2 Convert existing rates JSON into an array for the form
         $existingRates = [];
         $rates = $company->getRates();
 
@@ -44,12 +44,12 @@ final class CompanyController extends AbstractController
             }
         }
 
-        # 3 Create Form
+        // 3 Create Form
         $form = $this->createForm(CompanyType::class, $company);
         $form->get('rates')->setData($existingRates); // Pre-fill form with existing rates
         $form->handleRequest($request);
 
-        # 4 Form validation and submission
+        // 4 Form validation and submission
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $logoFile */
             $logoFile = $form->get('logoFile')->getData();
@@ -60,7 +60,7 @@ final class CompanyController extends AbstractController
 
                 // Delete old logo if it exists
                 if ($company->getLogo()) {
-                    $oldLogoPath = $targetDirectory . '/' . basename($company->getLogo());
+                    $oldLogoPath = $targetDirectory.'/'.basename($company->getLogo());
                     if ($filesystem->exists($oldLogoPath)) {
                         $filesystem->remove($oldLogoPath);
                     }
@@ -69,17 +69,17 @@ final class CompanyController extends AbstractController
                 // Generate unique filename
                 $originalFilename = pathinfo($logoFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $logoFile->guessExtension();
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$logoFile->guessExtension();
 
                 // Move the file to assets/images/logo/
                 $filesystem->mkdir($targetDirectory);
                 $logoFile->move($targetDirectory, $newFilename);
 
                 // Save the relative path
-                $company->setLogo($this->getParameter('logos_public_path') . '/' . $newFilename);
+                $company->setLogo($this->getParameter('logos_public_path').'/'.$newFilename);
             }
 
-            # 5 Process rates as key-value pairs
+            // 5 Process rates as key-value pairs
             $submittedRates = $form->get('rates')->getData();
             $rates = [];
             foreach ($submittedRates as $rate) {
@@ -89,7 +89,6 @@ final class CompanyController extends AbstractController
             }
 
             $company->setRates($rates);
-
 
             $this->entityManager->flush();
 

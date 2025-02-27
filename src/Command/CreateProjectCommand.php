@@ -36,6 +36,7 @@ class CreateProjectCommand extends Command
 
         if (!$client) {
             $io->error('Client "Heste-status aps" not found. Please create the client first.');
+
             return Command::FAILURE;
         }
 
@@ -59,4 +60,3 @@ class CreateProjectCommand extends Command
         return Command::SUCCESS;
     }
 }
-

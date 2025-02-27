@@ -19,7 +19,7 @@ class Company
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
-    #[ORM\Column(type: "json")]
+    #[ORM\Column(type: 'json')]
     private array $rates = [];
 
     public function getId(): ?int
@@ -56,6 +56,7 @@ class Company
         if (is_string($this->rates)) {
             return json_decode($this->rates, true) ?? [];
         }
+
         return is_array($this->rates) ? $this->rates : [];
     }
 
@@ -69,6 +70,7 @@ class Company
         }
 
         $this->rates = $formattedRates; // Save as proper key-value JSON
+
         return $this;
     }
 }

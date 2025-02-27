@@ -47,8 +47,6 @@ class Project
     #[ORM\Column(type: 'string', enumType: Priority::class)]
     private Priority $priority;
 
-
-
     #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2, nullable: true)]
     private ?string $estimatedBudget = null;
 
@@ -64,7 +62,6 @@ class Project
     {
         $this->lastUpdated = new \DateTime();
     }
-
 
     public function __construct()
     {
@@ -172,8 +169,6 @@ class Project
         return $this;
     }
 
-
-
     public function getTotalMinutesUsed(): int
     {
         $totalMinutes = 0;
@@ -182,6 +177,7 @@ class Project
                 $totalMinutes += $timelog->getTotalMinutes();
             }
         }
+
         return $totalMinutes;
     }
 
@@ -193,6 +189,7 @@ class Project
     public function setDeadline(\DateTimeInterface $deadline): static
     {
         $this->deadline = $deadline;
+
         return $this;
     }
 
@@ -204,9 +201,9 @@ class Project
     public function setPriority(Priority $priority): static
     {
         $this->priority = $priority;
+
         return $this;
     }
-
 
     public function getEstimatedBudget(): ?string
     {
@@ -223,6 +220,7 @@ class Project
     public function setEstimatedTime(?int $minutes): static
     {
         $this->estimatedMinutes = $minutes;
+
         return $this;
     }
 
@@ -233,7 +231,7 @@ class Project
 
     public function getRemainingMinutes(): ?int
     {
-        if ($this->estimatedMinutes === null) {
+        if (null === $this->estimatedMinutes) {
             return null;
         }
 
@@ -241,8 +239,6 @@ class Project
 
         return max(0, $this->estimatedMinutes - $usedMinutes);
     }
-
-
 
     public function getLastUpdated(): ?\DateTimeInterface
     {
@@ -264,6 +260,7 @@ class Project
     public function setArchived(bool $isArchived): static
     {
         $this->isArchived = $isArchived;
+
         return $this;
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Todo;
-use App\Entity\User;
 use App\Form\TodoType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,7 +12,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class TodosController extends AbstractController
 {
-
     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
@@ -24,7 +22,6 @@ class TodosController extends AbstractController
     #[Route('/admin/todos', name: 'admin_todos')]
     public function index(): Response
     {
-
         $todos = $this->entityManager->getRepository(Todo::class)->findAll();
         $todoDataArray = [];
         foreach ($todos as $todo) {
@@ -36,6 +33,7 @@ class TodosController extends AbstractController
                 'project' => $todo->getProject() ? $todo->getProject()->getName() : 'Unassigned',
             ];
         }
+
         return $this->render('admin/todos/index.html.twig', [
             'controller_name' => 'TodosController',
             'todoDataArray' => $todoDataArray,

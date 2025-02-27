@@ -60,8 +60,6 @@ class Todo
         return $this;
     }
 
-
-
     public function getDateStart(): ?\DateTimeInterface
     {
         return $this->dateStart;

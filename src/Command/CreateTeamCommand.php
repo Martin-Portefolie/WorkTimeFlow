@@ -66,6 +66,7 @@ class CreateTeamCommand extends Command
                 $io->success("Associated team '{$teamName}' with project '{$projectName}'.");
             } else {
                 $io->error("Project '{$projectName}' not found.");
+
                 return Command::FAILURE;
             }
         }

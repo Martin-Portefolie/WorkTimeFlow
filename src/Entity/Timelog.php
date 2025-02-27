@@ -14,7 +14,6 @@ class Timelog
     #[ORM\Column]
     private ?int $id = null;
 
-
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $totalMinutes = null;
 
@@ -35,7 +34,6 @@ class Timelog
         return $this->id;
     }
 
-
     public function getTotalMinutes(): ?int
     {
         return $this->totalMinutes;
@@ -44,10 +42,11 @@ class Timelog
     public function setTotalMinutes(int $minutes): static
     {
         $this->totalMinutes = $minutes;
+
         return $this;
     }
 
-// Helper methods to convert total minutes to hours and minutes
+    // Helper methods to convert total minutes to hours and minutes
     public function getHours(): int
     {
         return intdiv($this->totalMinutes, 60);
@@ -58,13 +57,13 @@ class Timelog
         return $this->totalMinutes % 60;
     }
 
-// Helper method to set hours and minutes
+    // Helper method to set hours and minutes
     public function setHoursAndMinutes(int $hours, int $minutes): static
     {
         $this->totalMinutes = ($hours * 60) + $minutes;
+
         return $this;
     }
-
 
     public function getDate(): ?\DateTimeInterface
     {

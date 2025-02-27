@@ -30,11 +30,9 @@ class TimeRegisterController extends AbstractController
     /**
      * @throws \Exception
      */
-
     #[Route('/profile/time-register/{week<\d+>?}/{year<\d+>?}', name: 'app_time_register', methods: ['GET'])]
-    public function index(Request $request, int $week = null, int $year = null): Response
+    public function index(Request $request, ?int $week = null, ?int $year = null): Response
     {
-
         $timezone = new \DateTimeZone($_ENV['APP_TIMEZONE'] ?? 'Europe/Copenhagen');
         $yearWeekData = $this->dateService->getWeekYear($timezone, $week, $year);
         $week = $yearWeekData['week'];
@@ -42,15 +40,14 @@ class TimeRegisterController extends AbstractController
         $weekData = $this->dateService->getWeek($week, $year);
         $data = $weekData['data'];
 
-
         $user = $this->getUser();
-        if (!$user instanceof \App\Entity\User) {
+        if (!$user instanceof User) {
             return $this->json(['error' => 'User not logged in'], 403);
         }
 
         $userTeams = $user->getTeams();
 
-        #TODO Should go into repository
+        // TODO Should go into repository
         $todos = $this->entityManager->getRepository(Todo::class)->createQueryBuilder('t')
             ->join('t.project', 'p')
             ->join('p.teams', 'team')
@@ -59,27 +56,18 @@ class TimeRegisterController extends AbstractController
             ->getQuery()
             ->getResult();
 
-
-
-//        $weeklyTotal = 0;
-//        foreach ($data as &$day) {
-//            $dayTotal = 0;
-//            foreach ($day['timelog'] as $timelog) {
-//                $dayTotal += $timelog['hours'] * 60 + $timelog['minutes'];
-//            }
-//            $day['dayTotal'] = $dayTotal;
-//            $weeklyTotal += $dayTotal;
-//        }
-
-
-
-
+        //        $weeklyTotal = 0;
+        //        foreach ($data as &$day) {
+        //            $dayTotal = 0;
+        //            foreach ($day['timelog'] as $timelog) {
+        //                $dayTotal += $timelog['hours'] * 60 + $timelog['minutes'];
+        //            }
+        //            $day['dayTotal'] = $dayTotal;
+        //            $weeklyTotal += $dayTotal;
+        //        }
 
         $timelogs = $this->entityManager->getRepository(Timelog::class)
             ->findTimelogsByUserAndWeek($user, $week, $year);
-
-
-
 
         foreach ($timelogs as $timelog) {
             foreach ($data as &$day) {
@@ -96,7 +84,6 @@ class TimeRegisterController extends AbstractController
             }
         }
 
-
         $weeklyTotal = 0;
         foreach ($data as &$day) {
             $dayTotal = 0;
@@ -112,7 +99,7 @@ class TimeRegisterController extends AbstractController
             'year' => $year,
             'todos' => $todos,
             'weeklyData' => $data,
-            'weeklyTotal' => $weeklyTotal
+            'weeklyTotal' => $weeklyTotal,
         ]);
     }
 
@@ -167,5 +154,4 @@ class TimeRegisterController extends AbstractController
             'minutes' => $timelog->getMinutes(),
         ]);
     }
-
 }

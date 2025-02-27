@@ -17,21 +17,21 @@ class RateType extends AbstractType
                 'label' => 'Rate Name (Identifier)',
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'e.g. rate_for_washing_a_car'
+                    'placeholder' => 'e.g. rate_for_washing_a_car',
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'The rate key cannot be empty.']),
-                ]
+                ],
             ])
             ->add('value', TextType::class, [
                 'label' => 'Rate Amount',
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'e.g. 600'
+                    'placeholder' => 'e.g. 600',
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'The rate amount cannot be empty.']),
-                ]
+                ],
             ]);
     }
 

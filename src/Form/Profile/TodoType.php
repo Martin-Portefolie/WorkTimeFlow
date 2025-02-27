@@ -2,8 +2,8 @@
 
 namespace App\Form\Profile;
 
-use App\Entity\Todo;
 use App\Entity\Project;
+use App\Entity\Todo;
 use App\Enum\TodoStatus;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -41,7 +41,7 @@ class TodoType extends AbstractType
             ])
             ->add('status', ChoiceType::class, [
                 'choices' => array_combine(
-                    array_map(fn($status) => $status->getLabel(), TodoStatus::cases()),
+                    array_map(fn ($status) => $status->getLabel(), TodoStatus::cases()),
                     TodoStatus::cases()
                 ),
                 'label' => 'Status',

@@ -5,7 +5,6 @@ namespace App\Controller\Admin;
 use App\Entity\Team;
 use App\Entity\User;
 use App\Form\TeamType;
-
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +25,7 @@ class TeamsController extends AbstractController
     {
         $teams = $this->entityManager->getRepository(Team::class)->findAll();
         $allUsers = $this->entityManager->getRepository(User::class)->findAll();
+
         return $this->render('admin/teams/index.html.twig', [
             'teams' => $teams,
             'allUsers' => $allUsers,
@@ -92,6 +92,4 @@ class TeamsController extends AbstractController
 
         return $this->redirectToRoute('admin_team');
     }
-
-
 }
