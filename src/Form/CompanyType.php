@@ -24,7 +24,7 @@ class CompanyType extends AbstractType
             ])
             ->add('logoFile', FileType::class, [
                 'label' => 'Upload New Logo',
-                'mapped' => false,  // Not mapped to entity directly
+                'mapped' => false,
                 'required' => false,
                 'constraints' => [
                     new File([
@@ -40,14 +40,7 @@ class CompanyType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'required' => false,
-                'label' => 'Rates',
-                'attr' => ['class' => 'form-control'],
-                'entry_options' => [
-                    'constraints' => [
-                        new NotBlank(['message' => 'Rate name cannot be empty']),
-                    ],
-                    'attr' => ['class' => 'form-control'],
-                ],
+                'by_reference' => false,
             ]);
     }
 

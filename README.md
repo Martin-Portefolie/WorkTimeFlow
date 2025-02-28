@@ -13,7 +13,6 @@ Getting started:
 ```shell
 # 1. (always) start docker
 docker-compose up --build -d #only build once
-docker-compose up  
 docker compose exec php composer install #installing vendor files
 # 2(one-time-required) install dependencies
 docker compose exec php composer install

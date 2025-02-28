@@ -11,7 +11,9 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <!-- Company Name -->
                     <div>
-                        <label for="{{ form.name.vars.id }}" class="block text-sm">{{ 'company_management.index.name'|trans }}</label>
+                        <label for="{{ form.name.vars.id }}" class="block text-sm">
+                            {{ 'company_management.index.name'|trans }}
+                        </label>
                         {{ form_widget(form.name, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' } }) }}
                     </div>
 
@@ -31,11 +33,13 @@
 
                 <!-- Rates Management -->
                 <div class="mt-6 p-4 bg-gray-100 rounded-lg shadow" data-controller="rates">
-                    <label class="block text-lg font-medium text-gray-700">{{ 'company_management.index.rates'|trans }}</label>
+                    <label class="block text-lg font-medium text-gray-700">
+                        {{ 'company_management.index.rates'|trans }}
+                    </label>
 
                     <div id="rates-collection"
                          data-rates-target="collection"
-                         data-prototype="{{ form_widget(form.rates.vars.prototype.key)|e('html_attr') }}{{ form_widget(form.rates.vars.prototype.value)|e('html_attr') }}"
+                         data-prototype="{{ form_widget(form.rates.vars.prototype)|e('html_attr') }}"
                          class="space-y-3 mt-3">
 
                         {% for rateField in form.rates %}
@@ -69,6 +73,7 @@
                     </button>
                 </div>
 
+                <!-- Submit Button -->
                 <button type="submit" class="btn btn-primary mt-4">{{ 'company_management.index.save'|trans }}</button>
 
                 {{ form_end(form) }}
