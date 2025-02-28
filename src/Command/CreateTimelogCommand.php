@@ -10,7 +10,6 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -64,6 +63,7 @@ class CreateTimelogCommand extends Command
 
         if (!$user || !$todo) {
             $io->error('Invalid username or todo ID.');
+
             return Command::FAILURE;
         }
 
@@ -79,6 +79,7 @@ class CreateTimelogCommand extends Command
 
         if (!$hasAccess) {
             $io->error("User '{$username}' does not have access to this todo.");
+
             return Command::FAILURE;
         }
 
@@ -94,6 +95,7 @@ class CreateTimelogCommand extends Command
         $this->entityManager->flush();
 
         $io->success("Time logged for user '{$username}' on todo '{$todo->getName()}'. Description: {$description}");
+
         return Command::SUCCESS;
     }
 }

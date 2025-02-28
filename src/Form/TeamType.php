@@ -37,7 +37,6 @@ class TeamType extends AbstractType
                 'label' => 'Assign Projects',
                 'required' => false,
             ]);
-        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

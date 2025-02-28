@@ -22,7 +22,6 @@ class TestAutosave
         return $this->id;
     }
 
-
     public function getTotalMinutes(): ?int
     {
         return $this->totalMinutes;
@@ -31,10 +30,11 @@ class TestAutosave
     public function setTotalMinutes(int $minutes): static
     {
         $this->totalMinutes = $minutes;
+
         return $this;
     }
 
-// Helper methods to convert total minutes to hours and minutes
+    // Helper methods to convert total minutes to hours and minutes
     public function getHours(): int
     {
         return intdiv($this->totalMinutes, 60);
@@ -45,11 +45,11 @@ class TestAutosave
         return $this->totalMinutes % 60;
     }
 
-// Helper method to set hours and minutes
+    // Helper method to set hours and minutes
     public function setHoursAndMinutes(int $hours, int $minutes): static
     {
         $this->totalMinutes = ($hours * 60) + $minutes;
+
         return $this;
     }
-
 }

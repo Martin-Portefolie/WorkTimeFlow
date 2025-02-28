@@ -1,3 +1,14 @@
+company_management:
+  index:
+    title: "Company Management"
+    name: "name"
+    logo: "logo"
+    rates: "rates"
+    save: "save"
+    add_rate: "add"
+    rates_name: "name"
+    rates_amount: "rates amount (hourly)"
+
 client_management:
   index:
     title: "Client Management"

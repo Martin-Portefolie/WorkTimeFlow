@@ -22,7 +22,8 @@ export default class extends Controller {
         };
 
         try {
-            const response = await fetch("/profile/save-time", {
+            const locale = document.documentElement.lang || "en"; // Get locale from `<html lang="">`
+            const response = await fetch(`/${locale}/profile/save-time`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -35,7 +36,7 @@ export default class extends Controller {
             const result = await response.json();
             console.log("Save successful:", result);
 
-            // ✅ Update the UI with the new values
+            //  Update the UI with the new values
             this.updateUI(input, result);
 
         } catch (error) {
@@ -49,10 +50,10 @@ export default class extends Controller {
         const hours = result.hours;
         const minutes = result.minutes;
 
-        // ✅ Update the input field with formatted time
+        //  Update the input field with formatted time
         input.value = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 
-        // ✅ Find the total field for the row
+        // Find the total field for the row
         const row = input.closest("tr");
         let rowTotal = 0;
 
@@ -66,17 +67,7 @@ export default class extends Controller {
             totalCell.textContent = `${Math.floor(rowTotal / 60)}h ${rowTotal % 60}m`;
         }
 
-        // ✅ Update the column totals
-        // const dayTotalCell = document.querySelector(`td[data-date="${date}"]`);
-        // if (dayTotalCell) {
-        //     let dayTotal = 0;
-        //     document.querySelectorAll(`input[data-date="${date}"]`).forEach((inp) => {
-        //         const [h, m] = inp.value.split(":").map((val) => parseInt(val, 10));
-        //         dayTotal += h * 60 + m;
-        //     });
-        //
-        //     dayTotalCell.textContent = `${Math.floor(dayTotal / 60)}h ${dayTotal % 60}m`;
-        // }
+
         const dayTotalCell = document.querySelector(`td[data-day-total="${date}"]`);
         if (dayTotalCell) {
             let dayTotal = 0;
@@ -85,13 +76,13 @@ export default class extends Controller {
                 dayTotal += h * 60 + m;
             });
 
-            // ✅ Update the cell text content
+            //  Update the cell text content
             dayTotalCell.textContent = `${Math.floor(dayTotal / 60)}h ${dayTotal % 60}m`;
         }
 
         let weeklyTotal = 0;
         document.querySelectorAll("td[data-day-total]").forEach((cell) => {
-            console.log("Checking cell:", cell.textContent); // ✅ Debugging
+            console.log("Checking cell:", cell.textContent); //  Debugging
             const time = cell.textContent.trim().split(" ");
 
             if (time.length === 2) {
@@ -99,7 +90,7 @@ export default class extends Controller {
                 const m = parseInt(time[1]) || 0;
                 weeklyTotal += h * 60 + m;
             } else {
-                console.warn("Invalid time format:", cell.textContent); // ✅ Debugging
+                console.warn("Invalid time format:", cell.textContent); //  Debugging
             }
         });
 

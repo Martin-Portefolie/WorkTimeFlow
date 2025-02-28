@@ -2,10 +2,8 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Client;
 use App\Entity\Team;
 use App\Entity\User;
-use App\Form\ClientType;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,7 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-
 
 class UsersController extends AbstractController
 {
@@ -123,7 +120,4 @@ class UsersController extends AbstractController
 
         return $this->redirectToRoute('admin_users');
     }
-
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Enum;
 
 enum TodoStatus: string
@@ -33,4 +34,3 @@ enum TodoStatus: string
         };
     }
 }
-

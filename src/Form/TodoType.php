@@ -27,7 +27,6 @@ class TodoType extends AbstractType
                 'placeholder' => 'Select a project',
                 'required' => true,
             ]);
-        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

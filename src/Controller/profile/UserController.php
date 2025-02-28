@@ -16,55 +16,54 @@ use Symfony\Component\Routing\Attribute\Route;
 final class UserController extends AbstractController
 {
     #[Route('/profile/user', name: 'app_user')]
+    public function index(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
 
-   public function index(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
-   {
-       $user = $this->getUser();
-       if (!$user) {
-           return $this->redirectToRoute('app_login');
-       }
+        // Create the form manually
+        $form = $this->createFormBuilder($user)
+            ->add('username', TextType::class, [
+                'label' => 'Username',
+                'attr' => ['class' => 'form-control'],
+            ])
+            ->add('email', EmailType::class, [
+                'label' => 'Email',
+                'attr' => ['class' => 'form-control'],
+            ])
+            ->add('plainPassword', PasswordType::class, [
+                'label' => 'New Password (optional)',
+                'mapped' => false,
+                'required' => false,
+                'attr' => ['class' => 'form-control'],
+            ])
+            ->add('save', SubmitType::class, [
+                'label' => 'Update Profile',
+                'attr' => ['class' => 'btn btn-primary'],
+            ])
+            ->getForm();
 
-       // Create the form manually
-       $form = $this->createFormBuilder($user)
-           ->add('username', TextType::class, [
-               'label' => 'Username',
-               'attr' => ['class' => 'form-control'],
-           ])
-           ->add('email', EmailType::class, [
-               'label' => 'Email',
-               'attr' => ['class' => 'form-control'],
-           ])
-           ->add('plainPassword', PasswordType::class, [
-               'label' => 'New Password (optional)',
-               'mapped' => false,
-               'required' => false,
-               'attr' => ['class' => 'form-control'],
-           ])
-           ->add('save', SubmitType::class, [
-               'label' => 'Update Profile',
-               'attr' => ['class' => 'btn btn-primary'],
-           ])
-           ->getForm();
+        $form->handleRequest($request);
 
-       $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $plainPassword = $form->get('plainPassword')->getData();
 
-       if ($form->isSubmitted() && $form->isValid()) {
-           $data = $form->getData();
-           $plainPassword = $form->get('plainPassword')->getData();
+            if ($plainPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
+                $user->setPassword($hashedPassword);
+            }
 
-           if ($plainPassword) {
-               $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
-               $user->setPassword($hashedPassword);
-           }
+            $entityManager->flush();
+            $this->addFlash('success', 'Profile updated successfully!');
 
-           $entityManager->flush();
-           $this->addFlash('success', 'Profile updated successfully!');
+            return $this->redirectToRoute('app_user');
+        }
 
-           return $this->redirectToRoute('app_user');
-       }
-
-       return $this->render('profile/user/index.html.twig', [
-           'form' => $form->createView(),
-       ]);
-   }
+        return $this->render('profile/user/index.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 }

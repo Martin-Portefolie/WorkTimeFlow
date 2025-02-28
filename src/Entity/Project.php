@@ -2,9 +2,11 @@
 
 namespace App\Entity;
 
+use App\Enum\Priority;
 use App\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
@@ -34,15 +36,39 @@ class Project
     private Collection $todos;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
-    private ?Client $client = null;
+    #[ORM\JoinColumn(nullable: false)]
+    private Client $client;
+    #[ORM\Column(type: 'boolean')]
+    private bool $isArchived = false;
 
-    #[ORM\Column]
-    private ?bool $Active = null;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $deadline = null;
+
+    #[ORM\Column(type: 'string', enumType: Priority::class)]
+    private Priority $priority;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 15, scale: 2, nullable: true)]
+    private ?string $estimatedBudget = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $estimatedMinutes = null;
+
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $lastUpdated;
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function updateTimestamp(): void
+    {
+        $this->lastUpdated = new \DateTime();
+    }
 
     public function __construct()
     {
         $this->teams = new ArrayCollection();
         $this->todos = new ArrayCollection();
+        $this->lastUpdated = new \DateTime();
+        $this->priority = Priority::MEDIUM;
     }
 
     public function getId(): ?int
@@ -143,18 +169,6 @@ class Project
         return $this;
     }
 
-    public function isActive(): ?bool
-    {
-        return $this->Active;
-    }
-
-    public function setActive(bool $Active): static
-    {
-        $this->Active = $Active;
-
-        return $this;
-    }
-
     public function getTotalMinutesUsed(): int
     {
         $totalMinutes = 0;
@@ -163,6 +177,90 @@ class Project
                 $totalMinutes += $timelog->getTotalMinutes();
             }
         }
+
         return $totalMinutes;
+    }
+
+    public function getDeadline(): ?\DateTimeInterface
+    {
+        return $this->deadline;
+    }
+
+    public function setDeadline(\DateTimeInterface $deadline): static
+    {
+        $this->deadline = $deadline;
+
+        return $this;
+    }
+
+    public function getPriority(): ?Priority
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(Priority $priority): static
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    public function getEstimatedBudget(): ?string
+    {
+        return $this->estimatedBudget;
+    }
+
+    public function setEstimatedBudget(?string $estimatedBudget): static
+    {
+        $this->estimatedBudget = $estimatedBudget;
+
+        return $this;
+    }
+
+    public function setEstimatedTime(?int $minutes): static
+    {
+        $this->estimatedMinutes = $minutes;
+
+        return $this;
+    }
+
+    public function getEstimatedMinutes(): ?int
+    {
+        return $this->estimatedMinutes;
+    }
+
+    public function getRemainingMinutes(): ?int
+    {
+        if (null === $this->estimatedMinutes) {
+            return null;
+        }
+
+        $usedMinutes = $this->getTotalMinutesUsed();
+
+        return max(0, $this->estimatedMinutes - $usedMinutes);
+    }
+
+    public function getLastUpdated(): ?\DateTimeInterface
+    {
+        return $this->lastUpdated;
+    }
+
+    public function setLastUpdated(\DateTimeInterface $lastUpdated): static
+    {
+        $this->lastUpdated = $lastUpdated;
+
+        return $this;
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->isArchived;
+    }
+
+    public function setArchived(bool $isArchived): static
+    {
+        $this->isArchived = $isArchived;
+
+        return $this;
     }
 }

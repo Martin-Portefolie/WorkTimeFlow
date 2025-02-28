@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class ProjectController extends AbstractController
 {
     private $entityManager;
+
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -32,15 +33,21 @@ class ProjectController extends AbstractController
                 'name' => $project->getName(),
                 'description' => $project->getDescription(),
                 'client' => $project->getClient()->getName(),
-                'teams' => $project->getTeams(),
-                'todo' => $project->getTodos(),
-                'active' => $project->isActive(),
+                'teams' => $project->getTeams()->toArray(), // Convert collection to array
+                'todo' => $project->getTodos()->toArray(), // Convert collection to array
+                'is_archived' => $project->isArchived(),
+                'total_minutes' => $project->getTotalMinutesUsed(),
+                'deadline' => $project->getDeadline()?->format('Y-m-d'),
+                'priority' => $project->getPriority()->value,
+                'estimated_budget' => $project->getEstimatedBudget(),
+                'estimated_minutes' => $project->getEstimatedMinutes() ?? 0,
+                'remaining_minutes' => $project->getRemainingMinutes() ?? 0,
             ];
         }
 
         return $this->render('admin/project/index.html.twig', [
             'projectDataArray' => $projectsDataArray,
-            'allTeams' => $allTeams, // Pass all teams for selection
+            'allTeams' => $allTeams,
         ]);
     }
 
@@ -53,7 +60,6 @@ class ProjectController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Persist selected teams directly from the form data
             $selectedTeams = $form->get('teams')->getData();
             foreach ($selectedTeams as $team) {
                 $project->addTeam($team);
@@ -79,10 +85,26 @@ class ProjectController extends AbstractController
             throw $this->createNotFoundException('Project not found');
         }
 
-        // Directly update from the request data, as fields are in the same form on the `index.html.twig`
+        // name, description, is_archived
         $project->setName($request->request->get('name'));
         $project->setDescription($request->request->get('description'));
-        $project->setActive($request->request->has('active'));
+        $project->setArchived($request->request->has('is_archived'));
+
+        // Priority
+        $priorityValue = $request->request->get('priority');
+        if (in_array($priorityValue, \App\Enum\Priority::getValues())) {
+            $project->setPriority(\App\Enum\Priority::from($priorityValue));
+        }
+
+        // Budget
+        $budgetValue = $request->request->get('estimated_budget');
+        $project->setEstimatedBudget(null !== $budgetValue ? (float) $budgetValue : null);
+
+        // Estimated hours
+
+        $estimatedTime = $request->request->get('estimated_time');
+
+        $project->setEstimatedTime(null !== $estimatedTime ? (int) $estimatedTime : 0);
 
         // Manage team associations
         $selectedTeamIds = $request->request->all('team_ids', []);
@@ -106,5 +128,4 @@ class ProjectController extends AbstractController
 
         return $this->redirectToRoute('admin_project');
     }
-
 }

@@ -2,7 +2,6 @@
 
 namespace App\Controller\profile;
 
-use App\Entity\Project;
 use App\Entity\Todo;
 use App\Entity\User;
 use App\Enum\TodoStatus;
@@ -14,7 +13,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
 
 final class StatusController extends AbstractController
 {
@@ -31,18 +29,16 @@ final class StatusController extends AbstractController
     public function index(?int $year = null, ?int $month = null): Response
     {
         $user = $this->getUser();
-        if (!$user instanceof \App\Entity\User) {
+        if (!$user instanceof User) {
             return $this->json(['error' => 'User not logged in'], 403);
         }
 
-
-        # 2.0 Get teams and projects
+        // 2.0 Get teams and projects
         $teams = $this->userProjectService->getUserTeams($user);
         $projects = $this->userProjectService->getProjectsByUser($user);
         $teamProjects = $this->userProjectService->mapTeamsToProjects($teams, $projects);
 
-
-        # 3.0 Get Todos
+        // 3.0 Get Todos
         $todos = $this->userProjectService->getTodosByUserProjects($user, $projects);
         $todoData = [];
         foreach ($todos as $todo) {
@@ -60,7 +56,7 @@ final class StatusController extends AbstractController
             ];
         }
 
-        # 3.0 Prepare calendar data
+        // 3.0 Prepare calendar data
         if (!$year) {
             $year = (int) (new \DateTime())->format('Y');
         }
@@ -69,16 +65,16 @@ final class StatusController extends AbstractController
         }
         if ($month < 1) {
             $month = 12;
-            $year--;
+            --$year;
         } elseif ($month > 12) {
             $month = 1;
-            $year++;
+            ++$year;
         }
 
         $calendarData = $this->generateCalendarData($year, $month);
         $this->assignTodosToCalendar($calendarData, $todos);
 
-        # 4.0 Render view
+        // 4.0 Render view
         return $this->render('/profile/status/index.html.twig', [
             'controller_name' => 'StatusController',
             'user' => $user->getUsername(),
@@ -101,7 +97,7 @@ final class StatusController extends AbstractController
         }
 
         $todo = $this->entityManager->getRepository(Todo::class)->find($id);
-        if (!$todo || !$todo->getProject()->getTeams()->exists(fn($key, $team) => $user->getTeams()->contains($team))) {
+        if (!$todo || !$todo->getProject()->getTeams()->exists(fn ($key, $team) => $user->getTeams()->contains($team))) {
             return $this->json(['error' => 'Unauthorized access'], 403);
         }
 
@@ -117,7 +113,6 @@ final class StatusController extends AbstractController
         if (!$statusEnum) {
             return $this->json(['error' => 'Invalid status'], 400);
         }
-
 
         $todo->setStatus($statusEnum);
         $this->entityManager->flush();
@@ -149,11 +144,9 @@ final class StatusController extends AbstractController
         ]);
     }
 
-
-
-
     /**
      *  5.0 Generate calendar data for the given month.
+     *
      * @throws \Exception
      */
     private function generateCalendarData(?int $year, ?int $month): array
@@ -168,7 +161,7 @@ final class StatusController extends AbstractController
         $daysInMonth = (int) $startOfMonth->format('t');
 
         $calendarData = [];
-        for ($i = 0; $i < $daysInMonth; $i++) {
+        for ($i = 0; $i < $daysInMonth; ++$i) {
             $currentDay = $startOfMonth->modify("+$i days");
 
             $calendarData[] = [
@@ -207,17 +200,17 @@ final class StatusController extends AbstractController
                     $hours = intdiv($totalMinutes, 60);
                     $minutes = $totalMinutes % 60;
 
-                    if ($totalMinutes  <= 0) {
-                        $status = "Pending";
+                    if ($totalMinutes <= 0) {
+                        $status = 'Pending';
                     } elseif ($totalMinutes > 0) {
-                        $status = "In Progress";
+                        $status = 'In Progress';
                     }
 
                     $day['todos'][] = [
                         'id' => $todo->getId(),
                         'name' => $todo->getName(),
                         'project_name' => $todo->getProject() ? $todo->getProject()->getName() : 'Unknown Project',
-                        'logged_time' => sprintf("%dh %02dm", $hours, $minutes),
+                        'logged_time' => sprintf('%dh %02dm', $hours, $minutes),
                         'status' => $status,
                     ];
                 }

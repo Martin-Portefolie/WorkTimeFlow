@@ -30,7 +30,5 @@ class TodoRepository extends ServiceEntityRepository
             ->groupBy('todo.id')
             ->getQuery()
             ->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
-
     }
-
 }

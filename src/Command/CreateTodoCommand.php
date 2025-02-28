@@ -2,20 +2,16 @@
 
 namespace App\Command;
 
-use App\Entity\Client;
 use App\Entity\Project;
 use App\Entity\Todo;
-use App\Entity\User;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use function PHPUnit\Framework\throwException;
 
 #[AsCommand(
     name: 'create-todo',
@@ -60,6 +56,7 @@ class CreateTodoCommand extends Command
 
         if (!$project) {
             $io->error('Invalid project ID.');
+
             return Command::FAILURE;
         }
 
@@ -74,6 +71,7 @@ class CreateTodoCommand extends Command
         $this->entityManager->flush();
 
         $io->success("Todo '{$name}' has been created and associated with project '{$project->getName()}'.");
+
         return Command::SUCCESS;
     }
 }

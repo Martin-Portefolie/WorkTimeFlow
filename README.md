@@ -13,7 +13,6 @@ Getting started:
 ```shell
 # 1. (always) start docker
 docker-compose up --build -d #only build once
-docker-compose up  
 docker compose exec php composer install #installing vendor files
 # 2(one-time-required) install dependencies
 docker compose exec php composer install
@@ -22,6 +21,17 @@ docker compose exec php bin/console doctrine:migrations:migrate
 # 4 (always) initiate tailwind
 docker compose exec php bin/console tailwind:build --watch --poll
 
+```
+
+### Test
+Before a pull request, make sure that your code passes the:
+twig-lint,
+php-cs-fixer, 
+and unit tests
+
+```shell
+docker compose exec php bin/console lint:twig templates/
+docker compose exec php ./vendor/bin/php-cs-fixer fix --dry-run --diff
 ```
 
 ### helpful commands
