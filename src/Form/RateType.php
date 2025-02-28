@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
@@ -10,14 +9,16 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class RateType extends AbstractType
 {
+
+    #TODO SHOULD BE RESTYLED
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('key', TextType::class, [
                 'label' => 'Rate Name (Identifier)',
                 'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'e.g. rate_for_washing_a_car',
+                    'class' => 'form-control border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder' => 'Enter rate key...',
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'The rate key cannot be empty.']),
@@ -26,8 +27,8 @@ class RateType extends AbstractType
             ->add('value', TextType::class, [
                 'label' => 'Rate Amount',
                 'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'e.g. 600',
+                    'class' => 'form-control border border-gray-300 rounded-lg shadow-sm p-2  focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder' => 'Enter rate amount...',
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'The rate amount cannot be empty.']),

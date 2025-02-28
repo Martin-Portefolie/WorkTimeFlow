@@ -15,33 +15,30 @@
         </a>
 
         <div class="flex items-center space-x-6">
-            <!-- Logged in section -->
             {% if app.user %}
-
                 <div class="hidden sm:flex space-x-6">
                     <a href="{{ path('app_time_register') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                        <img src="{{ asset('icons/profile_menu/time-fill.svg') }}" alt="Tidsregistrering" class="h-5 w-5">
-                        <span>Tidsregistrering</span>
+                        <img src="{{ asset('icons/profile_menu/time-fill.svg') }}" alt="{{ 'navbar.time_register'|trans }}" class="h-5 w-5">
+                        <span>{{ 'navbar.time_register'|trans }}</span>
                     </a>
 
                     <a href="{{ path('app_status') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                        <img src="{{ asset('icons/profile_menu/todo.svg') }}" alt="Projekter og Todos" class="h-5 w-5">
-                        <span>Status</span>
+                        <img src="{{ asset('icons/profile_menu/todo.svg') }}" alt="{{ 'navbar.status'|trans }}" class="h-5 w-5">
+                        <span>{{ 'navbar.status'|trans }}</span>
                     </a>
 
-                    <!-- Profile -->
                     <a href="{{ path('app_user') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                        <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="Profile" class="h-5 w-5">
-                        <span>Profile</span>
+                        <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="{{ 'navbar.profile'|trans }}" class="h-5 w-5">
+                        <span>{{ 'navbar.profile'|trans }}</span>
                     </a>
                 </div>
             {% endif %}
 
-            <!-- Language Selector (Dropdown) -->
+            <!-- Language Selector -->
             <div data-controller="language-dropdown" class="relative">
                 <button data-action="click->language-dropdown#toggle"
                         class="flex items-center space-x-2 px-3 py-2 text-white hover:text-gray-300 focus:outline-none">
-                    <img src="{{ asset('icons/profile_menu/globe.svg') }}" alt="Language" class="h-5 w-5">
+                    <img src="{{ asset('icons/profile_menu/globe.svg') }}" alt="{{ 'navbar.language'|trans }}" class="h-5 w-5">
                     <span>{{ app.request.locale|upper }}</span>
                     <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -51,9 +48,9 @@
                 <!-- Dropdown Menu -->
                 <div data-language-dropdown-target="menu" class="absolute right-0 mt-2 w-40 bg-white text-black shadow-lg rounded-md hidden">
                     <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'_locale': 'en'})) }}"
-                       class="block px-4 py-2 hover:bg-gray-200">🇬🇧 English</a>
+                       class="block px-4 py-2 hover:bg-gray-200">🇬🇧 {{ 'navbar.english'|trans }}</a>
                     <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'_locale': 'da'})) }}"
-                       class="block px-4 py-2 hover:bg-gray-200">🇩🇰 Dansk</a>
+                       class="block px-4 py-2 hover:bg-gray-200">🇩🇰 {{ 'navbar.danish'|trans }}</a>
                 </div>
             </div>
 
@@ -61,19 +58,16 @@
             <div class="flex items-center space-x-6">
                 {% if app.user %}
                     <a href="{{ path('app_logout') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                        <img src="{{ asset('icons/profile_menu/logout.svg') }}" alt="Logout" class="h-5 w-5">
-                        <span>Logout</span>
+                        <img src="{{ asset('icons/profile_menu/logout.svg') }}" alt="{{ 'navbar.logout'|trans }}" class="h-5 w-5">
+                        <span>{{ 'navbar.logout'|trans }}</span>
                     </a>
                 {% else %}
                     <a href="{{ path('app_login') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                        <img src="{{ asset('icons/profile_menu/login.svg') }}" alt="Logout" class="h-5 w-5">
-
-                        <span>Login</span>
+                        <img src="{{ asset('icons/profile_menu/login.svg') }}" alt="{{ 'navbar.login'|trans }}" class="h-5 w-5">
+                        <span>{{ 'navbar.login'|trans }}</span>
                     </a>
                 {% endif %}
-
             </div>
-
         </div>
     </div>
 </nav>

@@ -2,33 +2,33 @@
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
 
         <!-- Left: Admin Panel Title -->
-        <div class="text-lg ">Admin Panel</div>
+        <div class="text-lg ">{{ 'navbar_admin.admin_panel'|trans }}</div>
 
         <!-- Right: Admin Menu -->
         <div class="flex flex-wrap justify-center space-x-4">
             <a href="{{ path('admin_company') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                <img src="{{ asset('icons/admin_menu/client.svg') }}" alt="Clients" class="h-5 w-5">
-                <span>Our Company</span>
+                <img src="{{ asset('icons/admin_menu/company.svg') }}" alt="{{ 'navbar_admin.our_company'|trans }}" class="h-5 w-5">
+                <span>{{ 'navbar_admin.our_company'|trans }}</span>
             </a>
             <a href="{{ path('admin_client') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                <img src="{{ asset('icons/admin_menu/client.svg') }}" alt="Clients" class="h-5 w-5">
-                <span>Clients</span>
+                <img src="{{ asset('icons/admin_menu/client.svg') }}" alt="{{ 'navbar_admin.clients'|trans }}" class="h-5 w-5">
+                <span>{{ 'navbar_admin.clients'|trans }}</span>
             </a>
             <a href="{{ path('admin_project') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                <img src="{{ asset('icons/admin_menu/project.svg') }}" alt="Projects" class="h-5 w-5">
-                <span>Projects</span>
+                <img src="{{ asset('icons/admin_menu/project.svg') }}" alt="{{ 'navbar_admin.projects'|trans }}" class="h-5 w-5">
+                <span>{{ 'navbar_admin.projects'|trans }}</span>
             </a>
             <a href="{{ path('admin_team') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="Teams" class="h-5 w-5">
-                <span>Teams</span>
+                <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="{{ 'navbar_admin.teams'|trans }}" class="h-5 w-5">
+                <span>{{ 'navbar_admin.teams'|trans }}</span>
             </a>
             <a href="{{ path('admin_todos') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                <img src="{{ asset('icons/admin_menu/todo.svg') }}" alt="Todos" class="h-5 w-5">
-                <span>Todos</span>
+                <img src="{{ asset('icons/admin_menu/todo.svg') }}" alt="{{ 'navbar_admin.todos'|trans }}" class="h-5 w-5">
+                <span>{{ 'navbar_admin.todos'|trans }}</span>
             </a>
             <a href="{{ path('admin_users') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
-                <img src="{{ asset('icons/admin_menu/user.svg') }}" alt="Users" class="h-5 w-5">
-                <span>Users</span>
+                <img src="{{ asset('icons/admin_menu/user.svg') }}" alt="{{ 'navbar_admin.users'|trans }}" class="h-5 w-5">
+                <span>{{ 'navbar_admin.users'|trans }}</span>
             </a>
         </div>
 

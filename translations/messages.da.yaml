@@ -28,3 +28,23 @@ client_management:
     postalCode: "Post nummer"
     city: "By"
     country: "Land"
+
+navbar:
+  home: "Hjem"
+  time_register: "Tidsregistrering"
+  status: "Status"
+  profile: "Profil"
+  language: "Sprog"
+  logout: "Log ud"
+  login: "Log ind"
+  change_language: "Skift sprog"
+  english: "Engelsk"
+  danish: "Dansk"
+navbar_admin:
+  admin_panel: "Admin Panel"
+  our_company: "Vores Firma"
+  clients: "Kunder"
+  projects: "Projekter"
+  teams: "Teams"
+  todos: "Opgaver"
+  users: "Brugere"
