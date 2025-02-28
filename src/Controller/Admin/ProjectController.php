@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Company;
 use App\Entity\Project;
 use App\Entity\Team;
 use App\Form\ProjectType;
@@ -25,6 +26,7 @@ class ProjectController extends AbstractController
     {
         $projects = $this->entityManager->getRepository(Project::class)->findAll();
         $allTeams = $this->entityManager->getRepository(Team::class)->findAll();
+        $company = $this->entityManager->getRepository(Company::class)->find(1);
 
         $projectsDataArray = [];
         foreach ($projects as $project) {
@@ -48,6 +50,7 @@ class ProjectController extends AbstractController
         return $this->render('admin/project/index.html.twig', [
             'projectDataArray' => $projectsDataArray,
             'allTeams' => $allTeams,
+            'company' => $company
         ]);
     }
 
