@@ -1,12 +1,18 @@
+{% set company = get_company() %}
+
 <nav class="bg-primary text-white px-6 py-4">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
 
         <!-- Left: Logo -->
         <a href="{{ path('home') }}" class="flex items-center space-x-3">
-            <img src="{{ asset('images/logo.svg') }}" alt="Logo" class="h-16">
-            <span class="text-2xl sm:text-4xl">HTC</span>
+            {% if company and company.logo %}
+                <img src="{{ asset(company.logo) }}" alt="{{ company.name }}" class="h-16">
+                <span class="text-2xl sm:text-4xl">{{ company.name }}</span>
+            {% else %}
+                <img src="{{ asset('images/logo.svg') }}" alt="Default Logo" class="h-16">
+                <span class="text-2xl sm:text-4xl">HTC</span>
+            {% endif %}
         </a>
-
 
         <div class="flex items-center space-x-6">
             <!-- Logged in section -->
