@@ -1,0 +1,36 @@
+<nav class="bg-secondary text-white px-6 py-3">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+
+        <!-- Left: Admin Panel Title -->
+        <div class="text-lg ">Admin Panel</div>
+
+        <!-- Right: Admin Menu -->
+        <div class="flex flex-wrap justify-center space-x-4">
+            <a href="{{ path('admin_company') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                <img src="{{ asset('icons/admin_menu/client.svg') }}" alt="Clients" class="h-5 w-5">
+                <span>Our Company</span>
+            </a>
+            <a href="{{ path('admin_client') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                <img src="{{ asset('icons/admin_menu/client.svg') }}" alt="Clients" class="h-5 w-5">
+                <span>Clients</span>
+            </a>
+            <a href="{{ path('admin_project') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                <img src="{{ asset('icons/admin_menu/project.svg') }}" alt="Projects" class="h-5 w-5">
+                <span>Projects</span>
+            </a>
+            <a href="{{ path('admin_team') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                <img src="{{ asset('icons/profile_menu/users.svg') }}" alt="Teams" class="h-5 w-5">
+                <span>Teams</span>
+            </a>
+            <a href="{{ path('admin_todos') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                <img src="{{ asset('icons/admin_menu/todo.svg') }}" alt="Todos" class="h-5 w-5">
+                <span>Todos</span>
+            </a>
+            <a href="{{ path('admin_users') }}" class="flex items-center space-x-2 hover:text-gray-300 transition">
+                <img src="{{ asset('icons/admin_menu/user.svg') }}" alt="Users" class="h-5 w-5">
+                <span>Users</span>
+            </a>
+        </div>
+
+    </div>
+</nav>

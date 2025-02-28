@@ -6,6 +6,8 @@ company_management:
     rates: "rates"
     save: "save"
     add_rate: "add"
+    rates_name: "name"
+    rates_amount: "rates amount (hourly)"
 
 client_management:
   index:

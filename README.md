@@ -24,9 +24,13 @@ docker compose exec php bin/console tailwind:build --watch --poll
 ```
 
 ### Test
-Before a pr, be sure that your code passes the php-cs-fixer, and unit tests
+Before a pull request, make sure that your code passes the:
+twig-lint,
+php-cs-fixer, 
+and unit tests
 
 ```shell
+docker compose exec php bin/console lint:twig templates/
 docker compose exec php ./vendor/bin/php-cs-fixer fix --dry-run --diff
 ```
 
