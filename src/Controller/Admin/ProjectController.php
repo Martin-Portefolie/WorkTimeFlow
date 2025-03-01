@@ -44,6 +44,8 @@ class ProjectController extends AbstractController
                 'estimated_budget' => $project->getEstimatedBudget(),
                 'estimated_minutes' => $project->getEstimatedMinutes() ?? 0,
                 'remaining_minutes' => $project->getRemainingMinutes() ?? 0,
+                'rate' => $project->getRate(),
+                'is_paid' => $project->isPaid(),
             ];
         }
 
@@ -106,8 +108,16 @@ class ProjectController extends AbstractController
         // Estimated hours
 
         $estimatedTime = $request->request->get('estimated_time');
-
         $project->setEstimatedTime(null !== $estimatedTime ? (int) $estimatedTime : 0);
+
+        // Handle Rate Selection
+        $selectedRate = $request->request->get('rate');
+        $project->setRate($selectedRate);
+
+        // Paid Status
+        $isPaid = $request->request->has('is_paid');
+        $project->setIsPaid($isPaid);
+
 
         // Manage team associations
         $selectedTeamIds = $request->request->all('team_ids', []);
@@ -126,6 +136,8 @@ class ProjectController extends AbstractController
                 $project->addTeam($team);
             }
         }
+
+
 
         $this->entityManager->flush();
 

@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Company;
+use App\Entity\Rate;
 use App\Form\CompanyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,6 +28,7 @@ final class CompanyController extends AbstractController
     {
         # 1 Create new Company if it doesn't exist
         $company = $this->entityManager->getRepository(Company::class)->find(1);
+
 
         if (!$company) {
             $company = new Company();
@@ -68,9 +70,6 @@ final class CompanyController extends AbstractController
                 $company->setLogo($this->getParameter('logos_public_path') . '/' . $newFilename);
             }
 
-            # 4  rate logic.
-            $rates = array_values(array_filter($company->getRates(), fn($rate) => !empty($rate)));
-            $company->setRates($rates);
 
 
             $this->entityManager->flush();
@@ -80,9 +79,28 @@ final class CompanyController extends AbstractController
             return $this->redirectToRoute('admin_company');
         }
 
+
+
+
+
         return $this->render('admin/company/index.html.twig', [
             'company' => $company,
             'form' => $form->createView(),
+
         ]);
+    }
+
+    #[Route('/admin/company/rate/delete/{id}', name: 'admin_company_rate_delete', methods: ['POST'])]
+    public function deleteRate(int $id): Response
+    {
+        $rate = $this->entityManager->getRepository(Rate::class)->find($id);
+        if (!$rate) {
+            throw $this->createNotFoundException('Rate not found');
+        }
+
+        $this->entityManager->remove($rate);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('admin_company');
     }
 }

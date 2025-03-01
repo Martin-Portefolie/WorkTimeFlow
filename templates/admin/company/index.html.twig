@@ -9,7 +9,6 @@
                 {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
                     <!-- Company Name -->
                     <div>
                         <label for="{{ form.name.vars.id }}" class="block text-sm">
@@ -33,36 +32,30 @@
                 </div>
 
                 <!-- Rates Management -->
-                <div class="mt-6  bg-gray-50 rounded-lg shadow" data-controller="rates">
-                    <label class="block text-sm m-2">
+                <div class="mt-6 bg-gray-50 rounded-lg shadow p-4"
+                     data-controller="rates"
+                     data-rates-target="collection"
+                     data-prototype="{{ form_widget(form.rates.vars.prototype)|e('html_attr') }}">
+                    <label class="block text-sm">
                         {{ 'company_management.index.rates'|trans }}
                     </label>
 
-                    <div id="rates-collection"
-                         data-rates-target="collection"
-                         data-prototype="{{ form_widget(form.rates.vars.prototype)|e('html_attr') }}"
-                         class="space-y-3 m-2">
-
+                    <!-- Collection of Rate Fields -->
+                    <div id="rates-collection" class="space-y-3 mt-2">
                         {% for rateField in form.rates %}
                             <div class="rate-item flex items-center space-x-3 bg-white p-3 rounded-md shadow-md border border-gray-300">
-                                <!-- Rate Name (Key) -->
                                 <div class="w-1/2">
-                                    <label class="block text-sm"> {{ 'company_management.index.rates_name'|trans }}</label>
-                                    {{ form_widget(rateField.key, {'attr': {'class': 'form-control px-3 py-2 border border-gray-300 rounded-md', 'placeholder': 'Rate Name (e.g., rate_for_washing_a_car)'}}) }}
+                                    <label class="block text-sm">Rate Name</label>
+                                    {{ form_widget(rateField.name, {'attr': {'class': 'form-control px-3 py-2 border border-gray-300 rounded-md'}}) }}
                                 </div>
-                                <!-- Rate Amount (Value) -->
                                 <div class="w-1/2">
-                                    <label class="block text-sm">{{ 'company_management.index.rates_amount'|trans }}</label>
-                                    {{ form_widget(rateField.value, {'attr': {'class': 'form-control px-3 py-2 border border-gray-300 rounded-md', 'placeholder': 'Amount (e.g., 600)'}}) }}
+                                    <label class="block text-sm">Rate Value (€)</label>
+                                    {{ form_widget(rateField.value, {'attr': {'class': 'form-control px-3 py-2 border border-gray-300 rounded-md'}}) }}
                                 </div>
-
-                                <!-- Remove Button -->
-                                <button type="button"
-                                        class="remove-rate bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out"
+                                <button type="button" class="remove-rate bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition"
                                         data-action="click->rates#remove">
                                     ✕
                                 </button>
-
                             </div>
                         {% endfor %}
                     </div>
@@ -70,8 +63,7 @@
                     <!-- Add Rate Button -->
                     <button type="button"
                             data-action="click->rates#add"
-                            data-rates-target="addButton"
-                            class="inline-flex justify-center m-2 py-2 px-4 shadow-sm rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                            class="inline-flex justify-center mt-3 py-2 px-4 shadow-sm rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
                         {{ 'company_management.index.add_rate'|trans }}
                     </button>
                 </div>

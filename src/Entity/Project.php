@@ -56,6 +56,12 @@ class Project
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $lastUpdated;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $rate = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $isPaid = null;
+
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
     public function updateTimestamp(): void
@@ -260,6 +266,30 @@ class Project
     public function setArchived(bool $isArchived): static
     {
         $this->isArchived = $isArchived;
+
+        return $this;
+    }
+
+    public function getRate(): ?string
+    {
+        return $this->rate;
+    }
+
+    public function setRate(?string $rate): static
+    {
+        $this->rate = $rate;
+
+        return $this;
+    }
+
+    public function isPaid(): ?bool
+    {
+        return $this->isPaid;
+    }
+
+    public function setIsPaid(?bool $isPaid): static
+    {
+        $this->isPaid = $isPaid;
 
         return $this;
     }

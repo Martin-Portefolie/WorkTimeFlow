@@ -7,10 +7,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CompanyType extends AbstractType
 {
@@ -22,9 +22,9 @@ class CompanyType extends AbstractType
                 'label' => 'Company Name',
                 'attr' => ['class' => 'form-control'],
             ])
-            ->add('logoFile', FileType::class, [
+            ->add('logoFile', FileType::class, [ // ✅ Ensure logo upload field exists
                 'label' => 'Upload New Logo',
-                'mapped' => false,
+                'mapped' => false, // Prevents mapping to the entity directly
                 'required' => false,
                 'constraints' => [
                     new File([
@@ -36,18 +36,18 @@ class CompanyType extends AbstractType
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('rates', CollectionType::class, [
-                'entry_type' => RateType::class,
+                'entry_type' => RateType::class, // ✅ Use `RateType`
                 'allow_add' => true,
                 'allow_delete' => true,
-                'required' => false,
-                'by_reference' => false,
+                'by_reference' => false, // ✅ Important for managing collections in Symfony
+                'attr' => ['class' => 'rates-collection'],
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Company::class,
+            'data_class' => Company::class, // ✅ Maps to `Company`
         ]);
     }
 }
