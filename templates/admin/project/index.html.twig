@@ -30,14 +30,14 @@
                                 <div>
                                     <label for="name_{{ project.id }}" class="block text-sm font-medium text-gray-700">Name</label>
                                     <input type="text" name="name" id="name_{{ project.id }}" value="{{ project.name }}"
-                                           class="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none text-gray-900">
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
                                 <!-- Project Description -->
                                 <div>
                                     <label for="description_{{ project.id }}" class="block text-sm font-medium text-gray-700">Description</label>
                                     <input type="text" name="description" id="description_{{ project.id }}" value="{{ project.description }}"
-                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-gray-900">
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
                                 <!-- Client (non-editable) -->
@@ -97,14 +97,14 @@
 
                                             <!-- Default "Select Rate" Option -->
                                             <option value="" data-value="0" {% if project.rate is null %}selected{% endif %}>-- Select Rate --</option>
-
-                                            {% for rate in company.rates %}
+                                            {% if company is not null and company.rates is not empty %}
+                                                {% for rate in company.rates %}
                                                 <option value="{{ rate.id }}" data-value="{{ rate.value }}"
                                                         {% if project.rate and project.rate.id == rate.id %}selected{% endif %}>
                                                     {{ rate.name }} - €{{ rate.value }}/hour
                                                 </option>
                                             {% endfor %}
-
+                                            {% endif %}
                                         </select>
                                     </div>
 
