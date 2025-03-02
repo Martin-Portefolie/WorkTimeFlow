@@ -36,6 +36,11 @@
                 {% for project in projectDataArray %}
                     <div class="bg-white p-6 rounded-lg shadow-md">
 
+                        <a href="{{ path('admin_project_download', { id: project.id }) }}"
+                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                             {{ 'project_management.index.download_docx'|trans }}
+                        </a>
+
                         <!-- Alerts -->
                         <div class="m-4">
                             {% if project.remaining_minutes is not null and project.remaining_minutes <= 0 %}
@@ -78,7 +83,7 @@
 
                                 <!-- Todos (non-editable) -->
                                 <div>
-                                    <label for="todos_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.todos'|trans }}</label>
+                                    <label for="todos_{{ project.id }}" class="block text-sm font-medium text-dark">{{ 'project_management.index.todos'|trans }}</label>
                                     <ul class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border border">
                                         {% for todo in project.todo %}
                                             {% set totalMinutes = 0 %}
@@ -90,11 +95,11 @@
                                                 <div class="flex justify-between items-center">
                                                     <span>{{ todo.name }}</span>
                                                     <span class="text-blue">{{ todo.status.value }}</span>
-                                                    <span class="text-success">{{ totalMinutes }} {{ 'project_management.index.min_logged'|trans }}</span>
+                                                    <span class="text-green-600">{{ totalMinutes }} {{ 'project_management.index.min_logged'|trans }}</span>
 
                                                     <!-- Toggle Button -->
                                                     {% if todo.timelogs is not empty %}
-                                                        <button type="button" class="ml-4 text-sm "
+                                                        <button type="button" class="ml-4 text-sm text-blue-500 hover:text-blue-700 focus:outline-none"
                                                                 data-action="click->timelog-todo-collaps#toggle"
                                                                 data-turbo="false">
                                                             {{ 'project_management.index.show_logs'|trans }}
@@ -107,7 +112,7 @@
                                                     <ul id="timelog-{{ todo.id }}"
                                                         data-timelog-todo-collaps-target="logs"
                                                         data-id="{{ todo.id }}"
-                                                        class="ml-4 text-sm text-dark">
+                                                        class="ml-4 text-sm text-gray-600 hidden">
                                                         {% for log in todo.timelogs %}
                                                             <li class="border-l-2 border-blue-400 pl-2 mt-1">
                                                                 {{ log.totalMinutes }} {{ 'project_management.index.min_on'|trans }} {{ log.date|date("Y-m-d H:i") }}
@@ -123,7 +128,7 @@
 
                                 <!-- Teams Selection -->
                                 <div>
-                                    <label for="teams_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.teams'|trans }}</label>
+                                    <label for="teams_{{ project.id }}" class="block text-sm font-medium text-dark">{{ 'project_management.index.teams'|trans }}</label>
                                     <select name="team_ids[]" id="teams_{{ project.id }}" multiple
                                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark">
                                         {% for team in allTeams %}
@@ -138,7 +143,7 @@
 
                                 <!-- Priority Dropdown -->
                                 <div>
-                                    <label for="priority_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.priority'|trans }}</label>
+                                    <label for="priority_{{ project.id }}" class="block text-sm font-medium text-dark">{{ 'project_management.index.priority'|trans }}</label>
                                     <select name="priority" id="priority_{{ project.id }}"
                                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark">
                                         {% for priority in ['low', 'medium', 'high', 'critical'] %}
@@ -153,7 +158,7 @@
                                 <div data-controller="time-slider budget">
                                     <!-- Rate Selection Dropdown -->
                                     <div>
-                                        <label for="rate_select_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.select_rate'|trans }}</label>
+                                        <label for="rate_select_{{ project.id }}" class="block text-sm font-medium text-dark">{{ 'project_management.index.select_rate'|trans }}</label>
 
                                         {% if company is null or company.rates is empty %}
                                             <!-- Info message when no rates are available -->
@@ -182,7 +187,7 @@
 
                                     <!-- Estimated Time Slider -->
                                     <div class="mt-4">
-                                        <label class="block text-sm  text-dark">{{ 'project_management.index.estimated_time'|trans }}</label>
+                                        <label class="block text-sm font-medium text-dark">{{ 'project_management.index.estimated_time'|trans }}</label>
                                         <div class="flex space-x-4 items-center">
                                             <input type="range" name="estimated_hours"
                                                    min="0" max="500" step="5"
@@ -203,7 +208,7 @@
 
                                     <!-- Estimated Budget -->
                                     <div class="mt-4">
-                                        <label for="estimatedBudget_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.estimated_budget'|trans }}</label>
+                                        <label for="estimatedBudget_{{ project.id }}" class="block text-sm font-medium text-dark">{{ 'project_management.index.estimated_budget'|trans }}</label>
 
                                         {% if company is null or company.rates is empty %}
                                         <!-- Info message when no rates are available -->
@@ -225,7 +230,7 @@
                                 <div>
                                 <!-- Total Time Used -->
                                 <div>
-                                    <label class="block text-sm  text-dark">{{ 'project_management.index.total_time_used'|trans }}</label>
+                                    <label class="block text-sm font-medium text-dark">{{ 'project_management.index.total_time_used'|trans }}</label>
                                     <p class="mt-1 text-dark">
                                         {% set hours = project.total_minutes // 60 %}
                                         {% set minutes = project.total_minutes % 60 %}
@@ -237,7 +242,7 @@
 
                                 <!-- Remaining Time -->
                                 <div class="mt-4">
-                                    <label class="block text-sm  text-dark">{{ 'project_management.index.remaining_time'|trans }}</label>
+                                    <label class="block text-sm font-medium text-dark">{{ 'project_management.index.remaining_time'|trans }}</label>
                                     {% set remaining = project.remaining_minutes is not null ? (project.remaining_minutes // 60) ~ 'h ' ~ (project.remaining_minutes % 60) ~ 'm' : 'N/A' %}
                                     <p class="mt-1 text-dark">{{ remaining }}</p>
 
@@ -248,7 +253,7 @@
 
                                 <!-- Last updated -->
                                 <div>
-                                    <label for="deadline_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.last_updated'|trans }}</label>
+                                    <label for="deadline_{{ project.id }}" class="block text-sm font-medium text-dark">{{ 'project_management.index.last_updated'|trans }}</label>
                                     <input type="date" name="deadline" id="deadline_{{ project.id }}"
                                            value="{{ project.last_updated ? project.last_updated : '' }}"
                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark">
@@ -256,7 +261,7 @@
 
                                 <!-- Deadline -->
                                 <div>
-                                    <label for="deadline_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.deadline'|trans }}</label>
+                                    <label for="deadline_{{ project.id }}" class="block text-sm font-medium text-dark">{{ 'project_management.index.deadline'|trans }}</label>
                                     <input type="date" name="deadline" id="deadline_{{ project.id }}"
                                            value="{{ project.deadline ? project.deadline : '' }}"
                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark">
@@ -264,7 +269,7 @@
 
                                 <!-- Billed Status -->
                                 <div>
-                                    <label for="isPaid{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.paid'|trans }}</label>
+                                    <label for="isPaid{{ project.id }}" class="block text-sm font-medium text-dark">{{ 'project_management.index.paid'|trans }}</label>
                                     <input type="checkbox" name="is_paid" id="isPaid_{{ project.id }}"
                                            {% if project.is_paid %}checked{% endif %}
                                            class="mt-1 block text-dark focus:ring-indigo-500 h-4 w-4 border-gray-300 rounded">
@@ -272,7 +277,7 @@
 
                                 <!-- Archived Status  -->
                                 <div>
-                                    <label for="isArchived_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.archieved'|trans }}</label>
+                                    <label for="isArchived_{{ project.id }}" class="block text-sm font-medium text-dark">{{ 'project_management.index.archieved'|trans }}</label>
                                     <input type="checkbox" name="is_archived" id="isArchived_{{ project.id }}"
                                            {% if project.is_archived %}checked{% endif %}
                                            class="mt-1 block text-dark focus:ring-indigo-500 h-4 w-4 border-gray-300 rounded">
@@ -284,7 +289,7 @@
                             <div class="flex justify-end space-x-3 mt-4">
                                 <!-- Save Button -->
                                 <button type="submit"
-                                        class="py-2 px-4 border border-transparent shadow-sm text-sm  rounded-md text-white bg-success hover:bg-primary focus:outline-none">
+                                        class="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-save hover:bg-primary focus:outline-none">
                                     {{ 'project_management.index.save'|trans }}
                                 </button>
                             </div>

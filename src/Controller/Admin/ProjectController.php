@@ -14,6 +14,7 @@ use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ProjectController extends AbstractController
@@ -184,4 +185,127 @@ class ProjectController extends AbstractController
 
         return $this->redirectToRoute('admin_project');
     }
+
+    #[Route('/admin/project/invoice/{id}', name: 'admin_project_download')]
+    public function generateInvoice(int $id): Response
+    {
+        $project = $this->entityManager->getRepository(Project::class)->find($id);
+
+        if (!$project) {
+            throw $this->createNotFoundException('Project not found');
+        }
+
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+
+        // Styles
+        $phpWord->addTitleStyle(1, ['size' => 20, 'bold' => true, 'color' => '1E90FF']);
+        $phpWord->addTitleStyle(2, ['size' => 14, 'bold' => true, 'color' => '333333']);
+        $tableStyle = [
+            'borderSize' => 6,
+            'borderColor' => '999999',
+            'cellMargin' => 80
+        ];
+        $phpWord->addTableStyle('InvoiceTable', $tableStyle);
+
+        $section = $phpWord->addSection();
+
+        // **Header**
+        $section->addText("INVOICE", ['size' => 18, 'bold' => true], ['alignment' => 'center']);
+        $section->addText("DATE: " . date('Y-m-d'), ['size' => 12]);
+        $section->addText("INVOICE #: " . $project->getId(), ['size' => 12, 'bold' => true]);
+        $section->addText("Customer ID: " . strtoupper(substr($project->getClient()->getName(), 0, 3)) . $project->getId(), ['size' => 12]);
+
+        // **Customer Details**
+        $section->addText("To:", ['size' => 14, 'bold' => true]);
+        $section->addText($project->getClient()->getName());
+        $section->addText($project->getClient()->getContactPerson());
+        $section->addText($project->getClient()->getAdress() ?? "No address provided");
+        $section->addText($project->getClient()->getContactPhone() ?? "No phone number");
+        $section->addText($project->getClient()->getContactEmail() ?? "No phone number");
+
+        $section->addTextBreak(1);
+
+        // **Sales & Payment Terms**
+        $table = $section->addTable('InvoiceTable');
+
+        $table->addRow();
+        $table->addCell(4000)->addText("Salesperson:", ['bold' => true]);
+        $table->addCell(8000)->addText("Assigned Team");
+
+        $table->addRow();
+        $table->addCell(4000)->addText("Job:", ['bold' => true]);
+        $table->addCell(8000)->addText($project->getDescription());
+
+        $table->addRow();
+        $table->addCell(4000)->addText("Payment Terms:", ['bold' => true]);
+        $table->addCell(8000)->addText("Due on receipt");
+
+        $table->addRow();
+        $table->addCell(4000)->addText("Due Date:", ['bold' => true]);
+        $table->addCell(8000)->addText($project->getDeadline()?->format('Y-m-d') ?? 'N/A');
+
+        $section->addTextBreak(1);
+
+        // **Service Table (Qty, Description, Rate, Line Total)**
+        $section->addText("Project Breakdown", ['size' => 14, 'bold' => true]);
+        $serviceTable = $section->addTable('InvoiceTable');
+
+        // Table Header
+        $serviceTable->addRow();
+        $serviceTable->addCell(2000)->addText("Qty", ['bold' => true]);
+        $serviceTable->addCell(5000)->addText("Description", ['bold' => true]);
+        $serviceTable->addCell(3000)->addText("Unit Price", ['bold' => true]);
+        $serviceTable->addCell(3000)->addText("Line Total", ['bold' => true]);
+
+        // Service Entries
+        $estimatedHours = $project->getEstimatedMinutes() ? ($project->getEstimatedMinutes() / 60) : 0;
+        $rate = $project->getRate() ? $project->getRate()->getValue() : 0;
+        $lineTotal = $estimatedHours * $rate;
+
+        $serviceTable->addRow();
+        $serviceTable->addCell(2000)->addText(number_format($estimatedHours, 2));
+        $serviceTable->addCell(5000)->addText("Estimated Work Hours");
+        $serviceTable->addCell(3000)->addText(number_format($rate, 2) . " EUR/hour");
+        $serviceTable->addCell(3000)->addText(number_format($lineTotal, 2) . " EUR");
+
+        $section->addTextBreak(1);
+
+        // **Total Calculation**
+        $subtotal = $lineTotal;
+        $tax = $subtotal * 0.05; // 5% Tax (Changeable)
+        $total = $subtotal + $tax;
+
+        $totalTable = $section->addTable('InvoiceTable');
+
+        $totalTable->addRow();
+        $totalTable->addCell(6000)->addText("Subtotal", ['bold' => true]);
+        $totalTable->addCell(3000)->addText(number_format($subtotal, 2) . " EUR");
+
+        $totalTable->addRow();
+        $totalTable->addCell(6000)->addText("Sales Tax (5%)", ['bold' => true]);
+        $totalTable->addCell(3000)->addText(number_format($tax, 2) . " EUR");
+
+        $totalTable->addRow();
+        $totalTable->addCell(6000)->addText("Total", ['bold' => true, 'size' => 14]);
+        $totalTable->addCell(3000)->addText(number_format($total, 2) . " EUR", ['bold' => true, 'size' => 14]);
+
+        $section->addTextBreak(1);
+
+        // **Footer: Payment Info**
+        $section->addText("Make all payments to: Your Company Name", ['size' => 12, 'bold' => true]);
+        $section->addText("Thank you for your business!", ['size' => 12, 'italic' => true]);
+
+        $footer = $section->addFooter();
+        $footer->addText("Generated on " . date('Y-m-d H:i'), ['italic' => true], ['alignment' => 'center']);
+
+        // Save as temp file
+        $fileName = 'Invoice_Project_' . $project->getId() . '.docx';
+        $tempFile = sys_get_temp_dir() . '/' . $fileName;
+        $phpWord->save($tempFile, 'Word2007');
+
+        // Return as downloadable response
+        return $this->file($tempFile, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT);
+    }
+
+
 }

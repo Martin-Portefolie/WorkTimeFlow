@@ -71,6 +71,7 @@ project_management:
     currency: "€"
     hour: "hour"
     archieved: "Archieved"
+    download_docx: "Download Invoice"
 
 
 navbar:
