@@ -33,8 +33,9 @@
             <div class="space-y-6">
                 {% for client in pager.currentPageResults %}
                     <div class="bg-white p-6 rounded-lg shadow-md">
-                        <form action="#" method="post">
+                        <form action="{{ path('admin_client_update', { id: client.id }) }}" method="post">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
                                 <!-- Client Name -->
                                 <div>
                                     <label for="name_{{ client.id }}" class="block text-sm">
@@ -44,44 +45,43 @@
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
-                                <!-- Client Adress -->
+                                <!--  Client Address  -->
                                 <div>
-                                    <label for="name_{{ client.id }}" class="block text-sm">
-                                        {{ 'client_management.index.adress'|trans }}
+                                    <label for="address_{{ client.id }}" class="block text-sm">
+                                        {{ 'client_management.index.address'|trans }}
                                     </label>
-                                    <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.adress }}"
+                                    <input type="text" name="address" id="address_{{ client.id }}" value="{{ client.adress }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
-                                <!-- Client Postal Code -->
+                                <!--  Client Postal Code (Fixed name attribute) -->
                                 <div>
-                                    <label for="name_{{ client.id }}" class="block text-sm">
+                                    <label for="postalCode_{{ client.id }}" class="block text-sm">
                                         {{ 'client_management.index.postalCode'|trans }}
                                     </label>
-                                    <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.postalCode }}"
+                                    <input type="text" name="postalCode" id="postalCode_{{ client.id }}" value="{{ client.postalCode }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
-                                <!-- Client City -->
+                                <!--  Client City -->
                                 <div>
-                                    <label for="name_{{ client.id }}" class="block text-sm">
+                                    <label for="city_{{ client.id }}" class="block text-sm">
                                         {{ 'client_management.index.city'|trans }}
                                     </label>
-                                    <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.city }}"
+                                    <input type="text" name="city" id="city_{{ client.id }}" value="{{ client.city }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
-                                <!-- Client Country -->
+                                <!--  Client Country -->
                                 <div>
-                                    <label for="name_{{ client.id }}" class="block text-sm">
+                                    <label for="country_{{ client.id }}" class="block text-sm">
                                         {{ 'client_management.index.country'|trans }}
                                     </label>
-                                    <input type="text" name="name" id="name_{{ client.id }}" value="{{ client.country }}"
+                                    <input type="text" name="country" id="country_{{ client.id }}" value="{{ client.country }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
-
-                                <!-- Contact Person -->
+                                <!--  Contact Person -->
                                 <div>
                                     <label for="contact_person_{{ client.id }}" class="block text-sm">
                                         {{ 'client_management.index.contact_person'|trans }}
@@ -89,46 +89,35 @@
                                     <input type="text" name="contact_person" id="contact_person_{{ client.id }}" value="{{ client.contactPerson }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
-                                <!-- Contact Email -->
+
+                                <!--  Contact Email -->
                                 <div>
-                                    <label for="email_{{ client.id }}" class="block text-sm text-text-standard">
+                                    <label for="email_{{ client.id }}" class="block text-sm">
                                         {{ 'client_management.index.email'|trans }}
                                     </label>
                                     <input type="email" name="email" id="email_{{ client.id }}" value="{{ client.contactEmail }}"
-                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none text-text-paragraph">
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
+
                                 <!-- Contact Phone -->
                                 <div>
-                                    <label for="phone_{{ client.id }}" class="block text-sm text-text-standard">
+                                    <label for="phone_{{ client.id }}" class="block text-sm">
                                         {{ 'client_management.index.phone'|trans }}
                                     </label>
                                     <input type="text" name="phone" id="phone_{{ client.id }}" value="{{ client.contactPhone }}"
-                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none text-text-paragraph">
+                                           class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
                             </div>
-                            {% if client.projects is not empty %}
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
-                                    <!-- Projects -->
-                                    <div>
-                                        <label class="block text-sm text-text-standard">
-                                            {{ 'client_management.index.projects'|trans }}
-                                        </label>
-                                        <ul class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border border">
-                                            {% for project in client.projects %}
-                                                <li class="py-1"><a href="#">{{ project.name }}</a></li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            {% endif %}
+
                             <div class="flex justify-end space-x-3 mt-4">
-                                <!-- Save Button -->
+                                <!--  Save Button -->
                                 <button type="submit"
-                                        class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-save hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                                        class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-save hover:bg-primary focus:outline-none">
                                     {{ 'client_management.index.save'|trans }}
                                 </button>
                             </div>
                         </form>
+
                     </div>
                 {% endfor %}
             </div>

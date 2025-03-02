@@ -4,7 +4,7 @@
 
 {% block body %}
 
-    {{ dump(company.rates) }}
+
     <section class="relative bg-section_2 py-10 min-h-screen">
         <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
 
@@ -86,42 +86,64 @@
                                     </select>
                                 </div>
 
-                                <!-- Estimated Budget -->
-                                <div>
-                                    <label for="estimatedBudget_{{ project.id }}" class="block text-sm font-medium text-gray-700">Estimated Budget (€)</label>
-                                    <input type="number" name="estimated_budget" id="estimatedBudget_{{ project.id }}"
-                                           value="{{ project.estimated_budget is not null ? project.estimated_budget : '' }}"
-                                           step="0.01"
-                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900">
-                                </div>
+                                <div data-controller="time-slider budget">
+                                    <!-- Rate Selection Dropdown -->
+                                    <div>
+                                        <label for="rate_select_{{ project.id }}" class="block text-sm font-medium text-gray-700">Select Rate</label>
+                                        <select name="rate" id="rate_select_{{ project.id }}"
+                                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900"
+                                                data-budget-target="rate"
+                                                data-action="change->budget#updateBudget">
 
-                                <!-- Estimated Time Slider -->
-                                <div data-controller="time-slider">
-                                    <label class="block text-sm font-medium text-gray-700">Estimated Time</label>
+                                            <!-- Default "Select Rate" Option -->
+                                            <option value="" data-value="0" {% if project.rate is null %}selected{% endif %}>-- Select Rate --</option>
 
-                                    <div class="flex space-x-4 items-center">
-                                        <!-- Single Slider (for Hours) -->
-                                        <input type="range" name="estimated_hours"
-                                               data-time-slider-target="hours"
-                                               min="0" max="500" step="5"
-                                        value="{{ project.estimated_minutes is not null ? (project.estimated_minutes // 60) : '0' }}"
-                                        class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer">
+                                            {% for rate in company.rates %}
+                                                <option value="{{ rate.id }}" data-value="{{ rate.value }}"
+                                                        {% if project.rate and project.rate.id == rate.id %}selected{% endif %}>
+                                                    {{ rate.name }} - €{{ rate.value }}/hour
+                                                </option>
+                                            {% endfor %}
 
-                                        <!-- Display Selected Hours -->
-                                        <span data-time-slider-target="hoursDisplay" class="text-gray-800">
-                                        {{ project.estimated_minutes is not null ? (project.estimated_minutes // 60) : '0' }}h
-                                        </span>
+                                        </select>
                                     </div>
 
 
+                                    <!-- Estimated Time Slider -->
+                                    <div class="mt-4">
+                                        <label class="block text-sm font-medium text-gray-700">Estimated Time (Hours)</label>
+                                        <div class="flex space-x-4 items-center">
+                                            <input type="range" name="estimated_hours"
+                                                   min="0" max="500" step="5"
+                                                   value="{{ project.estimated_minutes is not null ? (project.estimated_minutes // 60) : '0' }}"
+                                                   class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
+                                                   data-time-slider-target="hours"
+                                                   data-budget-target="hours"
+                                                   data-action="input->time-slider#updateDisplay input->budget#updateBudget">
+                                            <span class="text-gray-800" data-time-slider-target="hoursDisplay">
+                                                {{ project.estimated_minutes is not null ? (project.estimated_minutes // 60) : '0' }}h
+                                            </span>
+                                        </div>
+                                        <!-- Hidden Input to Store Total Minutes -->
+                                        <input type="hidden" name="estimated_time"
+                                               data-time-slider-target="hiddenInput"
+                                               value="{{ project.estimated_minutes is not null ? project.estimated_minutes : '0' }}">
+                                    </div>
 
-                                    <!-- Hidden Input to Store Total Minutes -->
-                                    <input type="hidden" name="estimated_time"
-                                           data-time-slider-target="hiddenInput"
-                                           value="{{ project.estimated_minutes is not null ? project.estimated_minutes : '0' }}">
+                                    <!-- Estimated Budget -->
+                                    <div class="mt-4">
+                                        <label for="estimatedBudget_{{ project.id }}" class="block text-sm font-medium text-gray-700">Estimated Budget (€)</label>
+                                        <input type="number" name="estimated_budget"
+                                               id="estimatedBudget_{{ project.id }}"
+                                               value="{{ project.estimated_budget is not null ? project.estimated_budget : '0' }}"
+                                               step="0.01"
+                                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900"
+                                               data-budget-target="budget" readonly>
+                                    </div>
                                 </div>
 
 
+                                <div>
                                 <!-- Total Time Used -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Total Time Used</label>
@@ -132,24 +154,17 @@
                                     </p>
                                 </div>
 
+
+
                                 <!-- Remaining Time -->
-                                <div>
+                                <div class="mt-4">
                                     <label class="block text-sm font-medium text-gray-700">Remaining Time</label>
                                     {% set remaining = project.remaining_minutes is not null ? (project.remaining_minutes // 60) ~ 'h ' ~ (project.remaining_minutes % 60) ~ 'm' : 'N/A' %}
                                     <p class="mt-1 text-gray-800">{{ remaining }}</p>
                                 </div>
 
-                                <!-- Rate Selection Dropdown -->
-                                <div>
-                                    <label for="rate_select" class="block text-sm font-medium text-gray-700">Select Rate</label>
-                                    <select name="rate" id="rate_select"
-                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900">
-                                        {% for rate in company.rates %}
-                                            <option value="{{ rate.key }}">{{ rate.key }} - €{{ rate.value }}/hour</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
 
+                                </div>
                                 <!-- Deadline -->
                                 <div>
                                     <label for="deadline_{{ project.id }}" class="block text-sm font-medium text-gray-700">Deadline</label>

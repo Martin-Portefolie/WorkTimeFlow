@@ -4,7 +4,8 @@ export default class extends Controller {
     static targets = ["hours", "hoursDisplay", "hiddenInput"];
 
     connect() {
-        this.updateDisplay();
+        console.log("✅ Time Slider Controller Connected!");
+        this.updateDisplay(); // Ensure display updates on load
         this.hoursTarget.addEventListener("input", this.updateDisplay.bind(this));
     }
 
@@ -17,5 +18,8 @@ export default class extends Controller {
 
         // Update hidden input field (stores total minutes)
         this.hiddenInputTarget.value = totalMinutes;
+
+        // Trigger budget update (if budget controller is present)
+        this.dispatch("budget:update", { detail: { hours } });
     }
 }

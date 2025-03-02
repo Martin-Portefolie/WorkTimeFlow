@@ -56,8 +56,9 @@ class Project
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $lastUpdated;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $rate = null;
+    #[ORM\ManyToOne(targetEntity: Rate::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Rate $rate = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $isPaid = null;
@@ -270,15 +271,14 @@ class Project
         return $this;
     }
 
-    public function getRate(): ?string
+    public function getRate(): ?Rate
     {
         return $this->rate;
     }
 
-    public function setRate(?string $rate): static
+    public function setRate(?Rate $rate): static
     {
         $this->rate = $rate;
-
         return $this;
     }
 

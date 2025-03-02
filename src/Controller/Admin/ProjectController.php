@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Company;
 use App\Entity\Project;
+use App\Entity\Rate;
 use App\Entity\Team;
 use App\Form\ProjectType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -111,8 +112,17 @@ class ProjectController extends AbstractController
         $project->setEstimatedTime(null !== $estimatedTime ? (int) $estimatedTime : 0);
 
         // Handle Rate Selection
-        $selectedRate = $request->request->get('rate');
-        $project->setRate($selectedRate);
+        $selectedRateId = $request->request->get('rate'); // Get rate from form submission
+
+        if ($selectedRateId) {
+            $rate = $this->entityManager->getRepository(Rate::class)->find($selectedRateId);
+            if ($rate) {
+                $project->setRate($rate); // Assign rate object to project
+            }
+        } else {
+            $project->setRate(null); // Ensure it can be reset if needed
+        }
+
 
         // Paid Status
         $isPaid = $request->request->has('is_paid');
