@@ -4,20 +4,20 @@ export default class extends Controller {
     static targets = ["collection"];
 
     connect() {
-        console.log("✅ Rates controller connected!");
+        console.log("Rates controller connected!");
     }
 
     add(event) {
         event.preventDefault();
 
-        console.log("Adding new rate..."); // ✅ Debugging message
+        console.log("Adding new rate...");
 
         let collection = this.collectionTarget;
         let prototype = collection.dataset.prototype;
         let index = collection.children.length;
 
         if (!prototype) {
-            console.error("❌ Prototype data missing!");
+            console.error("Prototype data missing!");
             return;
         }
 
@@ -34,11 +34,11 @@ export default class extends Controller {
         // Append the new element
         collection.appendChild(newElement);
 
-        console.log("✅ New rate added!");
+        console.log("New rate added!");
 
         // Attach remove event
         newElement.querySelector(".remove-rate").addEventListener("click", () => {
-            console.log("❌ Rate removed!");
+            console.log("Rate removed!");
             newElement.remove();
         });
     }
@@ -46,6 +46,6 @@ export default class extends Controller {
     remove(event) {
         event.preventDefault();
         event.target.closest(".rate-item").remove();
-        console.log("❌ Rate removed!");
+        console.log("Rate removed!");
     }
 }

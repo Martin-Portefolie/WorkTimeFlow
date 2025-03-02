@@ -4,7 +4,7 @@ export default class extends Controller {
     static targets = ["hours", "rate", "budget"];
 
     connect() {
-        console.log("✅ Budget Controller Connected!");
+        console.log("Budget Controller Connected!");
         this.updateBudget(); // Ensure correct budget on page load
     }
 

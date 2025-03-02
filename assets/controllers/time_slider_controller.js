@@ -4,7 +4,7 @@ export default class extends Controller {
     static targets = ["hours", "hoursDisplay", "hiddenInput"];
 
     connect() {
-        console.log("✅ Time Slider Controller Connected!");
+        console.log("Time Slider Controller Connected!");
         this.updateDisplay(); // Ensure display updates on load
         this.hoursTarget.addEventListener("input", this.updateDisplay.bind(this));
     }

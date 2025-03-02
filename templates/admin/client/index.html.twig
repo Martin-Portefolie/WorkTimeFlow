@@ -107,6 +107,22 @@
                                     <input type="text" name="phone" id="phone_{{ client.id }}" value="{{ client.contactPhone }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
+
+                                {% if client.projects is not empty %}
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+                                        <!-- Projects -->
+                                        <div>
+                                            <label class="block text-sm text-text-standard">
+                                                {{ 'client_management.index.projects'|trans }}
+                                            </label>
+                                            <ul class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border border">
+                                                {% for project in client.projects %}
+                                                    <li class="py-1"><a href="#">{{ project.name }}</a></li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
 
                             <div class="flex justify-end space-x-3 mt-4">

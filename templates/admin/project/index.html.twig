@@ -28,33 +28,69 @@
 
                                 <!-- Project Name -->
                                 <div>
-                                    <label for="name_{{ project.id }}" class="block text-sm font-medium text-gray-700">Name</label>
+                                    <label for="name_{{ project.id }}" class="block text-sm">Name</label>
                                     <input type="text" name="name" id="name_{{ project.id }}" value="{{ project.name }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
                                 <!-- Project Description -->
                                 <div>
-                                    <label for="description_{{ project.id }}" class="block text-sm font-medium text-gray-700">Description</label>
+                                    <label for="description_{{ project.id }}" class="block text-sm ">Description</label>
                                     <input type="text" name="description" id="description_{{ project.id }}" value="{{ project.description }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
                                 <!-- Client (non-editable) -->
                                 <div>
-                                    <label for="client_{{ project.id }}" class="block text-sm font-medium text-gray-700">Client</label>
+                                    <label for="client_{{ project.id }}" class="block text-sm">Client</label>
                                     <input type="text" id="client_{{ project.id }}" value="{{ project.client }}" readonly
-                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-700 focus:outline-none">
+                                           class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border border">
+
                                 </div>
 
                                 <!-- Todos (non-editable) -->
                                 <div>
                                     <label for="todos_{{ project.id }}" class="block text-sm font-medium text-gray-700">Todos</label>
-                                    <ul class="mt-1 text-sm text-gray-800 bg-gray-100 rounded-md p-2">
+                                    <ul class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border border">
                                         {% for todo in project.todo %}
-                                            <li class="py-1">{{ todo.name }}</li>
+                                            {% set totalMinutes = 0 %}
+                                            {% for log in todo.timelogs %}
+                                                {% set totalMinutes = totalMinutes + log.totalMinutes %}
+                                            {% endfor %}
+
+                                            <li class="py-1" data-controller="timelog-todo-collaps">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="font-semibold">{{ todo.name }}</span>
+                                                    <span class="text-blue">{{ todo.status.value }}</span>
+                                                    <span class="text-green-600">{{ totalMinutes }} min logged</span>
+
+                                                    <!-- Toggle Button -->
+                                                    {% if todo.timelogs is not empty %}
+                                                        <button type="button" class="ml-4 text-sm text-blue-500 hover:text-blue-700 focus:outline-none"
+                                                                data-action="click->timelog-todo-collaps#toggle"
+                                                                data-turbo="false">
+                                                            Show Logs
+                                                        </button>
+                                                    {% endif %}
+                                                </div>
+
+                                                <!-- Collapsible Log Section -->
+                                                {% if todo.timelogs is not empty %}
+                                                    <ul id="timelog-{{ todo.id }}"
+                                                        data-timelog-todo-collaps-target="logs"
+                                                        data-id="{{ todo.id }}"
+                                                        class="ml-4 text-sm text-gray-600 hidden">
+                                                        {% for log in todo.timelogs %}
+                                                            <li class="border-l-2 border-blue-400 pl-2 mt-1">
+                                                                {{ log.totalMinutes }} min on {{ log.date|date("Y-m-d H:i") }}
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% endif %}
+                                            </li>
                                         {% endfor %}
                                     </ul>
+
                                 </div>
 
                                 <!-- Teams Selection -->
