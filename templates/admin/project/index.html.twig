@@ -12,37 +12,65 @@
             <div class="flex items-center justify-between mb-5">
                 <h1 class="text-2xl text-dark">{{ 'project_management.index.title'|trans }}</h1>
 
+                <!-- Search Bar -->
+                <form method="get" action="{{ path('admin_project') }}">
+                    <input type="text" name="search" placeholder="{{ 'client_management.index.search_placeholder'|trans }}"
+                           class="px-4 py-2 border rounded-md text-dark"
+                           value="{{ app.request.query.get('search') }}">
+                    <button type="submit"
+                            class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-search hover:bg-primary focus:outline-none">
+                        {{ 'client_management.index.search'|trans }}
+                    </button>
+                </form>
+
                 <!-- Create New Project Button -->
                 <a href="{{ path('admin_project_new') }}"
                    class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
-                    Create New Project
+                    {{ 'project_management.index.create_new_project'|trans }}
                 </a>
             </div>
 
             <!-- Project List -->
             <div class="space-y-6">
+
                 {% for project in projectDataArray %}
                     <div class="bg-white p-6 rounded-lg shadow-md">
+
+                        <!-- Alerts -->
+                        <div class="m-4">
+                            {% if project.remaining_minutes is not null and project.remaining_minutes <= 0 %}
+                                <div class="bg-red-500 text-white px-4 py-2 mt-2 rounded-md">
+                                    <span>{{ 'project_management.index.time_exceeded'|trans }}</span>
+                                </div>
+                            {% endif %}
+
+                            {% set today = "now"|date("Y-m-d") %}
+                            {% if today > project.deadline %}
+                                <div class="bg-red-500 text-white px-4 py-2 mt-2 rounded-md">
+                                    <span>{{ 'project_management.index.deadline_expired'|trans }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
                         <form action="{{ path('admin_project_update', { id: project.id }) }}" method="post">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                                 <!-- Project Name -->
                                 <div>
-                                    <label for="name_{{ project.id }}" class="block text-sm">Name</label>
+                                    <label for="name_{{ project.id }}" class="block text-sm">{{ 'project_management.index.name'|trans }}</label>
                                     <input type="text" name="name" id="name_{{ project.id }}" value="{{ project.name }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
                                 <!-- Project Description -->
                                 <div>
-                                    <label for="description_{{ project.id }}" class="block text-sm ">Description</label>
+                                    <label for="name_{{ project.id }}" class="block text-sm">{{ 'project_management.index.description'|trans }}</label>
                                     <input type="text" name="description" id="description_{{ project.id }}" value="{{ project.description }}"
                                            class="mt-1 block w-full px-4 py-2 border border rounded-md shadow-sm focus:outline-none">
                                 </div>
 
                                 <!-- Client (non-editable) -->
                                 <div>
-                                    <label for="client_{{ project.id }}" class="block text-sm">Client</label>
+                                    <label for="client_{{ project.id }}" class="block text-sm">{{ 'project_management.index.client'|trans }}</label>
                                     <input type="text" id="client_{{ project.id }}" value="{{ project.client }}" readonly
                                            class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border border">
 
@@ -50,7 +78,7 @@
 
                                 <!-- Todos (non-editable) -->
                                 <div>
-                                    <label for="todos_{{ project.id }}" class="block text-sm font-medium text-gray-700">Todos</label>
+                                    <label for="todos_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.todos'|trans }}</label>
                                     <ul class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border border">
                                         {% for todo in project.todo %}
                                             {% set totalMinutes = 0 %}
@@ -60,16 +88,16 @@
 
                                             <li class="py-1" data-controller="timelog-todo-collaps">
                                                 <div class="flex justify-between items-center">
-                                                    <span class="font-semibold">{{ todo.name }}</span>
+                                                    <span>{{ todo.name }}</span>
                                                     <span class="text-blue">{{ todo.status.value }}</span>
-                                                    <span class="text-green-600">{{ totalMinutes }} min logged</span>
+                                                    <span class="text-success">{{ totalMinutes }} {{ 'project_management.index.min_logged'|trans }}</span>
 
                                                     <!-- Toggle Button -->
                                                     {% if todo.timelogs is not empty %}
-                                                        <button type="button" class="ml-4 text-sm text-blue-500 hover:text-blue-700 focus:outline-none"
+                                                        <button type="button" class="ml-4 text-sm "
                                                                 data-action="click->timelog-todo-collaps#toggle"
                                                                 data-turbo="false">
-                                                            Show Logs
+                                                            {{ 'project_management.index.show_logs'|trans }}
                                                         </button>
                                                     {% endif %}
                                                 </div>
@@ -79,10 +107,10 @@
                                                     <ul id="timelog-{{ todo.id }}"
                                                         data-timelog-todo-collaps-target="logs"
                                                         data-id="{{ todo.id }}"
-                                                        class="ml-4 text-sm text-gray-600 hidden">
+                                                        class="ml-4 text-sm text-dark">
                                                         {% for log in todo.timelogs %}
                                                             <li class="border-l-2 border-blue-400 pl-2 mt-1">
-                                                                {{ log.totalMinutes }} min on {{ log.date|date("Y-m-d H:i") }}
+                                                                {{ log.totalMinutes }} {{ 'project_management.index.min_on'|trans }} {{ log.date|date("Y-m-d H:i") }}
                                                             </li>
                                                         {% endfor %}
                                                     </ul>
@@ -95,9 +123,9 @@
 
                                 <!-- Teams Selection -->
                                 <div>
-                                    <label for="teams_{{ project.id }}" class="block text-sm font-medium text-gray-700">Teams</label>
+                                    <label for="teams_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.teams'|trans }}</label>
                                     <select name="team_ids[]" id="teams_{{ project.id }}" multiple
-                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900">
+                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark">
                                         {% for team in allTeams %}
                                             <option value="{{ team.id }}"
                                                     {% if team in project.teams %}selected{% endif %}>
@@ -110,9 +138,9 @@
 
                                 <!-- Priority Dropdown -->
                                 <div>
-                                    <label for="priority_{{ project.id }}" class="block text-sm font-medium text-gray-700">Priority</label>
+                                    <label for="priority_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.priority'|trans }}</label>
                                     <select name="priority" id="priority_{{ project.id }}"
-                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900">
+                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark">
                                         {% for priority in ['low', 'medium', 'high', 'critical'] %}
                                             <option value="{{ priority }}"
                                                     {% if project.priority == priority %}selected{% endif %}>
@@ -125,29 +153,36 @@
                                 <div data-controller="time-slider budget">
                                     <!-- Rate Selection Dropdown -->
                                     <div>
-                                        <label for="rate_select_{{ project.id }}" class="block text-sm font-medium text-gray-700">Select Rate</label>
-                                        <select name="rate" id="rate_select_{{ project.id }}"
-                                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900"
-                                                data-budget-target="rate"
-                                                data-action="change->budget#updateBudget">
+                                        <label for="rate_select_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.select_rate'|trans }}</label>
 
-                                            <!-- Default "Select Rate" Option -->
-                                            <option value="" data-value="0" {% if project.rate is null %}selected{% endif %}>-- Select Rate --</option>
-                                            {% if company is not null and company.rates is not empty %}
+                                        {% if company is null or company.rates is empty %}
+                                            <!-- Info message when no rates are available -->
+                                            <div class="mt-2 p-2 bg-yellow-100 text-yellow-700 rounded-md border border-yellow-400">
+                                                <i>{{ 'project_management.index.warn_add_rates'|trans }}<a href="{{ path('admin_company') }}" class="text-blue-500 underline">Our Company</a> </i>
+                                            </div>
+                                        {% else %}
+                                            <!-- Show dropdown only if rates exist -->
+                                            <select name="rate" id="rate_select_{{ project.id }}"
+                                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark"
+                                                    data-budget-target="rate"
+                                                    data-action="change->budget#updateBudget">
+
+                                                <!-- Default "Select Rate" Option -->
+                                                <option value="" data-value="0" {% if project.rate is null %}selected{% endif %}>{{ 'project_management.index.select_rate'|trans }}</option>
+
                                                 {% for rate in company.rates %}
-                                                <option value="{{ rate.id }}" data-value="{{ rate.value }}"
-                                                        {% if project.rate and project.rate.id == rate.id %}selected{% endif %}>
-                                                    {{ rate.name }} - €{{ rate.value }}/hour
-                                                </option>
-                                            {% endfor %}
-                                            {% endif %}
-                                        </select>
+                                                    <option value="{{ rate.id }}" data-value="{{ rate.value }}"
+                                                            {% if project.rate and project.rate.id == rate.id %}selected{% endif %}>
+                                                        {{ rate.name }} - {{ 'project_management.index.currency'|trans }}{{ rate.value }}/{{ 'project_management.index.hour'|trans }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        {% endif %}
                                     </div>
-
 
                                     <!-- Estimated Time Slider -->
                                     <div class="mt-4">
-                                        <label class="block text-sm font-medium text-gray-700">Estimated Time (Hours)</label>
+                                        <label class="block text-sm  text-dark">{{ 'project_management.index.estimated_time'|trans }}</label>
                                         <div class="flex space-x-4 items-center">
                                             <input type="range" name="estimated_hours"
                                                    min="0" max="500" step="5"
@@ -168,13 +203,21 @@
 
                                     <!-- Estimated Budget -->
                                     <div class="mt-4">
-                                        <label for="estimatedBudget_{{ project.id }}" class="block text-sm font-medium text-gray-700">Estimated Budget (€)</label>
+                                        <label for="estimatedBudget_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.estimated_budget'|trans }}</label>
+
+                                        {% if company is null or company.rates is empty %}
+                                        <!-- Info message when no rates are available -->
+                                        <div class="mt-2 p-2 bg-yellow-100 text-yellow-700 rounded-md border border-yellow-400">
+                                            <i>{{ 'project_management.index.warn_add_rates'|trans }}<a href="{{ path('admin_company') }}" class="text-blue-500 underline">{{ 'project_management.index.our_company'|trans }}</a> </i>
+                                        </div>
+                                        {% else %}
                                         <input type="number" name="estimated_budget"
                                                id="estimatedBudget_{{ project.id }}"
                                                value="{{ project.estimated_budget is not null ? project.estimated_budget : '0' }}"
                                                step="0.01"
-                                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900"
+                                               class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border border"
                                                data-budget-target="budget" readonly>
+                                    {% endif %}
                                     </div>
                                 </div>
 
@@ -182,8 +225,8 @@
                                 <div>
                                 <!-- Total Time Used -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Total Time Used</label>
-                                    <p class="mt-1 text-gray-800">
+                                    <label class="block text-sm  text-dark">{{ 'project_management.index.total_time_used'|trans }}</label>
+                                    <p class="mt-1 text-dark">
                                         {% set hours = project.total_minutes // 60 %}
                                         {% set minutes = project.total_minutes % 60 %}
                                         {{ hours }}h {{ minutes }}m
@@ -194,27 +237,45 @@
 
                                 <!-- Remaining Time -->
                                 <div class="mt-4">
-                                    <label class="block text-sm font-medium text-gray-700">Remaining Time</label>
+                                    <label class="block text-sm  text-dark">{{ 'project_management.index.remaining_time'|trans }}</label>
                                     {% set remaining = project.remaining_minutes is not null ? (project.remaining_minutes // 60) ~ 'h ' ~ (project.remaining_minutes % 60) ~ 'm' : 'N/A' %}
-                                    <p class="mt-1 text-gray-800">{{ remaining }}</p>
+                                    <p class="mt-1 text-dark">{{ remaining }}</p>
+
                                 </div>
 
 
                                 </div>
+
+                                <!-- Last updated -->
+                                <div>
+                                    <label for="deadline_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.last_updated'|trans }}</label>
+                                    <input type="date" name="deadline" id="deadline_{{ project.id }}"
+                                           value="{{ project.last_updated ? project.last_updated : '' }}"
+                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark">
+                                </div>
+
                                 <!-- Deadline -->
                                 <div>
-                                    <label for="deadline_{{ project.id }}" class="block text-sm font-medium text-gray-700">Deadline</label>
+                                    <label for="deadline_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.deadline'|trans }}</label>
                                     <input type="date" name="deadline" id="deadline_{{ project.id }}"
                                            value="{{ project.deadline ? project.deadline : '' }}"
-                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900">
+                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark">
+                                </div>
+
+                                <!-- Billed Status -->
+                                <div>
+                                    <label for="isPaid{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.paid'|trans }}</label>
+                                    <input type="checkbox" name="is_paid" id="isPaid_{{ project.id }}"
+                                           {% if project.is_paid %}checked{% endif %}
+                                           class="mt-1 block text-dark focus:ring-indigo-500 h-4 w-4 border-gray-300 rounded">
                                 </div>
 
                                 <!-- Archived Status  -->
                                 <div>
-                                    <label for="isArchived_{{ project.id }}" class="block text-sm font-medium text-gray-700">Archived</label>
+                                    <label for="isArchived_{{ project.id }}" class="block text-sm  text-dark">{{ 'project_management.index.archieved'|trans }}</label>
                                     <input type="checkbox" name="is_archived" id="isArchived_{{ project.id }}"
                                            {% if project.is_archived %}checked{% endif %}
-                                           class="mt-1 block text-gray-900 focus:ring-indigo-500 h-4 w-4 border-gray-300 rounded">
+                                           class="mt-1 block text-dark focus:ring-indigo-500 h-4 w-4 border-gray-300 rounded">
                                 </div>
 
                             </div>
@@ -223,14 +284,36 @@
                             <div class="flex justify-end space-x-3 mt-4">
                                 <!-- Save Button -->
                                 <button type="submit"
-                                        class="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-success hover:bg-primary focus:outline-none">
-                                    Save
+                                        class="py-2 px-4 border border-transparent shadow-sm text-sm  rounded-md text-white bg-success hover:bg-primary focus:outline-none">
+                                    {{ 'project_management.index.save'|trans }}
                                 </button>
                             </div>
                         </form>
                     </div>
                 {% endfor %}
             </div>
+
+            <!-- Pagination Controls -->
+            {% if pager.nbPages > 1 %}
+                <div class="flex items-center mt-6 space-x-4">
+                    {% if pager.hasPreviousPage %}
+                        <a href="{{ pagerfanta_page_url(pager, pager.previousPage) }}"
+                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-pagination hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                            {{ 'client_management.index.previous'|trans }}
+                        </a>
+                    {% endif %}
+                    {% if pager.hasNextPage %}
+                        <a href="{{ pagerfanta_page_url(pager, pager.nextPage) }}"
+                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-pagination hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                            {{ 'client_management.index.next'|trans }}
+                        </a>
+                    {% endif %}
+                    <div class="ml-4">
+                        {{ 'client_management.index.page'|trans }} {{ pager.currentPage }}/{{ pager.nbPages }}
+                    </div>
+                </div>
+            {% endif %}
+
         </div>
     </section>
 {% endblock %}

@@ -60,8 +60,8 @@ class Project
     #[ORM\JoinColumn(nullable: true)]
     private ?Rate $rate = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $isPaid = null;
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $isPaid = false;
 
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
