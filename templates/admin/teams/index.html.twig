@@ -3,42 +3,54 @@
 {% block title %}Team Management{% endblock %}
 
 {% block body %}
-    <section class="relative bg-background py-10">
+    <section class="relative bg-section_2 py-10 min-h-screen">
         <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+
             <!-- Header Section -->
             <div class="flex items-center justify-between mb-5">
-                <h1 class="text-2xl font-semibold text-gray-900">Team Management</h1>
+                <h1 class="text-2xl  text-dark">{{ 'team_management.index.title'|trans }}</h1>
+
+                <!-- Search Bar -->
+                <form method="get" action="{{ path('admin_team') }}" class="flex space-x-2">
+                    <input type="text" name="search" placeholder="Search Teams..."
+                           class="px-4 py-2 border rounded-md text-dark"
+                           value="{{ app.request.query.get('search') }}">
+                    <button type="submit"
+                            class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-search hover:bg-primary focus:outline-none">
+                        Search
+                    </button>
+                </form>
 
                 <!-- Create New Team Button -->
                 <a href="{{ path('admin_team_new') }}"
-                   class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-alternate hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                    Create New Team
+                   class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                    {{ 'team_management.index.create_new_team'|trans }}
                 </a>
             </div>
 
             <!-- Team List -->
             <div class="space-y-6">
-                {% for team in teams %}
+                {% for team in teams.currentPageResults %}
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <form action="{{ path('admin_team_update', { id: team.id }) }}" method="post">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <!-- Team Name -->
                                 <div>
-                                    <label for="name_{{ team.id }}" class="block text-sm font-medium text-gray-700">Name</label>
+                                    <label for="name_{{ team.id }}" class="block text-sm text-dark">{{ 'team_management.index.name'|trans }}</label>
                                     <input type="text" name="name" id="name_{{ team.id }}" value="{{ team.name }}"
-                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-gray-900">
+                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-dark">
                                 </div>
 
                                 <!-- Users in Team (editable) -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Assign Users</label>
-                                    <div class="mt-1 bg-gray-100 rounded-md p-2 space-y-2">
+                                    <label class="block text-sm text-dark">{{ 'team_management.index.assign_users'|trans }}</label>
+                                    <div class="mt-1 bg-muted rounded-md p-2 space-y-2">
                                         {% for user in allUsers %}
                                             <label class="inline-flex items-center">
                                                 <input type="checkbox" name="user_ids[]" value="{{ user.id }}"
                                                        {% if user in team.users %}checked{% endif %}
                                                        class="form-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                                                <span class="ml-2 text-gray-800">{{ user.username }}</span>
+                                                <span class="ml-2 text-dark">{{ user.username }}</span>
                                             </label>
                                         {% endfor %}
                                     </div>
@@ -46,8 +58,8 @@
 
                                 <!-- Projects Associated with Team (non-editable) -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Projects</label>
-                                    <ul class="mt-1 text-sm text-gray-800 bg-gray-100 rounded-md p-2">
+                                    <label class="block text-sm text-dark">{{ 'team_management.index.projects'|trans }}</label>
+                                    <ul class="mt-1 text-sm bg-muted rounded-md p-2 border border">
                                         {% for project in team.projects %}
                                             <li class="py-1">{{ project.name }}</li>
                                         {% endfor %}
@@ -58,14 +70,36 @@
                             <div class="flex justify-end space-x-3 mt-4">
                                 <!-- Save Button -->
                                 <button type="submit"
-                                        class="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-success hover:bg-primary focus:outline-none">
-                                    Save Changes
+                                        class="py-2 px-4 border border-transparent shadow-sm text-sm rounded-md text-white bg-save hover:bg-primary focus:outline-none">
+                                    {{ 'team_management.index.save'|trans }}
                                 </button>
                             </div>
                         </form>
                     </div>
                 {% endfor %}
             </div>
+
+            <!-- Pagination Controls -->
+            {% if teams.nbPages > 1 %}
+                <div class="flex items-center mt-6 space-x-4">
+                    {% if teams.hasPreviousPage %}
+                        <a href="{{ pagerfanta_page_url(teams, teams.previousPage) }}"
+                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-pagination hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                            Previous
+                        </a>
+                    {% endif %}
+                    {% if teams.hasNextPage %}
+                        <a href="{{ pagerfanta_page_url(teams, teams.nextPage) }}"
+                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-pagination hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                            Next
+                        </a>
+                    {% endif %}
+                    <div class="ml-4">
+                        Page {{ teams.currentPage }}/{{ teams.nbPages }}
+                    </div>
+                </div>
+            {% endif %}
+
         </div>
     </section>
 {% endblock %}

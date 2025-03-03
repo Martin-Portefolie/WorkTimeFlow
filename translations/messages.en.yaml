@@ -72,8 +72,32 @@ project_management:
     hour: "hour"
     archieved: "Archieved"
     download_docx: "Download Invoice"
-
-
+  new:
+    title: "Create New Project"
+    name: "Project Name"
+    description: "Description"
+    client: "Client"
+    priority: "Priority"
+    deadline: "Deadline"
+    teams: "Assign Teams"
+    isArchived: "Archive Project"
+    save: "Save Project"
+team_management:
+  index:
+    title: "Team Management"
+    create_new_team: "Create New Team"
+    name: "Team Name"
+    assign_users: "Assign Users"
+    projects: "Associated Projects"
+    save: "Save"
+  new:
+    title: "Create New Team"
+    name: 'Name'
+    asign_users: "Assign Users"
+    explanation_users: "Chose what users should be part of the team"
+    projects: "Assign Projects"
+    explanation_projects: "Chose what projects should be part of the team"
+    submit: "Save Team"
 navbar:
   home: "Home"
   time_register: "Time Registration"

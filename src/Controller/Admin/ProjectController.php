@@ -186,7 +186,7 @@ class ProjectController extends AbstractController
         return $this->redirectToRoute('admin_project');
     }
 
-    #[Route('/admin/project/invoice/{id}', name: 'admin_project_download')]
+    #[Route('/admin/project/download/{id}', name: 'admin_project_download')]
     public function generateInvoice(int $id): Response
     {
         $project = $this->entityManager->getRepository(Project::class)->find($id);
@@ -229,8 +229,13 @@ class ProjectController extends AbstractController
         $table = $section->addTable('InvoiceTable');
 
         $table->addRow();
-        $table->addCell(4000)->addText("Salesperson:", ['bold' => true]);
+        $table->addCell(4000)->addText("Our Company", ['bold' => true]);
         $table->addCell(8000)->addText("Assigned Team");
+
+
+        $table->addRow();
+        $table->addCell(4000)->addText("Salesperson:", ['bold' => true]);
+        $table->addCell(8000)->addText("Person Name");
 
         $table->addRow();
         $table->addCell(4000)->addText("Job:", ['bold' => true]);
@@ -272,7 +277,7 @@ class ProjectController extends AbstractController
 
         // **Total Calculation**
         $subtotal = $lineTotal;
-        $tax = $subtotal * 0.05; // 5% Tax (Changeable)
+        $tax = $subtotal * 0.25; // 25% Tax (Changeable)
         $total = $subtotal + $tax;
 
         $totalTable = $section->addTable('InvoiceTable');

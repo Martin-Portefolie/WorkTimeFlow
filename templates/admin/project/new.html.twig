@@ -1,51 +1,44 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create New Project{% endblock %}
+{% block title %}{{ 'project_management.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <section class="relative bg-background py-10">
         <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
             <div class="flex items-center justify-between mb-5">
-                <h1 class="text-2xl text-dark ">Create New Project</h1>
+                <h1 class="text-2xl text-dark">{{ 'project_management.new.title'|trans }}</h1>
             </div>
 
             {{ form_start(form) }}
             <div class="bg-section_1 p-6 rounded-lg shadow-md space-y-4">
                 <div>
-                    <label class="block text-sm  text-dark">{{ form_label(form.name) }}</label>
+                    <label class="block text-sm text-dark">{{ 'project_management.new.name'|trans }}</label>
                     {{ form_widget(form.name, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' }}) }}
                 </div>
 
                 <div>
-                    <label class="block text-sm  text-dark">{{ form_label(form.description) }}</label>
+                    <label class="block text-sm text-dark">{{ 'project_management.new.description'|trans }}</label>
                     {{ form_widget(form.description, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900' } }) }}
                 </div>
 
                 <div>
-                    <label class="block text-sm  text-dark">{{ form_label(form.client) }}</label>
+                    <label class="block text-sm text-dark">{{ 'project_management.new.client'|trans }}</label>
                     {{ form_widget(form.client, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900' } }) }}
                 </div>
 
-{#                <div>#}
-{#                    <label class="block text-sm  text-dark">{{ form_label(form.estimatedMinutes) }}</label>#}
-{#                    {{ form_widget(form.estimatedMinutes, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark' } }) }}#}
-{#                </div>#}
-
-
-
                 <!-- Priority Dropdown -->
                 <div>
-                    <label class="block text-sm  text-dark">{{ form_label(form.priority) }}</label>
+                    <label class="block text-sm text-dark">{{ 'project_management.new.priority'|trans }}</label>
                     {{ form_widget(form.priority, {
                         'attr': {
-                             'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark'
+                            'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark'
                         }
                     }) }}
                 </div>
 
                 <!-- Deadline Input -->
                 <div class="">
-                    <label class="block text-sm  text-dark">{{ form_label(form.deadline) }}</label>
+                    <label class="block text-sm text-dark">{{ 'project_management.new.deadline'|trans }}</label>
                     {{ form_widget(form.deadline, {
                         'attr': {
                             'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark'
@@ -54,8 +47,8 @@
                 </div>
 
                 <!-- Team Selection with Checkboxes -->
-                <div h-5 w-5 text-dark>
-                    <label class="block text-sm  text-dark">{{ form_label(form.teams) }}</label>
+                <div>
+                    <label class="block text-sm text-dark">{{ 'project_management.new.teams'|trans }}</label>
                     <div class="space-y-2">
                         {{ form_widget(form.teams, {
                             'attr': {
@@ -67,20 +60,19 @@
                 </div>
 
                 <!-- Archived Checkbox -->
-                <div class="flex items-center space-x-3  p-3 rounded-md ">
+                <div class="flex items-center space-x-3 p-3 rounded-md">
                     {{ form_widget(form.isArchived, {
                         'attr': {
                             'class': 'h-5 w-5 text-dark'
                         }
                     }) }}
-                    <label class="block text-sm  text-dark">{{ form_label(form.isArchived) }}</label>
+                    <label class="block text-sm text-dark">{{ 'project_management.new.isArchived'|trans }}</label>
                 </div>
-
 
                 <div class="flex justify-end">
                     <button type="submit"
                             class="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-success hover:bg-primary focus:outline-none">
-                        Save Project
+                        {{ 'project_management.new.save'|trans }}
                     </button>
                 </div>
             </div>

@@ -83,28 +83,47 @@
 
                                 <!-- Todos (non-editable) -->
                                 <div>
-                                    <label for="todos_{{ project.id }}" class="block text-sm font-medium text-dark">{{ 'project_management.index.todos'|trans }}</label>
-                                    <ul class="mt-1 text-sm text-text-standard bg-muted rounded-md p-2 border border">
+                                    <label for="todos_{{ project.id }}" class="block text-sm font-medium text-dark">
+                                        {{ 'project_management.index.todos'|trans }}
+                                    </label>
+                                    <ul class=" text-sm text-text-standard bg-muted rounded-md p-2 border border">
                                         {% for todo in project.todo %}
                                             {% set totalMinutes = 0 %}
                                             {% for log in todo.timelogs %}
                                                 {% set totalMinutes = totalMinutes + log.totalMinutes %}
                                             {% endfor %}
 
-                                            <li class="py-1" data-controller="timelog-todo-collaps">
-                                                <div class="flex justify-between items-center">
-                                                    <span>{{ todo.name }}</span>
-                                                    <span class="text-blue">{{ todo.status.value }}</span>
-                                                    <span class="text-green-600">{{ totalMinutes }} {{ 'project_management.index.min_logged'|trans }}</span>
+                                            {% set hours = (totalMinutes // 60) %}
+                                            {% set minutes = (totalMinutes % 60) %}
 
-                                                    <!-- Toggle Button -->
-                                                    {% if todo.timelogs is not empty %}
-                                                        <button type="button" class="ml-4 text-sm text-blue-500 hover:text-blue-700 focus:outline-none"
-                                                                data-action="click->timelog-todo-collaps#toggle"
-                                                                data-turbo="false">
-                                                            {{ 'project_management.index.show_logs'|trans }}
-                                                        </button>
-                                                    {% endif %}
+                                            <li class="py-1 mt-2" data-controller="timelog-todo-collaps">
+                                                <div class="flex items-center w-full">
+                                                    <!-- 3/8 (37.5%) -->
+                                                    <div class="truncate" style="width: 37.5%;">
+                                                        <span>{{ todo.name }}</span>
+                                                    </div>
+                                                    <!-- 2/8 (25%) -->
+                                                    <div class="text-center" style="width: 25%;">
+                                                        <span class="text-blue">{{ todo.status.value }}</span>
+                                                    </div>
+                                                    <!-- 2/8 (25%) -->
+                                                    <div class="text-right" style="width: 25%;">
+                        <span class="text-green-600">
+                            {{ hours }}h {{ minutes }}m {{ 'project_management.index.min_logged'|trans }}
+                        </span>
+                                                    </div>
+                                                    <!-- 1/8 (12.5%) -->
+                                                    <div class="flex justify-end" style="width: 12.5%;">
+                                                        {% if todo.timelogs is not empty %}
+                                                            <button type="button" class="ml-4 text-sm text-blue-500 hover:text-blue-700 focus:outline-none"
+                                                                    data-action="click->timelog-todo-collaps#toggle"
+                                                                    data-turbo="false">
+                                                                {{ 'project_management.index.show_logs'|trans }}
+                                                            </button>
+                                                        {% else %}
+                                                            <div class="ml-4"></div>
+                                                        {% endif %}
+                                                    </div>
                                                 </div>
 
                                                 <!-- Collapsible Log Section -->
@@ -115,7 +134,9 @@
                                                         class="ml-4 text-sm text-gray-600 hidden">
                                                         {% for log in todo.timelogs %}
                                                             <li class="border-l-2 border-blue-400 pl-2 mt-1">
-                                                                {{ log.totalMinutes }} {{ 'project_management.index.min_on'|trans }} {{ log.date|date("Y-m-d H:i") }}
+                                                                {{ log.totalMinutes // 60 }}h {{ log.totalMinutes % 60 }}m
+                                                                {{ 'project_management.index.min_on'|trans }}
+                                                                {{ log.date|date("Y-m-d H:i") }}
                                                             </li>
                                                         {% endfor %}
                                                     </ul>
@@ -123,8 +144,8 @@
                                             </li>
                                         {% endfor %}
                                     </ul>
-
                                 </div>
+
 
                                 <!-- Teams Selection -->
                                 <div>

@@ -1,15 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello TodosController!{% endblock %}
+{% block title %}Todo Management{% endblock %}
 
 {% block body %}
-    <section class="relative bg-background py-10">
+    <section class="relative bg-section_2 min-h-screen py-10">
         <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
+
             <!-- Header Section -->
             <div class="flex items-center justify-between mb-5">
-                <h1 class="text-lg text-text-standard">Todo Management</h1>
+                <h1 class="text-2xl  text-dark">Todo Management</h1>
+
+                <!-- Search Bar -->
+                <form method="get" action="{{ path('admin_todos') }}" class="flex space-x-2">
+                    <input type="text" name="search" placeholder="Search Todos..."
+                           class="px-4 py-2 border rounded-md text-dark"
+                           value="{{ app.request.query.get('search') }}">
+                    <button type="submit"
+                            class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-search hover:bg-primary focus:outline-none">
+                        Search
+                    </button>
+                </form>
+
+                <!-- Create New Todo Button -->
                 <a href="{{ path('admin_todo_new') }}"
-                   class="inline-flex justify-center py-2 px-4 shadow-sm text-base rounded-md text-white bg-alternate hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                   class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
                     Create New Todo
                 </a>
             </div>
@@ -46,7 +60,6 @@
                                     <input type="date" name="dateEnd" id="dateEnd_{{ todo.id }}" value="{{ todo.dateEnd|date('Y-m-d') }}"
                                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-text-paragraph">
                                 </div>
-
                             </div>
 
                             <div class="flex justify-end space-x-3 mt-4">
@@ -59,7 +72,27 @@
                     </div>
                 {% endfor %}
             </div>
+
+            <!-- Pagination Controls -->
+            {% if pager.nbPages > 1 %}
+                <div class="flex items-center mt-6 space-x-4">
+                    {% if pager.hasPreviousPage %}
+                        <a href="{{ pagerfanta_page_url(pager, pager.previousPage) }}"
+                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-pagination hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                            Previous
+                        </a>
+                    {% endif %}
+                    {% if pager.hasNextPage %}
+                        <a href="{{ pagerfanta_page_url(pager, pager.nextPage) }}"
+                           class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-pagination hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                            Next
+                        </a>
+                    {% endif %}
+                    <div class="ml-4">
+                        Page {{ pager.currentPage }}/{{ pager.nbPages }}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </section>
-
 {% endblock %}

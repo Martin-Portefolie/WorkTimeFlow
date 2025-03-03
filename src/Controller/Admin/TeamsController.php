@@ -6,6 +6,8 @@ use App\Entity\Team;
 use App\Entity\User;
 use App\Form\TeamType;
 use Doctrine\ORM\EntityManagerInterface;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,13 +23,25 @@ class TeamsController extends AbstractController
     }
 
     #[Route('/admin/team', name: 'admin_team')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $teams = $this->entityManager->getRepository(Team::class)->findAll();
+        $searchTerm = $request->query->get('search');
+
+        // Query Builder for searching & pagination
+        $queryBuilder = $this->entityManager->getRepository(Team::class)->createQueryBuilder('t');
+
+        if ($searchTerm) {
+            $queryBuilder->andWhere('t.name LIKE :search')
+                ->setParameter('search', '%' . $searchTerm . '%');
+        }
+
+        $pagerfanta = new Pagerfanta(new QueryAdapter($queryBuilder));
+        $pagerfanta->setMaxPerPage(10);
+        $pagerfanta->setCurrentPage($request->query->getInt('page', 1));
         $allUsers = $this->entityManager->getRepository(User::class)->findAll();
 
         return $this->render('admin/teams/index.html.twig', [
-            'teams' => $teams,
+            'teams' => $pagerfanta,
             'allUsers' => $allUsers,
         ]);
     }
