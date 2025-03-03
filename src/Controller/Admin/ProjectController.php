@@ -72,7 +72,7 @@ class ProjectController extends AbstractController
             ];
         }
 
-        return $this->render('admin/project/index.html.twig', [
+        return $this->render('admin/project/test.html.twig', [
             'projectDataArray' => $projectsDataArray,
             'allTeams' => $allTeams,
             'company' => $company,

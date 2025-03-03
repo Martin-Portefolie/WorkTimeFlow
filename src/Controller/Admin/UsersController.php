@@ -2,10 +2,13 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Client;
 use App\Entity\Team;
 use App\Entity\User;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,13 +27,29 @@ class UsersController extends AbstractController
     }
 
     #[Route('/admin/user', name: 'admin_users')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $users = $this->entityManager->getRepository(User::class)->findAll();
+        $searchTerm = $request->query->get('search');
+
+        // Build query for search & pagination
+        $queryBuilder = $this->entityManager->getRepository(User::class)->createQueryBuilder('u')
+            ->leftJoin('u.teams', 't'); // Assuming a User belongs to multiple Teams
+
+        if ($searchTerm) {
+            $queryBuilder->andWhere('u.username LIKE :search OR u.email LIKE :search')
+                ->setParameter('search', '%' . $searchTerm . '%');
+        }
+
+        // Pagination setup
+        $pagerfanta = new Pagerfanta(new QueryAdapter($queryBuilder));
+        $pagerfanta->setMaxPerPage(10);
+        $pagerfanta->setCurrentPage($request->query->getInt('page', 1));
+
+        // Fetching all teams (for some additional use case)
         $allTeams = $this->entityManager->getRepository(Team::class)->findAll();
 
         $userDataArray = [];
-        foreach ($users as $user) {
+        foreach ($pagerfanta->getCurrentPageResults() as $user) {
             $userDataArray[] = [
                 'id' => $user->getId(),
                 'name' => $user->getUsername(),
@@ -44,8 +63,10 @@ class UsersController extends AbstractController
         return $this->render('admin/users/index.html.twig', [
             'userDataArray' => $userDataArray,
             'allTeams' => $allTeams,
+            'pager' => $pagerfanta,  // Passing pagination object to Twig
         ]);
     }
+
 
     #[Route('/admin/user/new', name: 'admin_user_new')]
     public function new(Request $request): Response

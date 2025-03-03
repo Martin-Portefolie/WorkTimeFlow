@@ -1,78 +1,121 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User Management{% endblock %}
+{% block title %}{{ 'user_management.index.title'|trans }}{% endblock %}
 
 {% block body %}
-    <section class="relative bg-background py-10">
-        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
-            <div class="flex items-center justify-between mb-5">
-                <h1 class="text-lg text-text-standard">User Management</h1>
-                <a href="{{ path('admin_user_new') }}" class="inline-flex justify-center py-2 px-4 bg-alternate text-white rounded-md">
-                    Create New User
-                </a>
-            </div>
+    <section class="relative bg-section_2 py-10 min-h-screen">
+        <div class="container mx-auto px-6 lg:px-8 max-w-7xl">
+            <h1 class="text-2xl font-semibold text-dark mb-6">{{ 'user_management.index.title'|trans }}</h1>
 
-            <div class="space-y-6">
-                {% for user in userDataArray %}
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <form action="{{ path('admin_user_update', { id: user.id }) }}" method="post">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Username -->
-                                <div>
-                                    <label for="name_{{ user.id }}" class="block text-sm text-text-standard">Name</label>
-                                    <input type="text" name="name" id="name_{{ user.id }}" value="{{ user.name }}"
-                                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-text-standard">
-                                </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-5">
 
-                                <!-- Email -->
-                                <div>
-                                    <label for="email_{{ user.id }}" class="block text-sm text-text-standard">Email</label>
-                                    <input type="email" name="email" id="email_{{ user.id }}" value="{{ user.email }}"
-                                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-text-paragraph">
-                                </div>
+                    <!-- Search Form -->
+                    <form method="get" action="{{ path('admin_users') }}" class="w-full md:w-auto flex space-x-2">
+                        <input type="text" name="search" value="{{ app.request.query.get('search', '') }}"
+                               placeholder="{{ 'user_management.index.search_placeholder'|trans }}"
+                               class="block w-full px-4 py-2 border border-grey-300 rounded-md shadow-sm focus:outline-none">
+                        <button type="submit"
+                                class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-search hover:bg-primary focus:outline-none">
+                            {{ 'user_management.index.search'|trans }}
+                        </button>
+                    </form>
 
-                                <!-- Reset Password -->
-                                <div class="col-span-2">
-                                    <label for="password_{{ user.id }}" class="block text-sm text-text-standard">New Password</label>
-                                    <input type="password" name="new_password" id="password_{{ user.id }}"
-                                           placeholder="Enter new password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none text-text-standard">
-                                </div>
+                    <!-- Create New User Button -->
+                    <a href="{{ path('admin_user_new') }}"
+                       class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight mt-4 md:mt-0">
+                        {{ 'user_management.index.create_new_user'|trans }}
+                    </a>
+                </div>
 
-                                <!-- Roles -->
-                                <div class="col-span-2">
-                                    <label class="block text-sm text-text-standard">Roles</label>
-                                    <div class="flex space-x-4 mt-1">
-                                        <label>
-                                            <input type="checkbox" name="roles[]" value="ROLE_USER" {% if 'ROLE_USER' in user.roles %}checked{% endif %}> User
-                                        </label>
-                                        <label>
-                                            <input type="checkbox" name="roles[]" value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}checked{% endif %}> Admin
-                                        </label>
+                <!-- User List -->
+                <div class="space-y-6">
+                    {% for user in pager.currentPageResults %}
+                        <div class="bg-white p-6 rounded-lg shadow-md border border-grey-300">
+                            <form action="{{ path('admin_user_update', { id: user.id }) }}" method="post">
+                                <div class="grid grid-cols-1 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-dark">{{ 'user_management.index.name'|trans }}</label>
+                                        <input type="text" name="name" value="{{ user.username }}"
+                                               class="mt-1 block w-full px-4 py-2 border border-grey-300 rounded-md shadow-sm focus:outline-none">
                                     </div>
-                                </div>
-
-                                <!-- Teams -->
-                                <div class="col-span-2">
-                                    <label class="block text-sm text-text-standard">Teams</label>
-                                    <div class="flex flex-wrap gap-4 mt-1">
-                                        {% for team in allTeams %}
+                                    <div>
+                                        <label class="block text-sm font-medium text-dark">{{ 'user_management.index.email'|trans }}</label>
+                                        <input type="email" name="email" value="{{ user.email }}"
+                                               class="mt-1 block w-full px-4 py-2 border border-grey-300 rounded-md shadow-sm focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-dark">{{ 'user_management.index.password'|trans }}</label>
+                                        <input type="password" name="new_password" placeholder="Enter new password"
+                                               class="mt-1 block w-full px-4 py-2 border border-grey-300 rounded-md shadow-sm focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-dark">{{ 'user_management.index.roles'|trans }}</label>
+                                        <div class="flex flex-wrap gap-4 mt-1">
                                             <label>
-                                                <input type="checkbox" name="team_ids[]" value="{{ team.id }}" {% if team in user.teams %}checked{% endif %}>
-                                                {{ team.name }}
+                                                <input type="checkbox" name="roles[]" value="ROLE_USER" {% if 'ROLE_USER' in user.roles %}checked{% endif %}>
+                                                User
                                             </label>
-                                        {% endfor %}
+                                            <label>
+                                                <input type="checkbox" name="roles[]" value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}checked{% endif %}>
+                                                Admin
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-dark">{{ 'user_management.index.teams'|trans }}</label>
+                                        <div class="flex flex-wrap gap-4 mt-1">
+                                            {% for team in allTeams %}
+                                                <label>
+                                                    <input type="checkbox" name="team_ids[]" value="{{ team.id }}" {% if team in user.teams %}checked{% endif %}>
+                                                    {{ team.name }}
+                                                </label>
+                                            {% endfor %}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="flex justify-end space-x-3 mt-4">
-                                <button type="submit" class="py-2 px-4 shadow-sm text-base rounded-md text-white bg-success hover:bg-primary focus:outline-none">
-                                    Save
-                                </button>
-                            </div>
-                        </form>
+                                <div class="flex justify-end mt-6">
+                                    <button type="submit"
+                                            class="py-3 px-6 text-lg font-medium rounded-md text-white bg-save hover:bg-primary focus:ring focus:ring-blue_hoover">
+                                        {{ 'user_management.index.save'|trans }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-gray-500">
+                            {{ 'user_management.index.no_users_found'|trans }}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination Controls -->
+                {% if pager.nbPages > 1 %}
+                    <div class="flex items-center mt-6 space-x-4">
+                        {% if pager.hasPreviousPage %}
+                            <a href="{{ pagerfanta_page_url(pager, pager.previousPage) }}"
+                               class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-pagination hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                                {{ 'user_management.index.previous'|trans }}
+                            </a>
+                        {% endif %}
+                        {% for page in 1..pager.nbPages %}
+                            <a href="{{ path('admin_users', {'page': page, 'search': app.request.query.get('search')}) }}"
+                               class="px-3 py-2 {% if page == pager.currentPage %}bg-blue-500 text-white{% else %}border border-gray-300{% endif %} rounded-lg">
+                                {{ page }}
+                            </a>
+                        {% endfor %}
+                        {% if pager.hasNextPage %}
+                            <a href="{{ pagerfanta_page_url(pager, pager.nextPage) }}"
+                               class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-pagination hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
+                                {{ 'user_management.index.next'|trans }}
+                            </a>
+                        {% endif %}
+                        <div class="ml-4">
+                            {{ 'user_management.index.page'|trans }} {{ pager.currentPage }}/{{ pager.nbPages }}
+                        </div>
                     </div>
-                {% endfor %}
+                {% endif %}
             </div>
         </div>
     </section>

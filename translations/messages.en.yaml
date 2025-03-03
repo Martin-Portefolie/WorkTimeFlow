@@ -98,6 +98,31 @@ team_management:
     projects: "Assign Projects"
     explanation_projects: "Chose what projects should be part of the team"
     submit: "Save Team"
+todo_management:
+  index:
+    title: "Todo Management"
+    search: "Search"
+    search_placeholder: "Name, Project..."
+    create_new_todo: "Create New Todo"
+    name: "Name"
+    dateStart: "Todo Start Date"
+    dateEnd: "Todo End Date"
+    project: "Project"
+    save: "Save"
+  new:
+    project_help: "Cannot Change when first set"
+user_management:
+  index:
+    title: "User Management"
+    create_new_user: "Create new user"
+    name: "Name"
+    email: "Email"
+    password: "Password"
+    roles: "Roles"
+    teams:  "Teams"
+    save: "Save"
+  new:
+    teams_help: "Chose what teams the user should be part of"
 navbar:
   home: "Home"
   time_register: "Time Registration"
@@ -109,7 +134,6 @@ navbar:
   change_language: "Change Language"
   english: "English"
   danish: "Danish"
-
 navbar_admin:
   admin_panel: "Admin Panel"
   our_company: "Our Company"
