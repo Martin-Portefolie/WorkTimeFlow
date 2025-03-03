@@ -4,45 +4,75 @@
 
 {% block body %}
     <section class="relative bg-background py-10">
-        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
-            <h1 class="text-xl text-text-headline mb-8">Create New User</h1>
+        <div class="container mx-auto px-6 lg:px-8 max-w-7xl">
+            <h1 class="text-2xl font-semibold text-dark mb-6">Create New User</h1>
 
-            <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="bg-section_1 p-6 rounded-lg shadow-md border border-muted">
                 {{ form_start(form) }}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <!-- Username -->
-                <div class="mb-4">
-                    <label class="block text-lg text-text-headline">{{ form_label(form.username) }}</label>
-                    {{ form_widget(form.username, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border rounded-md shadow-sm'}}) }}
-                </div>
+                    <!-- Username -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary mb-2">{{ form_label(form.username) }}</label>
+                        {{ form_widget(form.username, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                    </div>
 
-                <!-- Email -->
-                <div class="mb-4">
-                    <label class="block text-lg text-text-headline">{{ form_label(form.email) }}</label>
-                    {{ form_widget(form.email, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border rounded-md shadow-sm'}}) }}
-                </div>
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary mb-2">{{ form_label(form.email) }}</label>
+                        {{ form_widget(form.email, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                    </div>
 
-                <!-- Password -->
-                <div class="mb-4">
-                    <label class="block text-lg text-text-headline">{{ form_label(form.password) }}</label>
-                    {{ form_widget(form.password, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border rounded-md shadow-sm'}}) }}
+                    <!-- Password -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary mb-2">{{ form_label(form.password) }}</label>
+                        {{ form_widget(form.password, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                    </div>
                 </div>
 
                 <!-- Roles -->
-                <div class="mb-4">
-                    <label class="block text-lg text-text-headline">{{ form_label(form.roles) }}</label>
-                    {{ form_widget(form.roles, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border rounded-md shadow-sm'}}) }}
+                <div class="p-6 bg-select border border-muted rounded-lg space-y-4 mt-6">
+                    <label class="block text-sm font-medium text-secondary mb-3">{{ form_label(form.roles) }}</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                        {% for choice in form.roles %}
+                            <div class="flex items-center space-x-3">
+                                {{ form_widget(choice, { 'attr': { 'class': 'h-4 w-4 text-blue focus:ring-blue rounded' } }) }}
+                                <label class="text-sm text-dark">{{ choice.vars.label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
 
-                <!-- Teams (Selection) -->
-                <div class="mb-4">
-                    <label class="block text-lg text-text-headline">{{ form_label(form.teams) }}</label>
-                    {{ form_widget(form.teams, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border rounded-md shadow-sm'}}) }}
+                <!-- Teams Selection -->
+                <div class="p-6 bg-select border border-muted rounded-lg space-y-6 mt-6">
+                    <label class="block text-sm font-medium text-secondary">{{ form_label(form.teams) }}</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                        {% for choice in form.teams %}
+                            <div class="flex items-center space-x-3">
+                                {{ form_widget(choice, { 'attr': { 'class': 'h-4 w-4 text-blue focus:ring-blue rounded' } }) }}
+                                <label class="text-sm text-dark">{{ choice.vars.label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <p class="text-xs text-muted">{{ 'user_management.new.teams_help'|trans }}</p>
                 </div>
 
+                <!-- Submit Button -->
                 <div class="flex justify-end mt-6">
                     <button type="submit"
-                            class="inline-flex justify-center py-3 px-6 border shadow-sm text-lg font-medium rounded-md text-white bg-success hover:bg-primary focus:outline-none">
+                            class="py-3 px-6 text-lg font-medium rounded-md text-white bg-save hover:bg-blue_hoover focus:ring focus:ring-blue_hoover">
                         Create User
                     </button>
                 </div>

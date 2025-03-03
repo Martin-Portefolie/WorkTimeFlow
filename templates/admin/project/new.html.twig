@@ -4,79 +4,98 @@
 
 {% block body %}
     <section class="relative bg-background py-10">
-        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
-            <div class="flex items-center justify-between mb-5">
-                <h1 class="text-2xl text-dark">{{ 'project_management.new.title'|trans }}</h1>
-            </div>
+        <div class="container mx-auto px-6 lg:px-8 max-w-7xl">
+            <h1 class="text-2xl font-semibold text-dark mb-6">{{ 'project_management.new.title'|trans }}</h1>
 
-            {{ form_start(form) }}
-            <div class="bg-section_1 p-6 rounded-lg shadow-md space-y-4">
-                <div>
-                    <label class="block text-sm text-dark">{{ 'project_management.new.name'|trans }}</label>
-                    {{ form_widget(form.name, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-grey-300 rounded-md shadow-sm text-dark' }}) }}
-                </div>
+            <div class="bg-section_1 p-6 rounded-lg shadow-lg border border-muted">
+                {{ form_start(form) }}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <div>
-                    <label class="block text-sm text-dark">{{ 'project_management.new.description'|trans }}</label>
-                    {{ form_widget(form.description, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900' } }) }}
-                </div>
-
-                <div>
-                    <label class="block text-sm text-dark">{{ 'project_management.new.client'|trans }}</label>
-                    {{ form_widget(form.client, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900' } }) }}
-                </div>
-
-                <!-- Priority Dropdown -->
-                <div>
-                    <label class="block text-sm text-dark">{{ 'project_management.new.priority'|trans }}</label>
-                    {{ form_widget(form.priority, {
-                        'attr': {
-                            'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark'
-                        }
-                    }) }}
-                </div>
-
-                <!-- Deadline Input -->
-                <div class="">
-                    <label class="block text-sm text-dark">{{ 'project_management.new.deadline'|trans }}</label>
-                    {{ form_widget(form.deadline, {
-                        'attr': {
-                            'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-dark'
-                        }
-                    }) }}
-                </div>
-
-                <!-- Team Selection with Checkboxes -->
-                <div>
-                    <label class="block text-sm text-dark">{{ 'project_management.new.teams'|trans }}</label>
-                    <div class="space-y-2">
-                        {{ form_widget(form.teams, {
+                    <!-- Name Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary">{{ 'project_management.new.name'|trans }}</label>
+                        {{ form_widget(form.name, {
                             'attr': {
-                                'class': ' flex flex-wrap gap-2 '
-                            },
-                            'label_attr': { 'class': 'inline-flex items-center text-sm' }
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- Description Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary">{{ 'project_management.new.description'|trans }}</label>
+                        {{ form_widget(form.description, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- Client Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary">{{ 'project_management.new.client'|trans }}</label>
+                        {{ form_widget(form.client, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- Priority Dropdown -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary">{{ 'project_management.new.priority'|trans }}</label>
+                        {{ form_widget(form.priority, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- Deadline Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary">{{ 'project_management.new.deadline'|trans }}</label>
+                        {{ form_widget(form.deadline, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
                         }) }}
                     </div>
                 </div>
 
-                <!-- Archived Checkbox -->
-                <div class="flex items-center space-x-3 p-3 rounded-md">
-                    {{ form_widget(form.isArchived, {
-                        'attr': {
-                            'class': 'h-5 w-5 text-dark'
-                        }
-                    }) }}
-                    <label class="block text-sm text-dark">{{ 'project_management.new.isArchived'|trans }}</label>
+                <!-- Team Selection -->
+                <div class="p-6 bg-select border border-muted rounded-lg space-y-4 mt-4">
+                    <label class="block text-sm font-medium text-secondary">{{ 'project_management.new.teams'|trans }}</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {% for choice in form.teams %}
+                            <div class="flex items-center space-x-3">
+                                {{ form_widget(choice, { 'attr': { 'class': 'h-4 w-4 text-blue focus:ring-blue rounded' } }) }}
+                                <label class="text-sm text-dark">{{ choice.vars.label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <p class="text-xs text-muted">{{ 'project_management.new.teams_help'|trans }}</p>
                 </div>
 
-                <div class="flex justify-end">
+                <!-- Archived Checkbox -->
+                <div class="flex items-center p-4 bg-select border border-muted rounded-lg shadow-sm mt-4">
+                    {{ form_widget(form.isArchived, {
+                        'attr': {
+                            'class': 'h-4 w-4 text-blue focus:ring-blue rounded'
+                        }
+                    }) }}
+                    <label class="ml-3 text-sm font-medium text-secondary">{{ 'project_management.new.isArchived'|trans }}</label>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-end mt-6">
                     <button type="submit"
-                            class="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-success hover:bg-primary focus:outline-none">
+                            class="py-3 px-6 text-lg font-medium rounded-md text-white bg-save hover:bg-blue_hoover focus:ring focus:ring-blue_hoover">
                         {{ 'project_management.new.save'|trans }}
                     </button>
                 </div>
+
+                {{ form_end(form) }}
             </div>
-            {{ form_end(form) }}
         </div>
     </section>
 {% endblock %}
