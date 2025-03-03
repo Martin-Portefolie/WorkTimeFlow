@@ -6,8 +6,8 @@
     <section class="relative bg-section_2 py-10 min-h-screen">
         <div class="container mx-auto px-6 lg:px-8 max-w-7xl">
             <h1 class="text-2xl font-semibold text-dark mb-6">{{ 'company_management.index.title'|trans }}</h1>
-
-            <div class="bg-white p-6 rounded-lg shadow-md">
+            <turbo-frame id="company_form">
+            <div class="bg-white p-6 rounded-lg shadow-md mt-4">
                 {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -33,6 +33,7 @@
                     </div>
                 </div>
 
+                <!-- #TODO WHEN FIRST RATE IS SET IN PROJECT, DELETE IS IMPOSIBLE -->
                 <!-- Rates Management -->
                 <div class="mt-6 bg-gray-50 rounded-lg shadow p-4"
                      data-controller="rates"
@@ -83,6 +84,7 @@
                     <div class="alert alert-success mt-4">{{ message }}</div>
                 {% endfor %}
             </div>
+            </turbo-frame>
         </div>
     </section>
 {% endblock %}

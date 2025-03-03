@@ -31,7 +31,9 @@
                 <!-- User List -->
                 <div class="space-y-6">
                     {% for user in pager.currentPageResults %}
-                        <div class="bg-white p-6 rounded-lg shadow-md border border-grey-300">
+                    <turbo-frame id="user_{{ user.id }}">
+
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-grey-300 mt-4">
                             <form action="{{ path('admin_user_update', { id: user.id }) }}" method="post">
                                 <div class="grid grid-cols-1 gap-6">
                                     <div>
@@ -87,6 +89,7 @@
                         <div class="text-center text-gray-500">
                             {{ 'user_management.index.no_users_found'|trans }}
                         </div>
+                        </turbo-frame>
                     {% endfor %}
                 </div>
 

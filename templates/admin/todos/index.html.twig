@@ -30,7 +30,8 @@
                 <!-- Todo List -->
                 <div class="space-y-6">
                     {% for todo in pager.currentPageResults %}
-                        <div class="bg-white p-6 rounded-lg shadow-md border border-grey-300">
+                    <turbo-frame id="todo_{{ todo.id }}">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-grey-300 mt-4">
                             <form action="{{ path('admin_todo_update', { id: todo.id }) }}" method="post">
                                 <div class="grid grid-cols-1 gap-6">
                                     <div>
@@ -63,6 +64,7 @@
                                 </div>
                             </form>
                         </div>
+                    </turbo-frame>
                     {% endfor %}
                 </div>
 

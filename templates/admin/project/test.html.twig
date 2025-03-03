@@ -29,7 +29,8 @@
                 <!-- Project List -->
                 <div class="space-y-6" data-controller="budget time-slider">
                     {% for project in projectDataArray %}
-                        <div class="bg-white p-6 rounded-lg shadow-md border border-grey-300 ">
+                    <turbo-frame id="project_{{ project.id }}">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-grey-300 mt-4">
 
                             <a href="{{ path('admin_project_download', { id: project.id }) }}"
                                class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
@@ -67,10 +68,10 @@
                                         </div>
                                         <!-- Last updated -->
                                         <div>
-                                            <label for="deadline_{{ project.id }}" class="block text-sm font-medium text-dark">
+                                            <label for="updated_{{ project.id }}" class="block text-sm font-medium text-dark">
                                                 {{ 'project_management.index.last_updated'|trans }}
                                             </label>
-                                            <input type="date" name="deadline" id="deadline_{{ project.id }}"
+                                            <input type="date" name="updated" id="updated_{{ project.id }}"
                                                    value="{{ project.last_updated ? project.last_updated : '' }}"
                                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-gray-100 text-gray-500 rounded-md shadow-sm cursor-not-allowed"
                                                    readonly>
@@ -309,6 +310,7 @@
                                 </div>
                             </form>
                         </div>
+                    </turbo-frame>
                     {% endfor %}
                 </div>
             </div>
