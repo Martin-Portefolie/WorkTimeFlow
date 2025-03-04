@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'upload_management.index.title'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="relative bg-section_2 py-10 min-h-screen">
+        <div class="container mx-auto px-6 lg:px-8 max-w-4xl">
+            <h1 class="text-2xl font-semibold text-dark mb-6">{{ 'upload_management.index.title'|trans }}</h1>
+
+            <div class="bg-white p-6 rounded-lg shadow-md space-y-6">
+                <!-- Upload Clients -->
+                <form action="{{ path('admin_upload_clients') }}" method="post" enctype="multipart/form-data" class="space-y-3">
+                    <h2 class="text-lg font-semibold">{{ 'upload_management.index.upload_clients'|trans }}</h2>
+                    <input type="file" name="client_docx" class="block w-full p-2 border border-gray-300 rounded-md">
+                    <button type="submit" class="px-4 py-2 text-white bg-save hover:bg-primary rounded-md">{{ 'upload_management.index.upload'|trans }}</button>
+                </form>
+
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="bg-{{ label == 'success' ? 'green' : 'red' }}-100 border border-{{ label == 'success' ? 'green' : 'red' }}-400 text-{{ label == 'success' ? 'green' : 'red' }}-700 px-4 py-3 rounded relative" role="alert">
+                            <strong class="font-bold">{{ label|capitalize }}!</strong>
+                            <span class="block sm:inline">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+
+                {#                <!-- Upload Projects -->#}
+{#                <form action="{{ path('admin_upload_projects') }}" method="post" enctype="multipart/form-data" class="space-y-3">#}
+{#                    <h2 class="text-lg font-semibold">{{ 'upload_management.index.upload_projects'|trans }}</h2>#}
+{#                    <input type="file" name="project_docx" class="block w-full p-2 border border-gray-300 rounded-md">#}
+{#                    <button type="submit" class="px-4 py-2 text-white bg-save hover:bg-primary rounded-md">{{ 'upload_management.index.upload'|trans }}</button>#}
+{#                </form>#}
+
+{#                <!-- Upload Todos -->#}
+{#                <form action="{{ path('admin_upload_todos') }}" method="post" enctype="multipart/form-data" class="space-y-3">#}
+{#                    <h2 class="text-lg font-semibold">{{ 'upload_management.index.upload_todos'|trans }}</h2>#}
+{#                    <input type="file" name="todo_docx" class="block w-full p-2 border border-gray-300 rounded-md">#}
+{#                    <button type="submit" class="px-4 py-2 text-white bg-save hover:bg-primary rounded-md">{{ 'upload_management.index.upload'|trans }}</button>#}
+{#                </form>#}
+            </div>
+        </div>
+    </section>
+{% endblock %}
