@@ -56,6 +56,13 @@ class Project
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $lastUpdated;
 
+    #[ORM\ManyToOne(targetEntity: Rate::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Rate $rate = null;
+
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $isPaid = false;
+
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
     public function updateTimestamp(): void
@@ -260,6 +267,29 @@ class Project
     public function setArchived(bool $isArchived): static
     {
         $this->isArchived = $isArchived;
+
+        return $this;
+    }
+
+    public function getRate(): ?Rate
+    {
+        return $this->rate;
+    }
+
+    public function setRate(?Rate $rate): static
+    {
+        $this->rate = $rate;
+        return $this;
+    }
+
+    public function isPaid(): ?bool
+    {
+        return $this->isPaid;
+    }
+
+    public function setIsPaid(?bool $isPaid): static
+    {
+        $this->isPaid = $isPaid;
 
         return $this;
     }

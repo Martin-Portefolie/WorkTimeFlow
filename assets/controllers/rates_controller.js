@@ -1,37 +1,51 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-    static targets = ["collection", "addButton"];
+    static targets = ["collection"];
 
     connect() {
-        this.updateRemoveEvent();
+        console.log("Rates controller connected!");
     }
 
     add(event) {
         event.preventDefault();
 
-        // Get the prototype template
-        let prototype = this.collectionTarget.dataset.prototype;
-        let index = this.collectionTarget.children.length;
+        console.log("Adding new rate...");
+
+        let collection = this.collectionTarget;
+        let prototype = collection.dataset.prototype;
+        let index = collection.children.length;
+
+        if (!prototype) {
+            console.error("Prototype data missing!");
+            return;
+        }
+
+        // Replace __name__ with the new index
         let newForm = prototype.replace(/__name__/g, index);
 
-        // Create a new element for the rate field
+        // Create new element for rate field
         let newElement = document.createElement("div");
-        newElement.classList.add("rate-item", "flex", "items-center", "space-x-2", "mt-2");
-        newElement.innerHTML = newForm + '<button type="button" data-action="click->rates#remove" class="remove-rate bg-red-500 text-white px-2 py-1 rounded-md">X</button>';
+        newElement.classList.add("rate-item", "flex", "items-center", "space-x-3", "bg-white", "p-3", "rounded-md", "shadow-md", "border", "border-gray-300");
+        newElement.innerHTML = newForm + `
+            <button type="button" class="remove-rate bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition">✕</button>
+        `;
 
         // Append the new element
-        this.collectionTarget.appendChild(newElement);
+        collection.appendChild(newElement);
+
+        console.log("New rate added!");
+
+        // Attach remove event
+        newElement.querySelector(".remove-rate").addEventListener("click", () => {
+            console.log("Rate removed!");
+            newElement.remove();
+        });
     }
 
     remove(event) {
         event.preventDefault();
         event.target.closest(".rate-item").remove();
-    }
-
-    updateRemoveEvent() {
-        this.element.querySelectorAll(".remove-rate").forEach((button) => {
-            button.addEventListener("click", (event) => this.remove(event));
-        });
+        console.log("Rate removed!");
     }
 }

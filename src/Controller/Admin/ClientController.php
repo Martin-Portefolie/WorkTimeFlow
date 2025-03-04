@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Client;
+use App\Entity\Project;
 use App\Form\ClientType;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
@@ -26,6 +27,7 @@ final class ClientController extends AbstractController
     {
         $searchTerm = $request->query->get('search');
         $queryBuilder = $this->entityManager->getRepository(Client::class)->createQueryBuilder('c');
+        $allProjects = $this->entityManager->getRepository(Project::class)->findAll();
 
         if ($searchTerm) {
             $queryBuilder->andWhere('c.name LIKE :search OR c.contactPerson LIKE :search OR c.contactEmail LIKE :search OR c.contactPhone LIKE :search')
@@ -43,10 +45,16 @@ final class ClientController extends AbstractController
             $clientDataArray[] = [
                 'id' => $clients->getId(),
                 'name' => $clients->getName(),
-                'contact' => $clients->getContactPerson(),
+                'contactPerson' => $clients->getContactPerson(),
                 'email' => $clients->getContactEmail(),
                 'phone' => $clients->getContactPhone(),
+                'adress' => $clients->getAdress(),
                 'projects' => $clients->getProjects(),
+                'contactPhone' => $clients->getContactPhone(),
+                'contactEmail' => $clients->getContactEmail(),
+                'postalCode' => $clients->getPostalCode(),
+                'country' => $clients->getCountry(),
+                'city' => $clients->getCity(),
             ];
         }
 
@@ -54,10 +62,32 @@ final class ClientController extends AbstractController
             'controller_name' => 'ClientController',
             'clientDataArray' => $clientDataArray,
             'pager' => $pagerfanta,
+            'allProjects' => $allProjects,
         ]);
     }
 
-    #[Route('/admin/new', name: 'admin_client_new')]
+
+    #[Route('/admin/client/update/{id}', name: 'admin_client_update', methods: ['POST'])]
+    public function update(Request $request, Client $client, EntityManagerInterface $entityManager): Response
+    {
+        $client->setName($request->request->get('name'));
+        $client->setContactPhone($request->request->get('contactPhone'));
+        $client->setContactEmail($request->request->get('contactEmail'));
+        $client->setContactPerson($request->request->get('contactPerson'));
+        $client->setAdress($request->request->get('adress'));
+        $client->setPostalCode($request->request->get('postalCode'));
+        $client->setCountry($request->request->get('country'));
+        $client->setCity($request->request->get('city'));
+
+        $entityManager->persist($client);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('admin_client'); // Redirect after saving
+    }
+
+
+
+    #[Route('/admin/client/new', name: 'admin_client_new')]
     public function new(Request $request): Response
     {
         $client = new Client();

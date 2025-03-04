@@ -54,19 +54,15 @@ class ProjectType extends AbstractType
                 'widget' => 'single_text',
                 'required' => true, // Since deadline cannot be null
             ])
-            ->add('estimatedBudget', NumberType::class, [
-                'label' => 'Estimated Budget',
-                'required' => false,
-                'scale' => 2, // Allow decimals
-            ])
-            ->add('estimatedHours', NumberType::class, [
-                'label' => 'Estimated Hours',
-                'required' => false,
-            ])
+
             ->add('isArchived', CheckboxType::class, [
                 'label' => 'Archived',
                 'required' => false,
             ]);
+//        ->add('estimatedMinutes', NumberType::class, [
+//            'label' => "Estimated Time",
+//            'required' => false,
+//        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

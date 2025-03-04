@@ -5,6 +5,8 @@ namespace App\Controller\Admin;
 use App\Entity\Todo;
 use App\Form\TodoType;
 use Doctrine\ORM\EntityManagerInterface;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,11 +22,25 @@ class TodosController extends AbstractController
     }
 
     #[Route('/admin/todos', name: 'admin_todos')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $todos = $this->entityManager->getRepository(Todo::class)->findAll();
+        $searchTerm = $request->query->get('search');
+        // Build query for search & pagination
+        $queryBuilder = $this->entityManager->getRepository(Todo::class)->createQueryBuilder('t')
+            ->leftJoin('t.project', 'p');
+
+        if ($searchTerm) {
+            $queryBuilder->andWhere('t.name LIKE :search OR p.name LIKE :search')
+                ->setParameter('search', '%' . $searchTerm . '%');
+        }
+
+        // Pagination setup
+        $pagerfanta = new Pagerfanta(new QueryAdapter($queryBuilder));
+        $pagerfanta->setMaxPerPage(10);
+        $pagerfanta->setCurrentPage($request->query->getInt('page', 1));
+
         $todoDataArray = [];
-        foreach ($todos as $todo) {
+        foreach ($pagerfanta->getCurrentPageResults() as $todo) {
             $todoDataArray[] = [
                 'id' => $todo->getId(),
                 'name' => $todo->getName(),
@@ -37,6 +53,7 @@ class TodosController extends AbstractController
         return $this->render('admin/todos/index.html.twig', [
             'controller_name' => 'TodosController',
             'todoDataArray' => $todoDataArray,
+            'pager' => $pagerfanta
         ]);
     }
 

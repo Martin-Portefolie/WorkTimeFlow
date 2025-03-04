@@ -1,47 +1,67 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create New Team{% endblock %}
+{% block title %}{{ 'team_management.new.title'|trans }}{% endblock %}
 
 {% block body %}
     <section class="relative bg-background py-10">
-        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
-            <div class="flex items-center justify-between mb-5">
-                <h1 class="text-2xl font-semibold text-gray-900">Create New Team</h1>
+        <div class="container mx-auto px-6 lg:px-8 max-w-7xl">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-2xl text-dark">{{ 'team_management.new.title'|trans }}</h1>
             </div>
 
             {{ form_start(form) }}
-            <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
+            <div class="bg-section_1 p-6 rounded-lg shadow-lg space-y-6 border border-muted">
+
                 <!-- Team Name Input -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">{{ form_label(form.name) }}</label>
-                    {{ form_widget(form.name, { 'attr': { 'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900' } }) }}
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-secondary">
+                        {{  'team_management.new.name'|trans  }}
+                    </label>
+                    {{ form_widget(form.name, {
+                        'attr': { 'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-lg shadow-sm focus:ring-blue focus:border-blue text-dark bg-white' }
+                    }) }}
                 </div>
 
                 <!-- User Selection (Checkboxes) -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">{{ form_label(form.users) }}</label>
+                <div class="p-6 bg-select border border-muted rounded-lg space-y-4">
+                    <label class="block text-sm font-medium text-secondary">
+                        {{  'team_management.new.asign_users'|trans  }}
+                    </label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {{ form_widget(form.users, { 'attr': { 'class': 'form-checkbox text-indigo-600' } }) }}
+                        {% for choice in form.users %}
+                            <div class="flex items-center space-x-3">
+                                {{ form_widget(choice, { 'attr': { 'class': 'h-4 w-4 text-blue focus:ring-blue rounded' } }) }}
+                                <label class="text-sm text-dark">{{ choice.vars.label }}</label>
+                            </div>
+                        {% endfor %}
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Select users to be part of this team.</p>
+                    <p class="text-xs text-muted">{{ 'team_management.new.explanation_users'|trans }}</p>
                 </div>
 
                 <!-- Project Selection (Checkboxes) -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">{{ form_label(form.projects) }}</label>
+                <div class="p-6 bg-select border border-muted rounded-lg space-y-4">
+                    <label class="block text-sm font-medium text-secondary">
+                        {{  'team_management.new.projects'|trans  }}
+                    </label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {{ form_widget(form.projects, { 'attr': { 'class': 'form-checkbox text-indigo-600' } }) }}
+                        {% for choice in form.projects %}
+                            <div class="flex items-center space-x-3">
+                                {{ form_widget(choice, { 'attr': { 'class': 'h-4 w-4 text-blue focus:ring-blue rounded' } }) }}
+                                <label class="text-sm text-dark">{{ choice.vars.label }}</label>
+                            </div>
+                        {% endfor %}
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Assign projects to this team.</p>
+                    <p class="text-xs text-muted">{{ 'team_management.new.explanation_projects'|trans }}</p>
                 </div>
 
                 <!-- Submit Button -->
-                <div class="flex justify-end">
+                <div class="flex justify-end mt-6">
                     <button type="submit"
-                            class="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-success hover:bg-primary focus:outline-none">
-                        Create Team
+                            class="py-3 px-6 text-lg font-medium rounded-md text-white bg-save hover:bg-blue_hoover focus:ring focus:ring-blue_hoover">
+                        {{ 'team_management.new.submit'|trans }}
                     </button>
                 </div>
+
             </div>
             {{ form_end(form) }}
         </div>

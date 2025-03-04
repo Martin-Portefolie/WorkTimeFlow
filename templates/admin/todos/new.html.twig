@@ -4,34 +4,59 @@
 
 {% block body %}
     <section class="relative bg-background py-10">
-        <div class="w-full max-w-7xl mx-auto px-6 lg:px-8 overflow-x-auto">
-            <h1 class="text-lg text-text-standard mb-5">Create New Todo</h1>
+        <div class="container mx-auto px-6 lg:px-8 max-w-7xl">
+            <h1 class="text-2xl font-semibold text-dark mb-6">Create New Todo</h1>
 
-            <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="bg-section_1 p-6 rounded-lg shadow-md border border-muted">
                 {{ form_start(form) }}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <div class="mb-4">
-                    <label class="block text-sm text-text-standard">{{ form_label(form.name) }}</label>
-                    {{ form_widget(form.name, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm'}}) }}
+                    <!-- Name Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary">{{ form_label(form.name) }}</label>
+                        {{ form_widget(form.name, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- Start Date Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary">{{ form_label(form.dateStart) }}</label>
+                        {{ form_widget(form.dateStart, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- End Date Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-secondary">{{ form_label(form.dateEnd) }}</label>
+                        {{ form_widget(form.dateEnd, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- Project Selection -->
+                    <div class="p-6 bg-select border border-muted rounded-lg space-y-4">
+                        <label class="block text-sm font-medium text-secondary">{{ form_label(form.project) }}</label>
+                        {{ form_widget(form.project, {
+                            'attr': {
+                                'class': 'mt-1 block w-full px-4 py-2 border border-muted rounded-md shadow-sm focus:ring-blue focus:border-blue text-dark bg-white'
+                            }
+                        }) }}
+                        <p class="text-xs text-muted">{{ 'todo_management.new.project_help'|trans }}</p>
+                    </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm text-text-standard">{{ form_label(form.dateStart) }}</label>
-                    {{ form_widget(form.dateStart, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm'}}) }}
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm text-text-standard">{{ form_label(form.dateEnd) }}</label>
-                    {{ form_widget(form.dateEnd, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm'}}) }}
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm text-text-standard">{{ form_label(form.project) }}</label>
-                    {{ form_widget(form.project, {'attr': {'class': 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm'}}) }}
-                </div>
-
+                <!-- Submit Button -->
                 <div class="flex justify-end mt-6">
-                    <button type="submit" class="py-2 px-4 shadow-sm text-base rounded-md text-white bg-success hover:bg-primary focus:outline-none">
+                    <button type="submit"
+                            class="py-3 px-6 text-lg font-medium rounded-md text-white bg-save hover:bg-blue_hoover focus:ring focus:ring-blue_hoover">
                         Create Todo
                     </button>
                 </div>
