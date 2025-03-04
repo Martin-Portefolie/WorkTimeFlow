@@ -50,7 +50,11 @@ docker compose exec php bin/console doctrine:migration:migrate
     docker compose exec php bin/console create-timelog "admin" 1 2 30 "2024-11-22" "Completed the storyboard initial draft"
     docker compose exec php bin/console create-timelog "admin" 1 1 30 "2024-11-20" "Completed the storyboard initial draft 2"
     docker compose exec php bin/console create-timelog "admin" 1 1 30 "2025-02-20" "Completed the storyboard initial draft 3"
+```
 
+```sh
+## To initiate symfony messenger
+docker compose exec php bin/console messenger:consume async -vv
 ```
 
 ### helpful tips

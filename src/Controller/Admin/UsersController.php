@@ -12,8 +12,12 @@ use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class UsersController extends AbstractController
 {
@@ -68,36 +72,61 @@ class UsersController extends AbstractController
     }
 
 
+    /**
+     * @throws TransportExceptionInterface
+     */
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('/admin/user/new', name: 'admin_user_new')]
-    public function new(Request $request): Response
+    public function new(Request $request, MailerInterface $mailer): Response
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Set default role if no roles are assigned
             if (empty($user->getRoles())) {
                 $user->setRoles(['ROLE_USER']);
             }
 
-            // Hash password
-            $plainPassword = $form->get('password')->getData();
-            if ($plainPassword) {
-                $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
-                $user->setPassword($hashedPassword);
-            }
+            // Generate a random password
+            $plainPassword = bin2hex(random_bytes(4)); // Example: "3a1b2c4d"
+            $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
+            $user->setPassword($hashedPassword);
 
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('admin_users');
+            // Create email
+            $email = (new TemplatedEmail())
+                ->from('HestTest@example.com')
+                ->to($user->getEmail())
+                ->subject('Your Password for Hest-Test-Calender')
+                ->htmlTemplate('emails/userinfo.html.twig')
+                ->context([
+                    'username' => $user->getUsername(),
+                    'user_email' => $user->getEmail(),
+                    'password' => $plainPassword,
+                    'login_url' => $this->generateUrl('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                ]);;
+
+            // Send email and log attempts
+            try {
+                $mailer->send($email);
+                $this->addFlash('success', 'User created and email sent with login details.');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Email sending failed: ' . $e->getMessage());
+            }
+
+//            return $this->redirectToRoute('admin_users');
         }
 
         return $this->render('admin/users/new.html.twig', [
             'form' => $form->createView(),
         ]);
     }
+
 
     #[Route('/admin/user/update/{id}', name: 'admin_user_update', methods: ['POST'])]
     public function update(Request $request, int $id, UserPasswordHasherInterface $passwordHasher): Response
