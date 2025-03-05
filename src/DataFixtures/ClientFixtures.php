@@ -12,13 +12,15 @@ class ClientFixtures extends Fixture
     {
         $client = new Client();
         $client->setName('Viden Djurs');
+        $client->setAdress('N P Josiassens Vej 44E');
+        $client->setCity('Grenå');
+        $client->setCountry('Danmark');
+        $client->setPostalCode('8500');
         $client->setContactPerson('Troels Jensen');
-        $client->setContactEmail('troels@fakeemail.com');
+        $client->setContactEmail('troels@fakeemail.dk');
         $client->setContactPhone('+45 12345678');
+
         $manager->persist($client);
-
-        // Create additional clients as needed...
-
         $manager->flush();
     }
 }
