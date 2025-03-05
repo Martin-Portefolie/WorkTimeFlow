@@ -13,6 +13,7 @@
 
                     <!-- Input Fields -->
                     {% for field in form %}
+                        {% if field.vars.name != '_token' %}
                         <div>
                             <label class="block text-sm font-medium text-secondary">{{ form_label(field) }}</label>
                             {{ form_widget(field, {
@@ -21,6 +22,7 @@
                                 }
                             }) }}
                         </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
 

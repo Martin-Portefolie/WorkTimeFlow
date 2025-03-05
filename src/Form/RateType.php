@@ -27,7 +27,7 @@ class RateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Rate::class, // ✅ Ensure it maps to `Rate` entity
+            'data_class' => Rate::class,
         ]);
     }
 }

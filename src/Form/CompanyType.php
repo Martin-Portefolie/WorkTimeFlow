@@ -22,9 +22,9 @@ class CompanyType extends AbstractType
                 'label' => 'Company Name',
                 'attr' => ['class' => 'form-control'],
             ])
-            ->add('logoFile', FileType::class, [ // ✅ Ensure logo upload field exists
+            ->add('logoFile', FileType::class, [
                 'label' => 'Upload New Logo',
-                'mapped' => false, // Prevents mapping to the entity directly
+                'mapped' => false,
                 'required' => false,
                 'constraints' => [
                     new File([
@@ -36,18 +36,19 @@ class CompanyType extends AbstractType
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('rates', CollectionType::class, [
-                'entry_type' => RateType::class, // ✅ Use `RateType`
+                'entry_type' => RateType::class,
                 'allow_add' => true,
                 'allow_delete' => true,
-                'by_reference' => false, // ✅ Important for managing collections in Symfony
+                'by_reference' => false,
                 'attr' => ['class' => 'rates-collection'],
+                'label' => false
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Company::class, // ✅ Maps to `Company`
+            'data_class' => Company::class,
         ]);
     }
 }

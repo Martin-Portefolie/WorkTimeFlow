@@ -111,6 +111,14 @@ todo_management:
     save: "Save"
   new:
     project_help: "Cannot Change when first set"
+upload_management:
+  index:
+    title: "Upload Management"
+    upload_clients: "Upload Client"
+    upload_projects: "Upload Project"
+    upload_todos: "Upload Todo"
+    upload: "Upload"
+
 user_management:
   index:
     title: "User Management"
@@ -121,6 +129,7 @@ user_management:
     roles: "Roles"
     teams:  "Teams"
     save: "Save"
+
   new:
     teams_help: "Chose what teams the user should be part of"
 navbar:
@@ -142,4 +151,5 @@ navbar_admin:
   teams: "Teams"
   todos: "Todos"
   users: "Users"
+  upload: "Upload"
 
