@@ -141,6 +141,15 @@ user_management:
     search: "Search"
   new:
     teams_help: "Choose which teams the user should be part of"
+time_register:
+  index:
+    title: "Time Register - Week %week%"
+    previous_week: "Previous Week"
+    today: "Today"
+    next_week: "Next Week"
+    create_new_todo: "Create New Todo"
+    total: "Total"
+    week_title: "Year %year% | Week %week%"
 
 navbar:
   home: "Home"

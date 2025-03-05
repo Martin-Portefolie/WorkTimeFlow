@@ -18,7 +18,7 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
         // ✅ Ensure required entities exist
         $client = $manager->getRepository(Client::class)->findOneBy(['name' => 'Viden Djurs']);
         $rate = $manager->getRepository(Rate::class)->findOneBy(['name' => 'Eksammens Rate']);
-        $team = $manager->getRepository(Team::class)->findOneBy(['name' => 'Eksammens Team']);
+
 
         if (!$client) {
             throw new \LogicException('Client "Viden Djurs" not found. Make sure ClientFixtures runs first.');
@@ -26,9 +26,7 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
         if (!$rate) {
             throw new \LogicException('Rate "Eksammens Rate" not found. Make sure RateFixtures runs first.');
         }
-        if (!$team) {
-            throw new \LogicException('Team "Eksammens Team" not found. Make sure TeamFixtures runs first.');
-        }
+
 
 
         $project = new Project();
@@ -41,7 +39,7 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
         $project->setPriority(Priority::MEDIUM);
         $project->setDeadline(new \DateTime('2025-03-08'));
         $project->setEstimatedBudget(0);
-        $project->setEstimatedTime(140, 0);
+        $project->setEstimatedTime(8400, 0);
 
         $manager->persist($project);
         $manager->flush();
