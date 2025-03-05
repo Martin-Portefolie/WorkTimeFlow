@@ -7,7 +7,7 @@ company_management:
     save: "Save"
     add_rate: "Add Rate"
     rates_name: "Name"
-    rates_amount: "Rates Amount (Hourly)"
+    rates_amount: "Rate Amount (Hourly)"
 
 client_management:
   index:
@@ -15,11 +15,11 @@ client_management:
     create_new_client: "Create New Client"
     name: "Name (Firm)"
     contactPerson: "Contact Person"
-    contactPhone: "Phone number"
+    contactPhone: "Phone Number"
     contactEmail: "Contact Email"
     projects: "Projects"
-    no_project_assigned: "no projects assigned"
-    adress: "Address"
+    no_project_assigned: "No projects assigned"
+    adress: "Adress"  # Kept as is
     save: "Save"
     previous: "Previous"
     next: "Next"
@@ -37,10 +37,11 @@ client_management:
     client_email: "Contact Email"
     client_phone: "Contact Phone"
     save_client: "Save Client"
-    adress: "Address"
+    adress: "Adress"  # Kept as is
     postalCode: "Postal Code"
     city: "City"
     country: "Country"
+
 project_management:
   index:
     title: "Project Management"
@@ -49,7 +50,7 @@ project_management:
     description: "Description"
     client: "Client"
     teams: "Teams"
-    todos: "Todos"
+    todos: "To-Dos"
     priority: "Priority"
     select_rate: "Select Rate"
     estimated_time: "Estimated Time (Hours)"
@@ -63,16 +64,15 @@ project_management:
     save: "Save"
     show_logs: "Show Logs"
     hide_logs: "Hide Logs"
-    time_exceeded: "⚠️ Time used exceeds Time planned"
+    time_exceeded: "⚠️ Time used exceeds planned time"
     deadline_expired: "⚠️ Deadline expired"
     please_add_rates: "⚠️ Please add rates in Our Company"
     warn_add_rates: "⚠️ Please add rates in "
     our_company: "Our Company"
-    min_logged: "min logged"
-    min_on: "min on"
+    min_logged: "Min logged"
+    min_on: "Min on"
     currency: "€"
-    hour: "hour"
-    archieved: "Archieved"
+    hour: "Hour"
     download_docx: "Download Invoice"
   new:
     title: "Create New Project"
@@ -82,9 +82,10 @@ project_management:
     priority: "Priority"
     deadline: "Deadline"
     teams: "Assign Teams"
-    teams_help: "Chose what teams the project should be part of"
+    teams_help: "Choose which teams the project should be part of"
     isArchived: "Archive Project"
     save: "Save Project"
+
 team_management:
   index:
     title: "Team Management"
@@ -97,46 +98,50 @@ team_management:
     search_placeholder: "Name, Teams..."
   new:
     title: "Create New Team"
-    name: 'Name'
-    asign_users: "Assign Users"
-    explanation_users: "Chose what users should be part of the team"
+    name: "Name"
+    assign_users: "Assign Users"
+    explanation_users: "Choose which users should be part of the team"
     projects: "Assign Projects"
-    explanation_projects: "Chose what projects should be part of the team"
+    explanation_projects: "Choose which projects should be part of the team"
     submit: "Save Team"
+
 todo_management:
   index:
-    title: "Todo Management"
+    title: "To-Do Management"
     search: "Search"
     search_placeholder: "Name, Project..."
-    create_new_todo: "Create New Todo"
+    create_new_todo: "Create New To-Do"
     name: "Name"
-    dateStart: "Todo Start Date"
-    dateEnd: "Todo End Date"
+    dateStart: "To-Do Start Date"
+    dateEnd: "To-Do End Date"
     project: "Project"
     save: "Save"
   new:
-    project_help: "Cannot Change when first set"
+    project_help: "Cannot change once set"
+
 upload_management:
   index:
     title: "Upload Management"
     upload_clients: "Upload Client"
     upload_projects: "Upload Project"
-    upload_todos: "Upload Todo"
+    upload_todos: "Upload To-Do"
     upload: "Upload"
 
 user_management:
   index:
     title: "User Management"
-    create_new_user: "Create new user"
+    create_new_user: "Create New User"
     name: "Name"
     email: "Email"
     password: "Password"
     roles: "Roles"
-    teams:  "Teams"
+    teams: "Teams"
     save: "Save"
-
+    search_placeholder: "Search users..."
+    search: "Search"
   new:
-    teams_help: "Chose what teams the user should be part of"
+    teams_help: "Choose which teams the user should be part of"
+
 navbar:
   home: "Home"
   time_register: "Time Registration"
@@ -148,13 +153,13 @@ navbar:
   change_language: "Change Language"
   english: "English"
   danish: "Danish"
+
 navbar_admin:
   admin_panel: "Admin Panel"
   our_company: "Our Company"
   clients: "Clients"
   projects: "Projects"
   teams: "Teams"
-  todos: "Todos"
+  todos: "To-Dos"
   users: "Users"
   upload: "Upload"
-
