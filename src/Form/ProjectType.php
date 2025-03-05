@@ -40,7 +40,7 @@ class ProjectType extends AbstractType
                 'choice_label' => 'name',
                 'multiple' => true,
                 'expanded' => true, // Uses checkboxes
-                'label' => 'Assign Teams',
+                'label' => false,
                 'required' => false,
             ])
             ->add('priority', ChoiceType::class, [

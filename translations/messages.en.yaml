@@ -14,10 +14,12 @@ client_management:
     title: "Client Management"
     create_new_client: "Create New Client"
     name: "Name (Firm)"
-    contact_person: "Contact Person"
-    email: "Contact Email"
-    phone: "Contact Phone"
+    contactPerson: "Contact Person"
+    contactPhone: "Phone number"
+    contactEmail: "Contact Email"
     projects: "Projects"
+    no_project_assigned: "no projects assigned"
+    adress: "Address"
     save: "Save"
     previous: "Previous"
     next: "Next"
@@ -80,6 +82,7 @@ project_management:
     priority: "Priority"
     deadline: "Deadline"
     teams: "Assign Teams"
+    teams_help: "Chose what teams the project should be part of"
     isArchived: "Archive Project"
     save: "Save Project"
 team_management:
@@ -90,6 +93,8 @@ team_management:
     assign_users: "Assign Users"
     projects: "Associated Projects"
     save: "Save"
+    search: "Search"
+    search_placeholder: "Name, Teams..."
   new:
     title: "Create New Team"
     name: 'Name'

@@ -46,19 +46,20 @@ class TeamsController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/team/new', name: 'admin_team_new')]
+    #[Route('/admin/team/new', name: 'admin_team_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $team = new Team();
         $form = $this->createForm(TeamType::class, $team);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Persist selected users directly from the form data
             $selectedUsers = $form->get('users')->getData();
+
             foreach ($selectedUsers as $user) {
                 $team->addUser($user);
+                $user->addTeam($team); // Ensure the relationship is bidirectional
+                $this->entityManager->persist($user); // Force Doctrine to track changes
             }
 
             $this->entityManager->persist($team);
@@ -66,6 +67,9 @@ class TeamsController extends AbstractController
 
             return $this->redirectToRoute('admin_team');
         }
+
+
+
 
         return $this->render('admin/teams/new.html.twig', [
             'form' => $form->createView(),

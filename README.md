@@ -10,14 +10,24 @@ Make sure to check [symfony requirements](https://symfony.com/doc/current/setup.
 ## local docker setup 
 Getting started:  
 
+
+### First time build
 ```shell
-# 1. (always) start docker
-docker-compose up --build -d #only build once
+# 1. (once) start docker
+docker-compose up  -d #only build once
 # 2(one-time-required) install dependencies
 docker compose exec php composer install
 # 3(one-time-required) migrate database.
 docker compose exec php bin/console doctrine:migrations:migrate
 # 4 (always) initiate tailwind
+docker compose exec php bin/console tailwind:build --watch --poll
+```
+
+###  start
+```shell
+# 1.  start docker
+docker-compose up  -d 
+# 2 (always) initiate tailwind
 docker compose exec php bin/console tailwind:build --watch --poll
 
 ```

@@ -18,14 +18,9 @@ class TeamType extends AbstractType
             ->add('name')
             ->add('users', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => 'id',
-                'multiple' => true,
-            ])
-            ->add('users', EntityType::class, [
-                'class' => User::class,
                 'choice_label' => 'username',
                 'multiple' => true,
-                'expanded' => true, // display as checkboxes
+                'expanded' => true,
                 'label' => 'Assign Users',
                 'required' => false,
             ])
@@ -34,7 +29,7 @@ class TeamType extends AbstractType
                 'choice_label' => 'name',
                 'multiple' => true,
                 'expanded' => true,
-                'label' => 'Assign Projects',
+                'label' => false,
                 'required' => false,
             ]);
     }
