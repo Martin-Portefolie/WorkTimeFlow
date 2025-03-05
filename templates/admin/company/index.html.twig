@@ -6,8 +6,9 @@
     <section class="relative bg-section_2 py-10 min-h-screen">
         <div class="container mx-auto px-6 lg:px-8 max-w-7xl">
             <h1 class="text-2xl font-semibold text-dark mb-6">{{ 'company_management.index.title'|trans }}</h1>
+            <div class="bg-white p-6 rounded-lg shadow-md">
             <turbo-frame id="company_form">
-            <div class="bg-white p-6 rounded-lg shadow-md mt-4">
+            <div class="bg-white p-6 rounded-lg shadow-md mt-4 border border-gray-300">
                 {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -85,6 +86,7 @@
                 {% endfor %}
             </div>
             </turbo-frame>
-        </div>
+            </div>
+            </div>
     </section>
 {% endblock %}

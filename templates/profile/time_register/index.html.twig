@@ -3,7 +3,7 @@
 {% block title %}{{ 'time_register.index.title'|trans({ '%week%': week }) }}{% endblock %}
 
 {% block body %}
-    <section class="relative bg-section_2 py-10 min-h-screen">
+    <section class="relative bg-section_1 py-10 min-h-screen">
         <div class="container mx-auto px-6 lg:px-8 max-w-7xl ">
 
             <!-- Header Section -->
@@ -32,7 +32,7 @@
                 </div>
                 <div class="flex space-x-3">
                     <!-- Add New Todo Button -->
-                    <a href="{{ path('admin_todo_new') }}"
+                    <a href="{{ path('new_todo') }}"
                        class="inline-flex justify-center py-2 px-4 shadow-sm rounded-md text-white bg-new hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-highlight">
                         {{ 'time_register.index.create_new_todo'|trans }}
                     </a>

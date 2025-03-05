@@ -40,6 +40,8 @@ module.exports = {
         section_2: custom_colors.pastel_rosa,
 
         blue: custom_colors.blue,
+        green: custom_colors.green,
+        purple: custom_colors.purple,
 
         grey,
         custom_colors,

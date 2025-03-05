@@ -1,3 +1,64 @@
+title: "Hest Test Calendar"
+
+hero:
+  title: "Hest Test Calendar"
+  subtitle: "Free, easy-to-use Time Registration system"
+
+features:
+  github:
+    title: "Download Hest Test Calendar"
+    description: "Get started with Hest Test Calendar today! Download the latest version from our open-source repository."
+    link: "https://github.com/Martin-Portefolie/hest-test-calender"
+  self_hosting:
+    title: "Host it Yourself"
+    description: "Want full control? Self-host Hest Test Calendar on your own server. We recommend Hostinger for an easy setup."
+    link: "https://www.hostinger.com/"
+  setup_support:
+    title: "Setup & Support"
+    description: "Need help setting up? Follow our step-by-step guide and join our community discussions."
+    link: "https://your-fake-forum.com"
+  read_more: "Read More"
+
+how_to_use:
+  title: "How to Use Hest Test Calendar"
+  description: "Hest Test Calendar is divided into two main sections: Admin and User Profile. Below is an overview of how each section works."
+
+sections:
+  admin_section:
+    title: "Admin Section"
+    description: "The admin section allows you to manage your company, customers, projects, tasks, and teams."
+    company:
+      title: "Company"
+      description: "Add your company details, set hourly rates, and define your business structure."
+    client:
+      title: "Clients"
+      description: "Store customer information and keep track of active clients."
+    project:
+      title: "Projects"
+      description: "Organize jobs for your clients into separate projects."
+    todo:
+      title: "Todos"
+      description: "Split each project into smaller, meaningful tasks that can be tracked individually."
+    users:
+      title: "Teams"
+      description: "Assign employees to projects and manage who's working on what."
+
+  user_profile_section:
+    title: "User Profile Section"
+    description: "The user profile section is designed for employees to track their work, update tasks, and manage their profile."
+    time-fill:
+      title: "Time Registration"
+      description: "Employees can log their working hours by week and track billable time."
+    todo:
+      title: "Create Todos"
+      description: "Users can create new tasks for the projects they are assigned to."
+    globe:
+      title: "Update Status"
+      description: 'Mark todos as "In Progress", "Completed", or "Blocked" for better tracking.'
+    users:
+      title: "Edit Profile"
+      description: "Employees can update their personal details and preferences."
+
 company_management:
   index:
     title: "Company Management"
@@ -104,7 +165,9 @@ team_management:
     projects: "Assign Projects"
     explanation_projects: "Choose which projects should be part of the team"
     submit: "Save Team"
-
+todo:
+  new:
+    title: "Create New Todo"
 todo_management:
   index:
     title: "To-Do Management"
@@ -116,6 +179,9 @@ todo_management:
     dateEnd: "To-Do End Date"
     project: "Project"
     save: "Save"
+    next: "Next"
+    page: "Page"
+    previous: "Previous"
   new:
     project_help: "Cannot change once set"
 
@@ -150,7 +216,10 @@ time_register:
     create_new_todo: "Create New Todo"
     total: "Total"
     week_title: "Year %year% | Week %week%"
-
+profile:
+  edit:
+    title: "Edit your profile"
+    password_hint: "leave blank if you just want to change Username or Email"
 navbar:
   home: "Home"
   time_register: "Time Registration"

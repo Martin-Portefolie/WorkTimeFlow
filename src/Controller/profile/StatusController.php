@@ -136,7 +136,9 @@ final class StatusController extends AbstractController
             $this->entityManager->persist($todo);
             $this->entityManager->flush();
 
-            return new RedirectResponse($this->generateUrl('app_status'));
+            #TODO SHOULD BE TURNED BACK, however we dont use the status for now.
+            #return new RedirectResponse($this->generateUrl('app_status'));
+            return new RedirectResponse($this->generateUrl('app_time_register'));
         }
 
         return $this->render('/profile/status/new_todo.html.twig', [

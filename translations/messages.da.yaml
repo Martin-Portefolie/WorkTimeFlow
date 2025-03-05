@@ -1,3 +1,29 @@
+title: "Hest Test Kalender"
+
+hero:
+  title: "Hest Test Kalender"
+  subtitle: "Gratis og brugervenligt tidsregistreringssystem"
+
+features:
+  github:
+    title: "Download Hest Test Kalender"
+    description: "Kom i gang med Hest Test Kalender i dag! Download den nyeste version fra vores open-source repository."
+    link: "https://github.com/Martin-Portefolie/hest-test-calender"
+  self_hosting:
+    title: "Host det selv"
+    description: "Vil du have fuld kontrol? Host Hest Test Kalender på din egen server. Vi anbefaler Hostinger for nem opsætning."
+    link: "https://www.hostinger.com/"
+  setup_support:
+    title: "Opsætning & Support"
+    description: "Har du brug for hjælp til opsætning? Følg vores trin-for-trin guide og deltag i vores fællesskabsdiskussioner."
+    link: "https://your-fake-forum.com"
+  read_more: "Læs mere"
+
+how_to_use:
+  title: "Sådan bruger du Hest Test Kalender"
+  description: "Hest Test Kalender er opdelt i to hovedsektioner: Admin og Brugerprofil. Nedenfor er en oversigt over, hvordan hver sektion fungerer."
+
+
 company_management:
   index:
     title: "Virksomhedsstyring"

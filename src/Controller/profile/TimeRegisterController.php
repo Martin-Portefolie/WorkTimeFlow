@@ -56,15 +56,6 @@ class TimeRegisterController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        //        $weeklyTotal = 0;
-        //        foreach ($data as &$day) {
-        //            $dayTotal = 0;
-        //            foreach ($day['timelog'] as $timelog) {
-        //                $dayTotal += $timelog['hours'] * 60 + $timelog['minutes'];
-        //            }
-        //            $day['dayTotal'] = $dayTotal;
-        //            $weeklyTotal += $dayTotal;
-        //        }
 
         $timelogs = $this->entityManager->getRepository(Timelog::class)
             ->findTimelogsByUserAndWeek($user, $week, $year);

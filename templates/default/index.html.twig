@@ -1,111 +1,96 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hest test Calender {% endblock %}
+{% block title %}{{ 'title'|trans }}{% endblock %}
 
 {% block body %}
+    <main class="bg-gray-700 text-white pt-16">
 
-
-    <!-- #TODO Update images  -->
-    <!-- #TODO Update Text, so it makes more sense  -->
-    <!-- Hero Section -->
-    <section class="bg-secondary text-white text-left py-16 px-6">
-        <h1 class="text-4xl font-bold font-display leading-tight">Hest test Calender - Et simpelt tids registrerings værktøj</h1>
-        <p class="mt-4 text-xl">Host selv løsning - Kvit og frit</p>
-
-        <div class="mt-6 grid grid-cols-1 sm:grid-cols-[25%_75%] gap-4 items-center justify-center mt-12">
-            <button class="btn btn-primary w-full sm:w-3/4 mx-auto">HENT GRATIS!</button>
-            <a href="">
-                <img src="{{ asset('images/demo.jpg') }}" alt="Step 2" class="w-full sm:w-3/4 rounded-lg mx-auto">
-            </a>
-        </div>
-    </section>
-
-    <!-- Feature Highlights Section -->
-    <section class="bg-white py-16 px-6 ">
-        <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-            <!-- Feature 1 -->
-            <div>
-                <img src="{{ asset('images/demo.jpg') }}" alt="Ease of Use" class="h-12 mx-auto mb-4">
-                <h3 class="text-xl font-bold">Download</h3>
-                <p class="text-neutral-600">Kan hentes kvit og frit fra github</p>
+        <!-- Hero Section -->
+        <section class="relative w-full h-[800px] bg-black">
+            <!-- Video Background -->
+            <div class="absolute top-0 left-0 w-full h-full">
+                <video autoplay loop muted playsinline class="w-full h-full object-cover">
+                    <source src="{{ asset('movie/movie.mp4') }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
             </div>
-            <!-- Feature 2 -->
-            <div>
-                <img src="{{ asset('images/demo.jpg') }}" alt="All-in-One Platform" class="h-12 mx-auto mb-4">
-                <h3 class="text-xl font-bold">Server</h3>
-                <p class="text-neutral-600">Køb eller host din egen server</p>
-            </div>
-            <!-- Feature 3 -->
-            <div>
-                <img src="{{ asset('images/demo.jpg') }}" alt="Support" class="h-12 mx-auto mb-4">
-                <h3 class="text-xl font-bold">Installere</h3>
-                <p class="text-neutral-600">Installere Hest Test Calender, og du er færdig.</p>
-            </div>
-        </div>
-    </section>
 
-    <!-- Cards in Sections -->
-            <!-- Card 1 -->
-    <section class="py-16 px-6 bg-neutral-100">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12">
-            <div>
-                <p class="text-blue-500 uppercase text-sm font-semibold">Et simplet admin system</p>
-                <h2 class="text-2xl font-bold">Hirakisk, og overskuelig måde at oprette dine opgaver på</h2>
-                <ul class="mt-4 space-y-2 text-neutral-700">
-                    <li>✅ Opret Klienter, opgaver, todos </li>
-                    <li>✅ Nem brugerstyring igenem teams</li>
-                    <li>✅ Download din data til csv</li>
-                </ul>
+            <!-- Top Black Bar with Text -->
+            <div class="absolute top-0 left-0 w-full bg-black text-white text-2xl px-6 py-4">
+                {{ 'hero.title'|trans }}
             </div>
-            <div>
-                <img src="{{ asset('images/demo.jpg') }}" alt="Email & Calendar Integration" class="w-full rounded-lg shadow-lg">
-            </div>
-        </div>
-    </section>
 
-    <!-- Card 2 -->
-    <section class="py-16 px-6 bg-white">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12">
-            <div>
-                <img src="{{ asset('images/demo.jpg') }}" alt="Customer Overview" class="w-full rounded-lg shadow-lg">
+            <!-- Bottom Black Bar with Text -->
+            <div class="absolute bottom-0 left-0 w-full bg-black text-white text-lg px-6 py-4">
+                {{ 'hero.subtitle'|trans }}
             </div>
-            <div>
-                <p class="text-blue-500 uppercase text-sm font-semibold">Den enkle tidsregistreing</p>
-                <h2 class="text-2xl font-bold">Hurtigt UI ?</h2>
-                <ul class="mt-4 space-y-2 text-neutral-700">
-                    <li>✅ Find, eller opret en todo på en opgave</li>
-                    <li>✅ Sæt status</li>
-                    <li>✅ Knyt en kommentar</li>
-                    <li>✅ Sæt tid for opgave</li>
-                    <li>✅ Bum du er færdig !</li>
-                </ul>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Card 3 -->
-    <section class="py-16 px-6 bg-neutral-100">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-12">
-            <div>
-                <p class="text-blue-500 uppercase text-sm font-semibold">11 Febuar 2025</p>
-                <h2 class="text-2xl font-bold"> Developer nyheder </h2>
-                <ul class="mt-4 space-y-2 text-neutral-700">
-                    <li>✅ Der arbejdes på ny forside</li>
-                    <li>✅ Nyt kalender registreings system</li>
-                    <li>✅ Nyt admin  system</li>
-                </ul>
-            </div>
-            <div>
-                <img src="{{ asset('images/demo.jpg') }}" alt="CRM Visualization" class="w-full rounded-lg shadow-lg">
-            </div>
-        </div>
-    </section>
+        <!-- Feature Highlights Section -->
+        <section class="py-16 px-6 bg-gray-900 text-white">
+            <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
 
-    <!-- Floating Login Button -->
-    <div class="fixed bottom-5 left-6">
-        <a href="#" class="bg-green-500 p-4 rounded-full shadow-lg text-white text-xl">Login</a>
-    </div>
+                {% for key, feature in features %}
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col justify-between h-full">
+                        <div>
+                            <!-- Use icon from the controller -->
+                            <img src="{{ asset(feature.icon) }}" alt="{{ ('features.' ~ key ~ '.title')|trans }}" class="h-12 mx-auto mb-4 flex-shrink-0">
+
+                            <h3 class="text-xl font-bold">{{ ('features.' ~ key ~ '.title')|trans }}</h3>
+                            <p class="mt-2 text-gray-300">
+                                {{ ('features.' ~ key ~ '.description')|trans }}
+                            </p>
+                        </div>
+                        <a href="{{ ('features.' ~ key ~ '.link')|trans }}" target="_blank" class="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition">
+                            {{ 'features.read_more'|trans }}
+                        </a>
+                    </div>
+                {% endfor %}
+
+            </div>
+        </section>
+
+        <!-- How to Use Section -->
+        <section class="py-16 px-6 bg-gray-700 text-white">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-3xl font-bold mb-6 text-left">{{ 'how_to_use.title'|trans }}</h2>
+                <p class="text-lg text-gray-300 mb-12 text-left">
+                    {{ 'how_to_use.description'|trans }}
+                </p>
+
+                {% for section in ['admin_section', 'user_profile_section'] %}
+                    <div class="bg-gray-600 p-6 rounded-lg shadow-lg mb-12">
+                        <h3 class="text-2xl font-bold {{ section == 'admin_section' ? 'text-blue-400' : 'text-green-400' }} mb-4 flex items-center">
+                            <!-- Set correct icon path based on section -->
+                            {% set icon_path = section == 'admin_section' ? 'icons/admin_menu/' : 'icons/profile_menu/' %}
+                            <img src="{{ asset(icon_path ~ section ~ '.svg') }}" alt="{{ ('sections.' ~ section ~ '.title')|trans }}" class="h-6 w-6 mr-2">
+                            {{ ('sections.' ~ section ~ '.title')|trans }}
+                        </h3>
+                        <p class="text-gray-300 mb-6">
+                            {{ ('sections.' ~ section ~ '.description')|trans }}
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                            {% for item in sections[section] %}
+                                <div>
+                                    <h4 class="text-lg font-semibold {{ section == 'admin_section' ? 'text-blue-300' : 'text-green-300' }} flex items-center">
+                                        <!-- Set correct icon path for each section -->
+                                        <img src="{{ asset(icon_path ~ item ~ '.svg') }}" alt="{{ ('sections.' ~ section ~ '.' ~ item ~ '.title')|trans }}" class="h-5 w-5 mr-2">
+                                        {{ ('sections.' ~ section ~ '.' ~ item ~ '.title')|trans }}
+                                    </h4>
+                                    <p class="text-gray-400 text-sm mt-2">
+                                        {{ ('sections.' ~ section ~ '.' ~ item ~ '.description')|trans }}
+                                    </p>
+                                    <a href="#" class="text-blue-400 hover:underline text-sm mt-2 inline-block">{{ 'features.read_more'|trans }}</a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
 
 
+            </div>
+        </section>
 
+    </main>
 {% endblock %}

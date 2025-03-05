@@ -1,45 +1,62 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}{{ 'todo.new.title'|trans }}{% endblock %}
+
 {% block body %}
-    <section class="relative bg-gray-100 py-12 px-6 mt-6">
-        <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Opret en ny Todo</h2>
+    <section class="relative bg-section_1 py-10 min-h-screen">
+        <div class="container mx-auto px-6 lg:px-8 max-w-7xl">
+            <h1 class="text-2xl font-semibold text-dark mb-6">
+                {{ 'todo.new.title'|trans }}
+            </h1>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+            <turbo-frame id="todo_form">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-300">
+                    <!-- Success Messages -->
+                    {% for message in app.flashes('success') %}
+                        <div class="mb-4 p-3 bg-success/20 text-success font-medium rounded-lg text-center">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
 
-            {{ form_start(form, { 'attr': {'class': 'space-y-6'} }) }}
+                    <!-- Todo Creation Form -->
+                    {{ form_start(form, { 'attr': {'class': 'space-y-6'} }) }}
 
-            <!-- Todo Name -->
-            <div>
-                {{ form_label(form.name, null, { 'attr': {'class': 'block text-sm font-medium text-gray-700'} }) }}
-                {{ form_widget(form.name, { 'attr': {'class': 'w-full p-2 border rounded-md focus:ring focus:ring-indigo-300'} }) }}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Todo Name -->
+                        <div>
+                            {{ form_label(form.name, null, { 'attr': {'class': 'block text-sm font-medium text-dark'} }) }}
+                            {{ form_widget(form.name, { 'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300'} }) }}
+                        </div>
+
+                        <!-- Select Project -->
+                        <div>
+                            {{ form_label(form.project, null, { 'attr': {'class': 'block text-sm font-medium text-dark'} }) }}
+                            {{ form_widget(form.project, { 'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300'} }) }}
+                        </div>
+
+                        <!-- Start Date -->
+                        <div>
+                            {{ form_label(form.dateStart, null, { 'attr': {'class': 'block text-sm font-medium text-dark'} }) }}
+                            {{ form_widget(form.dateStart, { 'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300'} }) }}
+                        </div>
+
+                        <!-- End Date -->
+                        <div>
+                            {{ form_label(form.dateEnd, null, { 'attr': {'class': 'block text-sm font-medium text-dark'} }) }}
+                            {{ form_widget(form.dateEnd, { 'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300'} }) }}
+                        </div>
+
+                        <!-- Status Selection -->
+                        <div>
+                            {{ form_label(form.status, null, { 'attr': {'class': 'block text-sm font-medium text-dark'} }) }}
+                            {{ form_widget(form.status, { 'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300'} }) }}
+                        </div>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </turbo-frame>
             </div>
-
-            <!-- Select Project -->
-            <div>
-                {{ form_label(form.project, null, { 'attr': {'class': 'block text-sm font-medium text-gray-700'} }) }}
-                {{ form_widget(form.project, { 'attr': {'class': 'w-full p-2 border rounded-md focus:ring focus:ring-indigo-300'} }) }}
-            </div>
-
-            <!-- Start Date -->
-            <div>
-                {{ form_label(form.dateStart, null, { 'attr': {'class': 'block text-sm font-medium text-gray-700'} }) }}
-                {{ form_widget(form.dateStart, { 'attr': {'class': 'w-full p-2 border rounded-md focus:ring focus:ring-indigo-300'} }) }}
-            </div>
-
-            <!-- End Date -->
-            <div>
-                {{ form_label(form.dateEnd, null, { 'attr': {'class': 'block text-sm font-medium text-gray-700'} }) }}
-                {{ form_widget(form.dateEnd, { 'attr': {'class': 'w-full p-2 border rounded-md focus:ring focus:ring-indigo-300'} }) }}
-            </div>
-
-            <!-- Status Selection -->
-            <div>
-                {{ form_label(form.status, null, { 'attr': {'class': 'block text-sm font-medium text-gray-700'} }) }}
-                {{ form_widget(form.status, { 'attr': {'class': 'w-full p-2 border rounded-md focus:ring focus:ring-indigo-300'} }) }}
-            </div>
-
-
-
-            {{ form_end(form) }}
         </div>
     </section>
 {% endblock %}

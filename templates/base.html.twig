@@ -2,8 +2,27 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <title>{% block title %}{% endblock %}</title>
+
+        <!-- Standard Favicon -->
+        <link rel="icon" type="image/x-icon" href="{{ asset('icons/favicons/favicon.ico') }}">
+
+        <!-- PNG Favicons -->
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/favicons/favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('icons/favicons/favicon-16x16.png') }}">
+
+        <!-- Apple Touch Icon -->
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/favicons/apple-touch-icon.png') }}">
+
+        <!-- Android Chrome Icons -->
+        <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/favicons/android-chrome-192x192.png') }}">
+        <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('icons/favicons/android-chrome-512x512.png') }}">
+
+        <!-- Web Manifest -->
+        <link rel="manifest" href="{{ asset('icons/favicons/site.webmanifest') }}">
+
+        <!-- Theme Color (for mobile browsers) -->
+        <meta name="theme-color" content="#ffffff">
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
         {% endblock %}
