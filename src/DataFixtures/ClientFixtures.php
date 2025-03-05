@@ -23,4 +23,13 @@ class ClientFixtures extends Fixture
         $manager->persist($client);
         $manager->flush();
     }
+
+    public function getDependencies(): array
+    {
+        return [
+            RateFixtures::class,
+        ];
+    }
 }
+
+

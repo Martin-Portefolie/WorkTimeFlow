@@ -15,7 +15,7 @@ class UserFixtures extends Fixture
     {
         $this->passwordHasher = $passwordHasher;
     }
-    public const USER_REFERENCE = 'users';
+
 
     public function load(ObjectManager $manager): void
     {
@@ -46,6 +46,6 @@ class UserFixtures extends Fixture
         // Save users to the database
         $manager->flush();
 
-        $this->addReference(self::USER_REFERENCE, $user2);
+
     }
 }

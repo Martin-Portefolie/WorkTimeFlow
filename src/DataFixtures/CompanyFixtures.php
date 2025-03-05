@@ -18,4 +18,11 @@ class CompanyFixtures extends Fixture
 
         $this->addReference(self::COMPANY_REFERENCE, $company);
     }
+
+    public function getDependencies(): array
+    {
+        return [
+            UserFixtures::class,
+        ];
+    }
 }
