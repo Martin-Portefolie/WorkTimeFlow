@@ -15,7 +15,6 @@ class ProjectFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        // ✅ Ensure required entities exist
         $client = $manager->getRepository(Client::class)->findOneBy(['name' => 'Viden Djurs']);
         $rate = $manager->getRepository(Rate::class)->findOneBy(['name' => 'Eksammens Rate']);
 
