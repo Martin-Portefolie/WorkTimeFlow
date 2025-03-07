@@ -1,5 +1,12 @@
 title: "Hest Test Calendar"
 
+status:
+  index:
+    title: "Status"
+    previous_month: "Previous month"
+    next_month: "Next Month"
+    current_month: "Current Month"
+
 hero:
   title: "Hest Test Calendar"
   subtitle: "Free, easy-to-use Time Registration system"
