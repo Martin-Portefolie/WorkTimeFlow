@@ -163,7 +163,7 @@ final class StatusController extends AbstractController
         $daysInMonth = (int) $startOfMonth->format('t');
 
         $calendarData = [];
-        for ($i = 0; $i < $daysInMonth; ++$i) {
+        for ($i = 1; $i < $daysInMonth; ++$i) {
             $currentDay = $startOfMonth->modify("+$i days");
 
             $calendarData[] = [
@@ -212,7 +212,8 @@ final class StatusController extends AbstractController
                         'id' => $todo->getId(),
                         'name' => $todo->getName(),
                         'project_name' => $todo->getProject() ? $todo->getProject()->getName() : 'Unknown Project',
-                        'logged_time' => sprintf('%dh %02dm', $hours, $minutes),
+                        #TODO Dosnt log time correctly, gets the total.
+//                        'logged_time' => sprintf('%dh %02dm', $hours, $minutes),
                         'status' => $status,
                     ];
                 }
