@@ -49,6 +49,60 @@ docker-compose exec php bin/console doctrine:migrations:migrate  #(only on insta
 docker-compose exec php bin/console tailwind:build --watch --poll
 ```
 
+## Data Fixtures Setup
+To populate your database with test data, follow these steps:
+
+### 1. Reset the database
+```sh
+php bin/console doctrine:schema:drop --full-database --force
+php bin/console doctrine:migrations:migrate
+```
+If using Docker:
+```sh
+docker-compose exec php bin/console doctrine:schema:drop --full-database --force
+docker-compose exec php bin/console doctrine:migrations:migrate
+```
+
+### 2. Load test data
+```sh
+php bin/console doctrine:fixtures:load
+```
+If using Docker:
+```sh
+docker-compose exec php bin/console doctrine:fixtures:load
+```
+
+## Mailer Setup
+
+To enable email sending in Symfony, follow these steps:
+
+### 1. Configure the `.env` file
+Open the `.env.local` file and update the `MAILER_DSN` value based on your email provider. Example for Gmail:
+```env
+MAILER_DSN=smtp://your_email@gmail.com:your_password@smtp.gmail.com:587?encryption=tls&auth_mode=login
+```
+For other mail providers, refer to the [Symfony Mailer documentation](https://symfony.com/doc/current/mailer.html).
+
+### 2. Clear the cache
+After updating the `.env.local` file, clear the cache to apply the changes:
+```sh
+php bin/console cache:clear
+```
+If using Docker:
+```sh
+docker-compose exec php bin/console cache:clear
+```
+
+### 3. Start the Mailer Transport
+Run the following command to start consuming mail messages via Symfony Messenger:
+```sh
+php bin/console messenger:consume async -vv
+```
+If using Docker:
+```sh
+docker-compose exec php bin/console messenger:consume async -vv
+```
+
 ## Production Setup
 
 ### Deploying to a Production Server
