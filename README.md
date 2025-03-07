@@ -13,8 +13,8 @@ Before setting up the project, ensure you have the following installed:
 ### Setup Without Docker
 ```sh
 # 1. Clone the repository
-git clone <repository_url>
-cd <project_directory>
+git clone https://github.com/Martin-Portefolie/hest-test-calender.git
+cd hest-test-calender
 
 # 2. Install dependencies
 composer install
