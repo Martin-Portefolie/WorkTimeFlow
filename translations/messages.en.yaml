@@ -135,6 +135,7 @@ project_management:
     currency: "€"
     hour: "Hour"
     download_docx: "Download Invoice"
+    archieved: "Archived"
   new:
     title: "Create New Project"
     name: "Project Name"

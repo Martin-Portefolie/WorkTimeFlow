@@ -6,25 +6,27 @@
     <main class="bg-gray-700 text-white pt-16">
 
         <!-- Hero Section -->
-        <section class="relative w-full h-[800px] bg-black">
-            <!-- Video Background -->
-            <div class="absolute top-0 left-0 w-full h-full">
-                <video autoplay loop muted playsinline class="w-full h-full object-cover">
+        <!-- Hero Section -->
+        <section class="relative bg-black">
+            <!-- Video Background (Centered and Constrained) -->
+            <div class="relative max-w-5xl mx-auto h-[500px]">
+                <video autoplay loop muted playsinline class="w-full h-full object-cover rounded-lg">
                     <source src="{{ asset('movie/movie.mp4') }}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
             </div>
 
-            <!-- Top Black Bar with Text -->
-            <div class="absolute top-0 left-0 w-full bg-black text-white text-2xl px-6 py-4">
+            <!-- Top Black Bar with Text (inside the max-w-5xl container) -->
+            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-5xl bg-black text-white text-2xl px-6 py-4 rounded-t-lg">
                 {{ 'hero.title'|trans }}
             </div>
 
             <!-- Bottom Black Bar with Text -->
-            <div class="absolute bottom-0 left-0 w-full bg-black text-white text-lg px-6 py-4">
+            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-5xl bg-black text-white text-lg px-6 py-4 rounded-b-lg">
                 {{ 'hero.subtitle'|trans }}
             </div>
         </section>
+
 
         <!-- Feature Highlights Section -->
         <section class="py-16 px-6 bg-gray-900 text-white">
