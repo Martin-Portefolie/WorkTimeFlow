@@ -31,11 +31,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - timeregistration and todo should be cl/ci experince.
 
 ### Added
-
+- docker-compose.prod.yml with traefik labels, and server setup
+- frankenPhp, and Caddy
 
 ### Changed
-
-- Design
+- updated to symfony 7.3, and updated recipes.
+- redesigned 
 
 
 ### Removed
+- nginx
