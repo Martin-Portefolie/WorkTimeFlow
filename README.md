@@ -1,4 +1,4 @@
-# Hest Test Calendar
+# Work Time Flow
 
 A free Symfony-based time-registration project designed to simplify tracking time logs and project management.
 
@@ -10,43 +10,22 @@ Before setting up the project, ensure you have the following installed:
 
 ## Local Development Setup
 
-### Setup Without Docker
-```sh
-# 1. Clone the repository
-git clone https://github.com/Martin-Portefolie/hest-test-calender.git
-cd hest-test-calender
 
-# 2. Install dependencies
-composer install
-
-# 3. Configure the environment
-cp .env .env.local  # Modify DB connection if needed
-
-# 4. Set up the database
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate
-
-# 5. Start the development server
-symfony server:start
-
-# 6. Build Tailwind CSS
-php bin/console tailwind:build --watch --poll
-```
 
 ### Setup With Docker
 ```sh
 # 1. Start Docker and build the containers
-docker-compose up --build -d #(only on install)
-docker-compose up  -d #(if already installed)
+docker compose up -d --build
+docker compose up  -d #(if already installed)
 
 # 2. Install dependencies
-docker-compose exec php composer install  #(only on install)
+docker compose exec app composer install
 
 # 3. Migrate the database
-docker-compose exec php bin/console doctrine:migrations:migrate  #(only on install)
+docker compose exec app bin/console doctrine:migrations:migrate  #(only on install)
 
 # 4. Start Tailwind CSS compilation
-docker-compose exec php bin/console tailwind:build --watch --poll
+docker compose exec app bin/console tailwind:build --watch --poll
 ```
 
 ## Data Fixtures Setup
@@ -54,23 +33,16 @@ To populate your database with test data, follow these steps:
 
 ### 1. Reset the database
 ```sh
-php bin/console doctrine:schema:drop --full-database --force
-php bin/console doctrine:migrations:migrate
+docker compose exec app php bin/console doctrine:schema:drop --full-database --force
+docker compose exec app php bin/console doctrine:migrations:migrate
 ```
-If using Docker:
-```sh
-docker-compose exec php bin/console doctrine:schema:drop --full-database --force
-docker-compose exec php bin/console doctrine:migrations:migrate
-```
+
 
 ### 2. Load test data
 ```sh
-php bin/console doctrine:fixtures:load
+docker compose exec app php bin/console doctrine:fixtures:load
 ```
-If using Docker:
-```sh
-docker-compose exec php bin/console doctrine:fixtures:load
-```
+
 
 ## Mailer Setup
 
@@ -86,21 +58,21 @@ For other mail providers, refer to the [Symfony Mailer documentation](https://sy
 ### 2. Clear the cache
 After updating the `.env.local` file, clear the cache to apply the changes:
 ```sh
-php bin/console cache:clear
+docker compose exec app php bin/console cache:clear
 ```
 If using Docker:
 ```sh
-docker-compose exec php bin/console cache:clear
+docker compose exec app php bin/console cache:clear
 ```
 
 ### 3. Start the Mailer Transport
 Run the following command to start consuming mail messages via Symfony Messenger:
 ```sh
-php bin/console messenger:consume async -vv
+docker compose exec app php bin/console messenger:consume async -vv
 ```
 If using Docker:
 ```sh
-docker-compose exec php bin/console messenger:consume async -vv
+docker compose exec app php bin/console messenger:consume async -vv
 ```
 
 ## Production Setup
@@ -108,8 +80,8 @@ docker-compose exec php bin/console messenger:consume async -vv
 ### Deploying to a Production Server
 ```sh
 # 1. Clone the repository
-git clone https://github.com/Martin-Portefolie/hest-test-calender
-cd hest-test-calender
+git clone https://github.com/Martin-Portefolie/WorkTimeFlow.git
+cd WorkTimeFlow
 
 # 2. Install dependencies in production mode
 composer install --no-dev --optimize-autoloader

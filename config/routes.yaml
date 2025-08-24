@@ -1,8 +1,17 @@
+# Redirect bare domain "/" -> "/da" (default locale)
+root_to_da:
+  path: /
+  controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction
+  defaults:
+    path: /da
+    permanent: false
+
+# All controller routes live under /{_locale}
 controllers:
-    resource: '../src/Controller/'
-    type: attribute
-    prefix: '/{_locale}'
-    defaults:
-        _locale: en
-    requirements:
-        _locale: en|da
+  resource: '../src/Controller/'
+  type: attribute
+  prefix: '/{_locale}'
+  defaults:
+    _locale: en
+  requirements:
+    _locale: 'en|da'

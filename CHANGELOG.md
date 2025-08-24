@@ -20,3 +20,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [Alpha]
+
+### TODO
+- rewrite docker setup
+  - needs labels for traefik
+  - needs to use frankenphp instead of nginx
+- reduce the admin section to a singlepage
+- reduce the timeregistration section to a singlepage
+  - timeregistration and todo should be cl/ci experince.
+
+### Added
+
+
+### Changed
+
+- Design
+
+
+### Removed
