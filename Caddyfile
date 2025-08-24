@@ -2,16 +2,10 @@
 	{$CADDY_GLOBAL_OPTIONS}
 }
 
-http://{$SERVER_NAME} {
+:80 {
 	root * /app/public
 	encode zstd br gzip
-
-	# Simple & reliable: try static file, else front controller
-	try_files {path} /index.php?{query}
-
-	# FrankenPHP’s built-in PHP handler
 	php_server
-
 	file_server {
 		hide *.php
 	}

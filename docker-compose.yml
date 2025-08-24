@@ -10,9 +10,10 @@ services:
       APP_ENV: dev
       SERVER_NAME: ":80"          # accept any host locally
       CADDY_GLOBAL_OPTIONS: "auto_https off"
+      SERVER_ROOT: /app/public
       HOME: /tmp
       COMPOSER_HOME: /tmp/composer
-      COMPOSER_CACHE_DIR: /tmp/composer/cach
+      COMPOSER_CACHE_DIR: /tmp/composer/cache
     volumes:
       - ./:/app                   # bind entire project (includes vendor on host)
       - dev_var:/app/var          # keep cache/logs out of your repo
@@ -22,7 +23,7 @@ services:
         condition: service_healthy
     tty: true
     user: "0:0"
-    entrypoint: ["/bin/sh","-lc","/app/docker/entrypoint.sh"]
+#    entrypoint: ["/bin/sh","-lc","/app/docker/entrypoint.sh"]
 
   database:
     image: mariadb:10.11.2
