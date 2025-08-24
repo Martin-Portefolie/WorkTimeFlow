@@ -3,77 +3,47 @@ services:
     build:
       context: .
       args: { APP_ENV: prod }
-    image: worktimeflow-app:prod
+    image: worktimeflow:prod
     environment:
       APP_ENV: prod
-      APP_DEBUG: "0"
-      # FrankenPHP is behind Traefik, so leave TLS to Traefik
-      SERVER_NAME: ":80"
+      SERVER_NAME: ":80"                  # let Traefik terminate TLS
       CADDY_GLOBAL_OPTIONS: "auto_https off"
-
-      # ---- Database / Symfony envs (match your .env expectations) ----
-      # Tip: override these via server-side .env or swarm secrets later.
-      DATABASE_URL: "mysql://db_user:change_me_pass@database:3306/db?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
-      MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
-      # APP_SECRET: "put-a-real-secret-here"   # (optional, recommended)
-
-    depends_on:
-      database:
-        condition: service_healthy
-
-    # Join Traefik's public network *and* the internal default network for DB
-    networks:
-      - default
-      - web
-
-    # Traefik routing (HTTPS + HTTP→HTTPS)
+      # <<< configure your real DB here >>>
+      # Example if you have a managed MariaDB or another container:
+      # DATABASE_URL: "mysql://db_user:db_password@db-host:3306/db?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
+      # MESSENGER_TRANSPORT_DSN: "sync://"
+      # MAILER_DSN: "null://null"
+    networks: [web]
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-      - "traefik.http.services.wtf.loadbalancer.server.port=80"
+      - "traefik.http.services.worktimeflow.loadbalancer.server.port=80"
 
-      # HTTPS router (serve both apex and www)
-      - "traefik.http.routers.wtf.rule=Host(`work-time-flow.site`) || Host(`www.work-time-flow.site`)"
-      - "traefik.http.routers.wtf.entrypoints=websecure"
-      - "traefik.http.routers.wtf.tls.certresolver=le"
-
-      # HTTP router → redirect to HTTPS
-      - "traefik.http.middlewares.wtf-https.redirectscheme.scheme=https"
+      # HTTP -> HTTPS
       - "traefik.http.routers.wtf-web.rule=Host(`work-time-flow.site`) || Host(`www.work-time-flow.site`)"
       - "traefik.http.routers.wtf-web.entrypoints=web"
+      - "traefik.http.middlewares.wtf-https.redirectscheme.scheme=https"
       - "traefik.http.routers.wtf-web.middlewares=wtf-https@docker"
-      - "traefik.http.routers.wtf-web.service=wtf"
+      - "traefik.http.routers.wtf-web.service=worktimeflow"
 
-      ## Optional: force canonical host (www → apex). Uncomment to enable:
-      # - "traefik.http.routers.wtf-www.rule=Host(`www.work-time-flow.site`)"
-      # - "traefik.http.routers.wtf-www.entrypoints=websecure"
-      # - "traefik.http.routers.wtf-www.tls.certresolver=le"
-      # - "traefik.http.routers.wtf-www.middlewares=wtf-www2apex@docker"
-      # - "traefik.http.middlewares.wtf-www2apex.redirectregex.regex=^https?://www\\.work-time-flow\\.site/(.*)"
-      # - "traefik.http.middlewares.wtf-www2apex.redirectregex.replacement=https://work-time-flow.site/$1"
-      # - "traefik.http.middlewares.wtf-www2apex.redirectregex.permanent=true"
+      # HTTPS (apex) – the real app
+      - "traefik.http.routers.wtf.rule=Host(`work-time-flow.site`)"
+      - "traefik.http.routers.wtf.entrypoints=websecure"
+      - "traefik.http.routers.wtf.tls.certresolver=le"
+      - "traefik.http.routers.wtf.service=worktimeflow"
 
-    restart: unless-stopped
+      # HTTPS (www) – redirect to apex
+      - "traefik.http.middlewares.wtf-www2apex.redirectregex.regex=^https?://www\\.work-time-flow\\.site/(.*)"
+      - "traefik.http.middlewares.wtf-www2apex.redirectregex.replacement=https://work-time-flow.site/$$1"
+      - "traefik.http.middlewares.wtf-www2apex.redirectregex.permanent=true"
+      - "traefik.http.routers.wtf-www.rule=Host(`www.work-time-flow.site`)"
+      - "traefik.http.routers.wtf-www.entrypoints=websecure"
+      - "traefik.http.routers.wtf-www.tls.certresolver=le"
+      - "traefik.http.routers.wtf-www.middlewares=wtf-www2apex@docker"
+      - "traefik.http.routers.wtf-www.service=worktimeflow"
 
-  database:
-    image: mariadb:10.11.2
-    environment:
-      MYSQL_ROOT_PASSWORD: change_me_root
-      MYSQL_DATABASE: db
-      MYSQL_USER: db_user
-      MYSQL_PASSWORD: change_me_pass
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -p$$MYSQL_ROOT_PASSWORD --silent"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
     restart: unless-stopped
 
 networks:
   web:
     external: true
-
-volumes:
-  mariadb_data:
