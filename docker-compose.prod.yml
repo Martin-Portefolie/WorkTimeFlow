@@ -1,49 +1,70 @@
 services:
-  worktimeflow:
+  app:
     build:
       context: .
       args: { APP_ENV: prod }
-    image: worktimeflow:prod
+    image: worktimeflow_app:prod
     environment:
       APP_ENV: prod
-      SERVER_NAME: ":80"                  # let Traefik terminate TLS
+      SERVER_NAME: ":80"                     # Caddy/FrankenPHP listens plain HTTP only (Traefik handles TLS)
       CADDY_GLOBAL_OPTIONS: "auto_https off"
-      # <<< configure your real DB here >>>
-      # Example if you have a managed MariaDB or another container:
-      # DATABASE_URL: "mysql://db_user:db_password@db-host:3306/db?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
-      # MESSENGER_TRANSPORT_DSN: "sync://"
-      # MAILER_DSN: "null://null"
-    networks: [web]
+      APP_DEBUG: "0"
+      # Match your .env DATABASE_URL format; service name "db" below
+      DATABASE_URL: "mysql://db_user:db_password@db:3306/db?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
+      MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
+      MAILER_DSN: "null://null"
+      TZ: "Europe/Copenhagen"
+    depends_on:
+      - db
+    networks:
+      - web           # for Traefik
+      - internal      # to reach db
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-      - "traefik.http.services.worktimeflow.loadbalancer.server.port=80"
+      - "traefik.http.services.wtf.loadbalancer.server.port=80"
 
-      # HTTP -> HTTPS
+      # HTTPS router (apex)
+      - "traefik.http.routers.wtf-apex.rule=Host(`work-time-flow.site`)"
+      - "traefik.http.routers.wtf-apex.entrypoints=websecure"
+      - "traefik.http.routers.wtf-apex.tls.certresolver=le"
+
+      # HTTP router → force HTTPS (both hosts)
+      - "traefik.http.middlewares.wtf-https.redirectscheme.scheme=https"
       - "traefik.http.routers.wtf-web.rule=Host(`work-time-flow.site`) || Host(`www.work-time-flow.site`)"
       - "traefik.http.routers.wtf-web.entrypoints=web"
-      - "traefik.http.middlewares.wtf-https.redirectscheme.scheme=https"
       - "traefik.http.routers.wtf-web.middlewares=wtf-https@docker"
-      - "traefik.http.routers.wtf-web.service=worktimeflow"
+      - "traefik.http.routers.wtf-web.service=wtf"
 
-      # HTTPS (apex) – the real app
-      - "traefik.http.routers.wtf.rule=Host(`work-time-flow.site`)"
-      - "traefik.http.routers.wtf.entrypoints=websecure"
-      - "traefik.http.routers.wtf.tls.certresolver=le"
-      - "traefik.http.routers.wtf.service=worktimeflow"
-
-      # HTTPS (www) – redirect to apex
-      - "traefik.http.middlewares.wtf-www2apex.redirectregex.regex=^https?://www\\.work-time-flow\\.site/(.*)"
-      - "traefik.http.middlewares.wtf-www2apex.redirectregex.replacement=https://work-time-flow.site/$$1"
-      - "traefik.http.middlewares.wtf-www2apex.redirectregex.permanent=true"
+      # www → apex canonical redirect (on HTTPS)
+      - "traefik.http.middlewares.wtf-canon.redirectregex.regex=^https?://www\\.work-time-flow\\.site/(.*)"
+      - "traefik.http.middlewares.wtf-canon.redirectregex.replacement=https://work-time-flow.site/$1"
+      - "traefik.http.middlewares.wtf-canon.redirectregex.permanent=true"
       - "traefik.http.routers.wtf-www.rule=Host(`www.work-time-flow.site`)"
       - "traefik.http.routers.wtf-www.entrypoints=websecure"
       - "traefik.http.routers.wtf-www.tls.certresolver=le"
-      - "traefik.http.routers.wtf-www.middlewares=wtf-www2apex@docker"
-      - "traefik.http.routers.wtf-www.service=worktimeflow"
-
+      - "traefik.http.routers.wtf-www.middlewares=wtf-canon@docker"
     restart: unless-stopped
+
+  db:
+    image: mariadb:10.11.2
+    container_name: wtf_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "change_me_root"
+      MYSQL_DATABASE: "db"
+      MYSQL_USER: "db_user"
+      MYSQL_PASSWORD: "db_password"
+      TZ: "Europe/Copenhagen"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - internal
 
 networks:
   web:
-    external: true
+    external: true           # same Traefik network you're already using
+  internal:
+
+volumes:
+  db_data:
