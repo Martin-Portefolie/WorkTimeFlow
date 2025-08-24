@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\Profile;
 
 use App\Entity\Timelog;
 use App\Entity\Todo;
