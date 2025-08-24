@@ -8,7 +8,7 @@ services:
       APP_ENV: prod
       SERVER_NAME: ":80"                     # Caddy/FrankenPHP listens plain HTTP only (Traefik handles TLS)
       CADDY_GLOBAL_OPTIONS: "auto_https off"
-      APP_DEBUG: "0"
+      APP_DEBUG: "1"
       # Match your .env DATABASE_URL format; service name "db" below
       DATABASE_URL: "mysql://db_user:db_password@db:3306/db?serverVersion=10.11.2-MariaDB&charset=utf8mb4"
       MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
