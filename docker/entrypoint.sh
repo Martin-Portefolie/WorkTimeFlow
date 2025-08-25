@@ -1,25 +1,31 @@
 #!/bin/sh
 set -e
 
-# ------- dev-friendly env for Composer (avoids / root-owned cache) -------
-: "${HOME:=/tmp}"
-: "${COMPOSER_HOME:=$HOME/.composer}"
-: "${COMPOSER_CACHE_DIR:=$COMPOSER_HOME/cache}"
-mkdir -p "$COMPOSER_CACHE_DIR" || true
+APP_ENV="${APP_ENV:-prod}"
 
-# ------- ensure Symfony dirs exist & are writable -------
-mkdir -p /app/var/cache /app/var/log || true
+# Writable dirs
+mkdir -p var/log var/cache var/sessions public/bundles
+chown -R www-data:www-data var public/bundles || true
+chmod -R ug+rwX var public/bundles var/cache var/log || true
 
-# Try to make var/ writable for the current user (works with bind mounts)
-# chown may fail if not root; that's fine—we ignore errors.
-chown -R "$(id -u)":"(id -g)" /app/var 2>/dev/null || true
-chmod -R u+rwX,go+rX /app/var 2>/dev/null || true
+# If a compiled env sneaks in, ignore it
+[ -f .env.local.php ] && rm -f .env.local.php || true
 
-# ------- Tailwind: make downloaded binary executable if present -------
-if [ -d /app/var/tailwind ]; then
-  # v3.4.17 path looks like /app/var/tailwind/vX.Y.Z/tailwindcss-linux-*
-  find /app/var/tailwind -type f -name 'tailwindcss-*' -exec chmod +x {} + 2>/dev/null || true
+# DB: create & migrate (only if DATABASE_URL is set)
+if [ -n "${DATABASE_URL:-}" ]; then
+  php -r 'try{new PDO(getenv("DATABASE_URL")); echo "DB OK\n";}catch(Throwable $e){fwrite(STDERR,$e->getMessage()."\n"); exit(1);}'
+  bin/console doctrine:database:create --if-not-exists -n || true
+  bin/console doctrine:migrations:migrate -n || true
 fi
 
-# ------- hand over to FrankenPHP (Caddy) -------
-exec frankenphp php-server
+# Cache
+bin/console cache:clear --env="$APP_ENV" || true
+bin/console cache:warmup --env="$APP_ENV" || true
+
+# Assets
+bin/console assets:install --symlink --relative public || bin/console assets:install public || true
+bin/console asset-map:compile || true
+bin/console importmap:install --no-interaction || true
+bin/console tailwind:build || true
+
+exec "$@"
