@@ -51,10 +51,10 @@ services:
     container_name: wtf_db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: "change_me_root"
-      MYSQL_DATABASE: "db"
-      MYSQL_USER: "db_user"
-      MYSQL_PASSWORD: "db_password"
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: db
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: db_password
       TZ: "Europe/Copenhagen"
     volumes:
       - db_data:/var/lib/mysql
