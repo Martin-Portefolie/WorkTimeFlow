@@ -6,7 +6,7 @@ services:
     image: worktimeflow_app:prod
     environment:
       APP_ENV: prod
-      APP_SECRET: "PUT-YOUR-SECRET-HERE"
+      APP_SECRET: "0aae38485c70f7ea7e06f162a2be4b4c36923268a37bece0abed99d0d329bc33"
       APP_DEBUG: "0"
       SERVER_NAME: ":80"
       CADDY_GLOBAL_OPTIONS: "auto_https off"
@@ -56,10 +56,10 @@ services:
       - db_data:/var/lib/mysql
     networks: [internal]
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -p$${MYSQL_ROOT_PASSWORD} --silent" ]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 30
 
 networks:
   web:
