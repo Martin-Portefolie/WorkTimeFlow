@@ -74,10 +74,10 @@ bin/console asset-map:compile || echo "⚠️  WARN: asset-map:compile failed (c
 # ------------------------------------------------------------------------------
 if [ -f public/assets/manifest.json ]; then
   echo "✅ Manifest present at public/assets/manifest.json"
-  if grep -q '"styles/app.css"' public/assets/manifest.json; then
-    echo "✅ styles/app.css mapped in manifest"
+  if ls public/assets/styles/app*.css >/dev/null 2>&1; then
+    echo "✅ Tailwind output: $(ls -1 public/assets/styles/app*.css | head -n1)"
   else
-    echo "⚠️  WARN: styles/app.css not found in manifest"
+    echo "⚠️  WARN: no Tailwind CSS output under public/assets/styles"
   fi
 else
   echo "⚠️  WARN: public/assets/manifest.json missing"
