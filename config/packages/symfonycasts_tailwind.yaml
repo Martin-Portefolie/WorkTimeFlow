@@ -1,4 +1,4 @@
 # config/packages/symfonycasts_tailwind.yaml
 symfonycasts_tailwind:
-  input_css:  '%kernel.project_dir%/assets/styles/app.css'
-  output_css: '%kernel.project_dir%/public/styles/app.css'
+  input_css: '%kernel.project_dir%/assets/styles/app.css'
+  config_file: '%kernel.project_dir%/tailwind.config.js'
