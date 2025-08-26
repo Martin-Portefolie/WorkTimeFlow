@@ -3,17 +3,17 @@ set -eu
 
 APP_ENV="${APP_ENV:-prod}"
 
-# Writable dirs & sane perms
+# Writable dirs & perms
 mkdir -p var/cache var/log var/sessions public/bundles
 chown -R www-data:www-data var public/bundles || true
 chmod -R ug+rwX var public/bundles || true
 
-# --- Wait for DB (if DATABASE_URL is set) ---
+# Wait for DB if configured
 if [ -n "${DATABASE_URL:-}" ]; then
   echo "Waiting for database…"
   php -r '
-    $u = getenv("DATABASE_URL"); if (!$u) exit(0);
-    $p = parse_url($u); if (!$p) exit(0);
+    $u = getenv("DATABASE_URL"); if(!$u) exit(0);
+    $p = parse_url($u); if(!$p) exit(0);
     $db = ltrim($p["path"] ?? "", "/");
     parse_str(parse_url($u, PHP_URL_QUERY) ?? "", $q);
     $charset = $q["charset"] ?? "utf8mb4";
@@ -31,24 +31,28 @@ if [ -n "${DATABASE_URL:-}" ]; then
   ' || { echo "Database not reachable, exiting"; exit 1; }
 fi
 
-# --- Database schema (no-op when already up) ---
+# DB schema (no-op when up-to-date)
 bin/console doctrine:database:create --if-not-exists --no-interaction || true
 bin/console doctrine:migrations:migrate --no-interaction || true
 
-# --- Cache & framework assets ---
+# Cache & framework assets
 bin/console cache:clear --env="$APP_ENV" || true
 bin/console cache:warmup --env="$APP_ENV" || true
 bin/console assets:install --symlink --relative public || bin/console assets:install public || true
 
-# --- Frontend build: Tailwind + AssetMapper ---
+# Ensure importmap vendor assets exist (Stimulus/Turbo, etc.)
+echo "Installing Importmap vendor assets…"
+bin/console importmap:install --prefer-offline || echo "WARN: importmap:install failed (continuing)"
+
+# Tailwind build (prod, one-shot)
 echo "Building Tailwind CSS (env=$APP_ENV)…"
-# In prod: one-off minified build (no watch)
 bin/console tailwind:build --minify || echo "WARN: Tailwind build failed (continuing)"
 
+# AssetMapper build
 echo "Compiling AssetMapper…"
 bin/console asset-map:compile || echo "WARN: asset-map:compile failed (continuing)"
 
-# Accept either default output (public/build/tailwind.css) or your custom path (public/styles/app.css)
+# Sanity check for the CSS output (either our configured path or the default)
 if [ -f public/styles/app.css ]; then
   echo "Tailwind output: public/styles/app.css"
 elif [ -f public/build/tailwind.css ]; then
