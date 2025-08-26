@@ -1,0 +1,6 @@
+# config/packages/tailwind.yaml
+tailwind:
+  input:  '%kernel.project_dir%/assets/styles/app.css'
+  output: '%kernel.project_dir%/public/styles/app.css'
+  # optional in prod:
+  # additional_options: ['--minify']
