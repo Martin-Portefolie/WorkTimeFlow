@@ -3,7 +3,7 @@ set -eu
 
 APP_ENV="${APP_ENV:-prod}"
 
-echo "▶️  Entrypoint starting (APP_ENV=$APP_ENV)"
+echo "Entrypoint starting (APP_ENV=$APP_ENV)"
 
 # ------------------------------------------------------------------------------
 # Writable dirs & permissions
@@ -17,7 +17,7 @@ chmod -R ug+rwX var public/bundles || true
 # Optional: wait for DB if DATABASE_URL is set
 # ------------------------------------------------------------------------------
 if [ -n "${DATABASE_URL:-}" ]; then
-  echo "⏳ Waiting for database…"
+  echo "Waiting for database…"
   php -r '
     $u = getenv("DATABASE_URL"); if(!$u) exit(0);
     $p = parse_url($u); if(!$p) exit(0);
@@ -31,11 +31,11 @@ if [ -n "${DATABASE_URL:-}" ]; then
     $pass    = $p["pass"]   ?? null;
     $dsn = sprintf("%s:host=%s;port=%d;dbname=%s;charset=%s", $scheme, $host, $port, $db, $charset);
     for ($i=0; $i<30; $i++) {
-      try { new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]); echo "✅ DB OK\n"; exit(0); }
-      catch (Throwable $e) { echo "… DB not ready: ".$e->getMessage()."\n"; sleep(2); }
+      try { new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]); echo "DB OK\n"; exit(0); }
+      catch (Throwable $e) { echo "DB not ready: ".$e->getMessage()."\n"; sleep(2); }
     }
     exit(1);
-  ' || { echo "❌ Database not reachable, exiting"; exit 1; }
+  ' || { echo "Database not reachable, exiting"; exit 1; }
 fi
 
 # ------------------------------------------------------------------------------
@@ -54,34 +54,34 @@ bin/console assets:install --symlink --relative public || bin/console assets:ins
 # ------------------------------------------------------------------------------
 # ImportMap vendor assets (Stimulus/Turbo, etc.) – required before asset-map:compile
 # ------------------------------------------------------------------------------
-echo "📦 Installing ImportMap vendor assets…"
-bin/console importmap:install --no-interaction || echo "⚠️  WARN: importmap:install failed (continuing)"
+echo "Installing ImportMap vendor assets…"
+bin/console importmap:install --no-interaction || echo "WARN: importmap:install failed (continuing)"
 
 # ------------------------------------------------------------------------------
 # Tailwind CSS (one-shot, prod)
 # ------------------------------------------------------------------------------
-echo "🎨 Building Tailwind CSS (env=$APP_ENV)…"
-bin/console tailwind:build --minify || echo "⚠️  WARN: Tailwind build failed (continuing)"
+echo "Building Tailwind CSS (env=$APP_ENV)…"
+bin/console tailwind:build --minify || echo "WARN: Tailwind build failed (continuing)"
 
 # ------------------------------------------------------------------------------
 # AssetMapper compile (writes public/assets + manifest.json)
 # ------------------------------------------------------------------------------
-echo "🧰 Compiling AssetMapper…"
-bin/console asset-map:compile || echo "⚠️  WARN: asset-map:compile failed (continuing)"
+echo "Compiling AssetMapper…"
+bin/console asset-map:compile || echo "WARN: asset-map:compile failed (continuing)"
 
 # ------------------------------------------------------------------------------
 # Sanity checks
 # ------------------------------------------------------------------------------
 if [ -f public/assets/manifest.json ]; then
-  echo "✅ Manifest present at public/assets/manifest.json"
+  echo "Manifest present at public/assets/manifest.json"
   if ls public/assets/styles/app*.css >/dev/null 2>&1; then
-    echo "✅ Tailwind output: $(ls -1 public/assets/styles/app*.css | head -n1)"
+    echo "Tailwind output: $(ls -1 public/assets/styles/app*.css | head -n1)"
   else
-    echo "⚠️  WARN: no Tailwind CSS output under public/assets/styles"
+    echo "WARN: no Tailwind CSS output under public/assets/styles"
   fi
 else
-  echo "⚠️  WARN: public/assets/manifest.json missing"
+  echo "WARN: public/assets/manifest.json missing"
 fi
 
-echo "🚀 Starting main process: $*"
+echo "Starting main process: $*"
 exec "$@"
