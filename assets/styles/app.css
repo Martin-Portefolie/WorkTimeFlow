@@ -2,123 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------- BASE (kept minimal) ---------- */
+@layer base {
+    html, body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
 
-html, body {
-    min-height: 100vh; /* Full viewport height */
-    display: flex;
-    flex-direction: column;
-
+    main { flex: 1; }
 }
 
-main {
-    flex: 1; /* Makes the content area expand and push footer down */
-}
-
-/* Button Variants */
-.btn {
-    @apply font-bold px-6 py-3 rounded-lg shadow-md transition;
-}
-
-.btn-primary {
-    @apply bg-primary text-white hover:bg-secondary;
-}
-
-.btn-secondary {
-    @apply bg-neutral-100 text-primary hover:bg-neutral-500;
-}
-
-/* Input Fields */
-.input-field {
-    @apply p-3 rounded-lg w-full sm:w-auto text-neutral-900 border border-neutral-300;
-}
-
-/* Section Containers */
-.section {
-    @apply max-w-5xl mx-auto py-10 px-6;
-}
-
-
-/* Global Text Styles */
-.text-heading {
-    @apply text-3xl font-bold font-display text-neutral-900;
-}
-
-.text-subheading {
-    @apply text-xl font-semibold text-neutral-900;
-}
-
-.text-body {
-    @apply text-lg text-neutral-700 leading-relaxed;
-}
-
-.text-small {
-    @apply text-sm text-neutral-600;
-}
-
-/* calender dropdown */
-/* General Dropdown Styling */
-.dropdown {
-    position: relative;
-    width: 100%;
-    border: 1px solid #D1D5DB; /* Tailwind: border-gray-300 */
-    border-radius: 0.5rem;
-    background: #fff;
-    cursor: pointer;
-}
-
-/* Selected Item */
-.dropdown-select {
-    padding: 0.75rem;
-    font-size: 1rem;
-    color: #374151; /* Tailwind: text-gray-700 */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Dropdown Menu #TODO DELETE ME IF NOT USED */
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: white;
-    border-radius: 0.5rem;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-    max-height: 200px;
-    overflow-y: auto;
-    display: none;
-}
-
-/* Show dropdown when active */
-/* Apply these styles inside your Tailwind file (app.css) */
+/* ---------- COMPONENTS (everything purge-safe) ---------- */
 @layer components {
-    .dropdown {
-        @apply relative w-full border border-gray-300 rounded-lg bg-white cursor-pointer shadow-sm;
-    }
+    /* wrappers */
+    .container-landing { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+    .hero-title { @apply text-5xl lg:text-7xl font-extrabold leading-tight bg-gradient-to-r from-slate-900 via-emerald-800 to-teal-700 bg-clip-text text-transparent; }
+    .hero-sub { @apply text-lg lg:text-2xl text-slate-600 max-w-3xl mx-auto; }
 
-    .dropdown-select {
-        @apply px-4 py-3 text-gray-700 flex justify-between items-center rounded-lg;
-    }
+    /* pills / badges */
+    .pill { @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium; }
+    .pill-emerald { @apply bg-emerald-50 border border-emerald-200 text-emerald-700; }
 
-    .dropdown-menu {
-        @apply absolute top-full left-0 w-full bg-white rounded-lg shadow-md z-50 max-h-48 overflow-y-auto hidden;
-    }
+    /* cards */
+    .card { @apply bg-white rounded-2xl ring-1 ring-slate-900/5 shadow-card; }
+    .card-soft { @apply rounded-2xl ring-1 ring-emerald-200/70 p-8 bg-gradient-to-br from-slate-50 to-emerald-50 shadow-xl; }
 
-    .dropdown-menu:not(.hidden) {
-        @apply block;
-    }
+    /* feature cards */
+    .feature { @apply p-8 text-center rounded-2xl bg-white ring-1 ring-emerald-100 transition hover:ring-emerald-200 hover:shadow-lg; }
+    .feature-icon { @apply w-16 h-16 mx-auto mb-6 rounded-2xl grid place-items-center bg-gradient-to-br from-emerald-400 to-emerald-600 text-white transition group-hover:scale-110; }
 
-    .dropdown-menu-search {
-        @apply w-full p-2 text-sm border-b border-gray-200 outline-none;
-    }
+    /* CTAs */
+    .cta-primary { @apply inline-flex items-center justify-center text-lg px-8 py-4 rounded-lg text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600; }
+    .cta-secondary { @apply inline-flex items-center justify-center text-lg px-8 py-4 rounded-lg ring-1 ring-emerald-200 text-emerald-700 hover:bg-emerald-50 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600; }
 
-    .dropdown-menu-inner {
-        @apply max-h-40 overflow-y-auto;
-    }
+    /* terminal */
+    .terminal-line  { @apply flex items-center gap-3 p-4 rounded-lg; }
+    .terminal-cmd   { @apply bg-slate-900; }
+    .terminal-res   { @apply bg-emerald-50 border border-emerald-200; }
+    .terminal-mark  { @apply text-emerald-400 font-mono; }
+    .terminal-text  { @apply text-slate-200 font-mono; }
 
-    .dropdown-menu-item {
-        @apply p-2 text-sm text-gray-600 cursor-pointer transition-all duration-150 hover:bg-gray-100;
-    }
+    /* buttons (legacy variants used elsewhere) */
+    .btn { @apply font-bold px-6 py-3 rounded-lg shadow-md transition; }
+    .btn-primary { @apply bg-primary text-white hover:bg-secondary; }
+    .btn-secondary { @apply bg-neutral-100 text-primary hover:bg-neutral-500; }
+
+    /* inputs */
+    .input-field { @apply p-3 rounded-lg w-full sm:w-auto text-neutral-900 border border-neutral-300; }
+
+    /* section layout */
+    .section { @apply max-w-5xl mx-auto py-10 px-6; }
+
+    /* typography helpers */
+    .text-heading { @apply text-3xl font-bold font-display text-neutral-900; }
+    .text-subheading { @apply text-xl font-semibold text-neutral-900; }
+    .text-body { @apply text-lg text-neutral-700 leading-relaxed; }
+    .text-small { @apply text-sm text-neutral-600; }
+
+    /* dropdown (single source of truth) */
+    .dropdown        { @apply relative w-full border border-gray-300 rounded-lg bg-white cursor-pointer shadow-sm; }
+    .dropdown-select { @apply px-4 py-3 text-gray-700 flex justify-between items-center rounded-lg; }
+    .dropdown-menu   { @apply absolute top-full left-0 w-full bg-white rounded-lg shadow-md z-50 max-h-48 overflow-y-auto hidden; }
+    .dropdown-menu:not(.hidden) { @apply block; }
+    .dropdown-menu-search { @apply w-full p-2 text-sm border-b border-gray-200 outline-none; }
+    .dropdown-menu-inner  { @apply max-h-40 overflow-y-auto; }
+    .dropdown-menu-item   { @apply p-2 text-sm text-gray-600 cursor-pointer transition-all duration-150 hover:bg-gray-100; }
 }

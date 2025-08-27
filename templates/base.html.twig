@@ -33,12 +33,14 @@
     </head>
 
     <body>
-    <!-- User menu -->
-    {% include 'components/_navbar_user.html.twig' %}
-    <!-- Admin menu -->
-    {% if is_granted('ROLE_ADMIN') %}
-        {% include 'components/_navbar_admin.html.twig' %}
-    {% endif %}
+        {% include 'components/_navbar.html.twig' %}
+
+    {#    <!-- User menu -->#}
+{#    {% include 'components/_navbar_user.html.twig' %}#}
+{#    <!-- Admin menu -->#}
+{#    {% if is_granted('ROLE_ADMIN') %}#}
+{#        {% include 'components/_navbar_admin.html.twig' %}#}
+{#    {% endif %}#}
 
     <!-- Content Section -->
     <main class="flex-grow bg-background">

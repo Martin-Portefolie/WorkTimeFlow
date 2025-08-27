@@ -1,88 +1,72 @@
 /** @type {import('tailwindcss').Config} */
-
-const grey = {
-  0: "#FFFFFF",  // Pure white
-  50: "#FCFCFC",  // Very light grey
-  100: "#F2F2F2", // Soft grey
-  150: "#E5E5E5", // Light grey
-  200: "#D6D6D6", // Medium-light grey
-  300: "#BFBFBF", // Neutral grey
-  400: "#999999", // Medium grey
-  500: "#707070", // Darker medium grey
-  700: "#4A4A4A", // Dark grey
-  900: "#1F1F1F", // Almost black
-};
-
-const custom_colors = {
-  dark_purple: "#7C3AED",
-      purple: "#A78BFA",
-      blue: "#2563EB",
-      green: "#10B981",
-      blue_hoover: "#4F8FF7",
-      pastel_rosa: "#F5EFFF",
-      pastel_green: "#EFFFF5"
-
-};
-
 module.exports = {
-  content: [
-    './assets/**/*.{html,js,twig}',
-    './templates/**/*.twig',
-  ],
-  theme: {
-    extend: {
-      colors: {
-        primary: grey[500],
-        secondary: grey[400],
-        alternate: "red",
-        background: grey[0],
-        section_1: custom_colors.pastel_green,
-        section_2: custom_colors.pastel_rosa,
+    content: [
+        "./templates/**/*.html.twig",
+        "./templates/**/*.twig",
+        "./assets/**/*.{js,ts,css,twig,html}",
+    ],
+    darkMode: 'class', // we’ll toggle by adding/removing .dark on <html> or <body>
+    theme: {
+        extend: {
+            colors: {
+                // Semantic system colors -> CSS vars
+                background: "var(--background)",
+                foreground: "var(--foreground)",
+                card: "var(--card-background)",
+                "card-foreground": "var(--card-foreground)",
+                popover: "var(--popover)",
+                "popover-foreground": "var(--popover-foreground)",
+                primary: "var(--primary)",
+                "primary-foreground": "var(--primary-foreground)",
+                secondary: "var(--secondary)",
+                "secondary-foreground": "var(--secondary-foreground)",
+                muted: "var(--muted)",
+                "muted-foreground": "var(--muted-foreground)",
+                accent: "var(--accent)",
+                "accent-foreground": "var(--accent-foreground)",
+                destructive: "var(--destructive)",
+                "destructive-foreground": "var(--destructive-foreground)",
+                border: "var(--border)",
+                input: "var(--input)",
+                "input-background": "var(--input-background)",
+                "switch-background": "var(--switch-background)",
+                ring: "var(--ring)",
 
-        blue: custom_colors.blue,
-        green: custom_colors.green,
-        purple: custom_colors.purple,
+                // Brand & terminal
+                "brand-emerald": "var(--brand-emerald)",
+                "brand-teal": "var(--brand-teal)",
+                "accent-mint": "var(--accent-mint)",
+                "terminal-bg": "var(--terminal-bg)",
+                "terminal-text": "var(--terminal-text)",
+                "terminal-accent": "var(--terminal-accent)",
 
-        grey,
-        custom_colors,
+                // Project border states
+                "project-border-active": "var(--project-border-active)",
+                "project-border-paid": "var(--project-border-paid)",
+                "project-border-archived": "var(--project-border-archived)",
+                "project-border-paid-archived": "var(--project-border-paid-archived)",
 
-        neutral: {
-          100: "#FAF5FF",
-          500: "#6B7280",
-          900: "#1F2937",
+                // Status
+                success: "var(--success)",
+                danger: "var(--danger)",
+                warning: "var(--warning)",
+                info: "var(--info)",
+            },
+            borderRadius: {
+                sm: "calc(var(--radius) - 4px)",
+                md: "calc(var(--radius) - 2px)",
+                lg: "var(--radius)",
+                xl: "calc(var(--radius) + 4px)",
+            },
+            boxShadow: {
+                card: "0 8px 24px rgba(0,0,0,0.08)",
+                pop: "0 12px 40px rgba(0,0,0,0.15)",
+            },
+            fontFamily: {
+                sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+                display: ["Poppins", "ui-sans-serif", "system-ui", "sans-serif"],
+            },
         },
-
-        white: grey[0],
-        dark: grey[900],
-        save: custom_colors.blue,
-        new: custom_colors.green,
-        muted: grey[200],
-        pagination: custom_colors.dark_purple,
-        search: custom_colors.purple,
-        select: grey[50],
-
-        success: "#10B981", // Green (active)
-        warning: "#F59E0B", // Yellow (pending)
-        error: "#EF4444", // Red (errors)
-      },
-
-      fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        display: ["Poppins", "sans-serif"],
-        cursive: ["Pacifico", "cursive"],
-      },
-
-      fontSize: {
-        sm: "0.875rem",
-        base: "1rem",
-        lg: "1.125rem",
-        xl: "1.25rem",
-        "2xl": "1.5rem",
-        "3xl": "2rem",
-        "4xl": "2.5rem",
-      },
     },
-  },
-  plugins: [],
+    plugins: [],
 };
-
