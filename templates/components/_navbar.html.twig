@@ -1,91 +1,44 @@
 {# templates/components/_navbar.html.twig #}
-{% set landing = landing|default(false) %}
-{% set admin   = admin|default(false) %}
 {% set company = get_company()|default(null) %}
 
 <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b" style="border-color: var(--border)">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between py-3">
 
-            {# Left: Logo #}
-            {% if landing %}
-                <a href="{{ path('app_alpha_default') }}" class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl shadow-lg grid place-items-center"
-                         style="background: linear-gradient(to bottom right, var(--brand-emerald), var(--brand-teal))">
-                        <svg class="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <circle cx="12" cy="12" r="9" stroke-width="2"/>
-                            <path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <span class="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-            WorkTimeFlow
-          </span>
-                </a>
-            {% else %}
-                <a href="{{ path('home') }}" class="flex items-center gap-3">
-                    {% if company and company.logo %}
-                        <img src="{{ asset(company.logo) }}" alt="{{ company.name }}" class="h-9 w-9 rounded-lg object-cover ring-1 ring-slate-900/5">
-                    {% else %}
-                        <div class="h-9 w-9 rounded-lg grid place-items-center shadow"
-                             style="background: linear-gradient(to bottom right, var(--brand-emerald), var(--brand-teal))">
-                            <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <circle cx="12" cy="12" r="9" stroke-width="2"/>
-                                <path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                    {% endif %}
-                    <span class="hidden sm:inline text-lg font-semibold text-slate-900">
-            {{ company.name|default('WorkTimeFlow') }}
-          </span>
-                </a>
-            {% endif %}
+            {# Left: Logo + Text #}
+            <a href="{{ path('home') }}" class="flex items-center space-x-3">
+                {% if company and company.logo %}
+                    <img src="{{ asset(company.logo) }}" alt="{{ company.name }}" class="h-10 w-10 rounded-lg object-cover ">
+                    <span class="text-xl sm:text-2xl font-bold text-slate-800">{{ company.name }}</span>
+                {% else %}
+                    <img src="{{ asset('images/logo2.svg') }}" alt="Default Logo" class="h-10 w-10 rounded-lg">
+                    <span class="text-xl sm:text-2xl font-bold text-slate-800">WorkTimeFlow</span>
+                {% endif %}
+            </a>
 
-            {# Center: Admin links if admin=true #}
-            {% if admin %}
-                <nav class="hidden md:flex items-center gap-6 text-sm text-slate-700">
-                    <a href="{{ path('admin_client') }}" class="hover:text-slate-900">Clients</a>
-                    <a href="{{ path('admin_project') }}" class="hover:text-slate-900">Projects</a>
-                    <a href="{{ path('admin_todos') }}" class="hover:text-slate-900">Todos</a>
-                    <a href="{{ path('admin_team') }}" class="hover:text-slate-900">Teams</a>
-                    <a href="{{ path('admin_users') }}" class="hover:text-slate-900">Users</a>
-                    <a href="{{ path('admin_upload_index') }}" class="hover:text-slate-900">Import</a>
-                </nav>
-            {% endif %}
-
-            {# Right: Language + auth #}
-            <div class="flex items-center gap-3">
-                <div class="hidden sm:flex items-center gap-3 text-sm text-slate-600">
-                    <a class="hover:text-slate-900"
-                       href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'_locale': 'en'})) }}">EN</a>
-                    <span aria-hidden="true">·</span>
-                    <a class="hover:text-slate-900"
-                       href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'_locale': 'da'})) }}">DA</a>
-                </div>
-
+            {# Right: Profile / Login / Logout #}
+            <div class="flex items-center space-x-4">
                 {% if app.user %}
-                    {% if not landing %}
-                        <a href="{{ path('app_user') }}"
-                           class="hidden sm:inline-flex items-center gap-2 rounded-lg px-3 py-2 ring-1 ring-slate-200 text-slate-700 hover:bg-slate-50">
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-width="2" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm-7 9a7 7 0 0 1 14 0Z"/>
-                            </svg>
-                            {{ app.user.userIdentifier|default('Account') }}
-                        </a>
-                    {% endif %}
-                    <a href="{{ path('app_logout') }}"
-                       class="inline-flex items-center gap-2 rounded-lg px-4 py-2 ring-1 ring-emerald-200 text-emerald-700 hover:bg-emerald-50">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                    <a href="{{ path('app_user') }}" class="flex items-center space-x-2 text-slate-700 hover:text-emerald-600 transition">
+                        <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="7" r="4" stroke-width="2"/>
+                            <path d="M5.5 21a7.5 7.5 0 0 1 13 0" stroke-width="2"/>
                         </svg>
-                        {{ 'navbar.logout'|trans }}
+                        <span>{{ app.user.userIdentifier|default('Profile') }}</span>
+                    </a>
+
+                    <a href="{{ path('app_logout') }}" class="flex items-center space-x-2 text-slate-700 hover:text-red-600 transition">
+                        <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>{{ 'navbar.logout'|trans|default('Logout') }}</span>
                     </a>
                 {% else %}
-                    <a href="{{ path('app_login') }}"
-                       class="inline-flex items-center gap-2 rounded-lg px-4 py-2 ring-1 ring-emerald-200 text-slate-700 hover:bg-emerald-50">
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 3h4a2 2 0 0 1 2 2v4M10 14l5-5m0 0l-5-5m5 5H3"/>
+                    <a href="{{ path('app_login') }}" class="flex items-center space-x-2 text-slate-700 hover:text-emerald-600 transition">
+                        <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v4M10 14l5-5m0 0l-5-5m5 5H3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        {{ 'navbar.login'|trans|default('Login') }}
+                        <span>{{ 'navbar.login'|trans|default('Login') }}</span>
                     </a>
                 {% endif %}
             </div>

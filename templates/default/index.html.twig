@@ -1,98 +1,189 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}{{ 'title'|trans }}{% endblock %}
+{% block title %}WorkTimeFlow – Modern Time Management{% endblock %}
 
 {% block body %}
-    <main class="bg-gray-700 text-white pt-16">
-
-        <!-- Hero Section -->
-        <!-- Hero Section -->
-        <section class="relative bg-black">
-            <!-- Video Background (Centered and Constrained) -->
-            <div class="relative max-w-5xl mx-auto h-[500px]">
-                <video autoplay loop muted playsinline class="w-full h-full object-cover rounded-lg">
-                    <source src="{{ asset('movie/movie.mp4') }}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-
-            <!-- Top Black Bar with Text (inside the max-w-5xl container) -->
-            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-5xl bg-black text-white text-2xl px-6 py-4 rounded-t-lg">
-                {{ 'hero.title'|trans }}
-            </div>
-
-            <!-- Bottom Black Bar with Text -->
-            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-5xl bg-black text-white text-lg px-6 py-4 rounded-b-lg">
-                {{ 'hero.subtitle'|trans }}
-            </div>
-        </section>
 
 
-        <!-- Feature Highlights Section -->
-        <section class="py-16 px-6 bg-gray-900 text-white">
-            <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
 
-                {% for key, feature in features %}
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col justify-between h-full">
-                        <div>
-                            <!-- Use icon from the controller -->
-                            <img src="{{ asset(feature.icon) }}" alt="{{ ('features.' ~ key ~ '.title')|trans }}" class="h-12 mx-auto mb-4 flex-shrink-0">
+    <section class="relative overflow-hidden">
+        <div class="absolute inset-0 -z-10 bg-gradient-to-b from-emerald-50 via-white to-white"></div>
 
-                            <h3 class="text-xl font-bold">{{ ('features.' ~ key ~ '.title')|trans }}</h3>
-                            <p class="mt-2 text-gray-300">
-                                {{ ('features.' ~ key ~ '.description')|trans }}
-                            </p>
-                        </div>
-                        <a href="{{ ('features.' ~ key ~ '.link')|trans }}" target="_blank" class="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition">
-                            {{ 'features.read_more'|trans }}
-                        </a>
-                    </div>
-                {% endfor %}
+        <div class="container-landing pt-16 pb-10 lg:pt-24">
+            <div class="text-center max-w-4xl mx-auto">
+                <div class="pill pill-emerald mb-6">
+                    <img src="{{ asset('images/logo2.svg') }}" alt="Default Logo" class="h-10 w-10 rounded-4xl">
+                    Modern Project Management
+                </div>
 
-            </div>
-        </section>
-
-        <!-- How to Use Section -->
-        <section class="py-16 px-6 bg-gray-700 text-white">
-            <div class="max-w-5xl mx-auto">
-                <h2 class="text-3xl font-bold mb-6 text-left">{{ 'how_to_use.title'|trans }}</h2>
-                <p class="text-lg text-gray-300 mb-12 text-left">
-                    {{ 'how_to_use.description'|trans }}
+                <h1 class="hero-title mb-4">WorkTimeFlow</h1>
+                <p class="hero-sub">
+                    Streamline your workflow with intelligent time tracking, project management, and team collaboration —
+                    all powered by an intuitive command interface.
                 </p>
+            </div>
 
-                {% for section in ['admin_section', 'user_profile_section'] %}
-                    <div class="bg-gray-600 p-6 rounded-lg shadow-lg mb-12">
-                        <h3 class="text-2xl font-bold {{ section == 'admin_section' ? 'text-blue-400' : 'text-green-400' }} mb-4 flex items-center">
-                            <!-- Set correct icon path based on section -->
-                            {% set icon_path = section == 'admin_section' ? 'icons/admin_menu/' : 'icons/profile_menu/' %}
-                            <img src="{{ asset(icon_path ~ section ~ '.svg') }}" alt="{{ ('sections.' ~ section ~ '.title')|trans }}" class="h-6 w-6 mr-2">
-                            {{ ('sections.' ~ section ~ '.title')|trans }}
-                        </h3>
-                        <p class="text-gray-300 mb-6">
-                            {{ ('sections.' ~ section ~ '.description')|trans }}
-                        </p>
+            <!-- video -->
+            <div class="relative mt-12 mb-10 max-w-4xl mx-auto">
+                <div class="card-soft">
+                    <div class="aspect-video rounded-xl relative overflow-hidden bg-black">
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
-                            {% for item in sections[section] %}
-                                <div>
-                                    <h4 class="text-lg font-semibold {{ section == 'admin_section' ? 'text-blue-300' : 'text-green-300' }} flex items-center">
-                                        <!-- Set correct icon path for each section -->
-                                        <img src="{{ asset(icon_path ~ item ~ '.svg') }}" alt="{{ ('sections.' ~ section ~ '.' ~ item ~ '.title')|trans }}" class="h-5 w-5 mr-2">
-                                        {{ ('sections.' ~ section ~ '.' ~ item ~ '.title')|trans }}
-                                    </h4>
-                                    <p class="text-gray-400 text-sm mt-2">
-                                        {{ ('sections.' ~ section ~ '.' ~ item ~ '.description')|trans }}
-                                    </p>
-                                    <a href="#" class="text-blue-400 hover:underline text-sm mt-2 inline-block">{{ 'features.read_more'|trans }}</a>
-                                </div>
-                            {% endfor %}
+                        {# Video element (hidden controls until play) #}
+                        <video
+                                id="demoVideo"
+                                class="absolute inset-0 w-full h-full object-cover rounded-xl"
+                                controls
+                                preload="metadata"
+                        >
+                            <source src="{{ asset('movie/movie.mp4') }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+
+                        {# Overlay Play Button #}
+                        <button
+                                id="playOverlay"
+                                class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white z-10"
+                        >
+                            <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
+                                <svg class="h-12 w-12 ml-1" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-semibold">Product Demo Video</h3>
+                            <p class="text-white/80">See WorkTimeFlow in action</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    const video = document.getElementById("demoVideo");
+                    const overlay = document.getElementById("playOverlay");
+
+                    overlay.addEventListener("click", () => {
+                        video.play();
+                        overlay.style.display = "none";
+                    });
+                });
+            </script>
+
+
+            <!-- CTAs -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/admin" class="cta-primary">
+                    Try Admin Demo
+                    <svg class="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7l7 7-7 7"/></svg>
+                </a>
+                <a href="/profile" class="cta-secondary">
+                    Try User Demo
+                    <svg class="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-white">
+        <div class="container-landing">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-3">Key Features</h2>
+                <p class="text-lg text-slate-600 max-w-2xl mx-auto">Powerful tools designed for modern teams and efficient project management</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="feature group">
+                    <div class="feature-icon"> <!-- terminal -->
+                        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M8 9l3 3-3 3M13 15h3M4 6h16v12H4z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Command Interface</h3>
+                    <p class="text-slate-600">Powerful terminal-style commands for quick actions and data entry.</p>
+                </div>
+
+                <div class="feature group">
+                    <div class="feature-icon">
+                        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M12 8v5l3 3M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Time Tracking</h3>
+                    <p class="text-slate-600">Effortless time registration with natural language input.</p>
+                </div>
+
+                <div class="feature group">
+                    <div class="feature-icon">
+                        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M21 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Team Management</h3>
+                    <p class="text-slate-600">Organize teams, assign projects, and track progress seamlessly.</p>
+                </div>
+
+                <div class="feature group">
+                    <div class="feature-icon">
+                        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M3 3v18h18M7 13v5M11 9v9M15 11v7M19 6v12"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Analytics</h3>
+                    <p class="text-slate-600">Comprehensive insights into productivity and project status.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20">
+        <div class="container-landing">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-3">Command Examples</h2>
+                <p class="text-lg text-slate-600 max-w-2xl mx-auto">Experience the power of natural language commands for instant productivity</p>
+            </div>
+
+            <div class="max-w-4xl mx-auto card p-6 sm:p-8">
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <div class="terminal-line terminal-cmd">
+                            <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M8 9l3 3-3 3M13 15h3M4 6h16v12H4z"/></svg>
+                            <span class="terminal-mark">$</span>
+                            <span class="terminal-text">add client "Hest Test Calendar APS"</span>
+                        </div>
+                        <div class="terminal-line terminal-res">
+                            <svg class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-emerald-800 font-medium">Client "Hest Test Calendar APS" created successfully</span>
                         </div>
                     </div>
-                {% endfor %}
 
+                    <div class="space-y-2">
+                        <div class="terminal-line terminal-cmd">
+                            <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M8 9l3 3-3 3M13 15h3M4 6h16v12H4z"/></svg>
+                            <span class="terminal-mark">$</span>
+                            <span class="terminal-text">add project "Redesign Website" for client "Hest Test Calendar APS"</span>
+                        </div>
+                        <div class="terminal-line terminal-res">
+                            <svg class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-emerald-800 font-medium">Project "Redesign Website" added to Hest Test Calendar APS</span>
+                        </div>
+                    </div>
 
+                    <div class="space-y-2">
+                        <div class="terminal-line terminal-cmd">
+                            <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M8 9l3 3-3 3M13 15h3M4 6h16v12H4z"/></svg>
+                            <span class="terminal-mark">$</span>
+                            <span class="terminal-text">add todo "Find a new name" for website to Redesign Website  </span>
+                        </div>
+                        <div class="terminal-line terminal-res">
+                            <svg class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-emerald-800 font-medium">Todo "Find new name" added to project Redesign Website</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="terminal-line terminal-cmd">
+                            <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M8 9l3 3-3 3M13 15h3M4 6h16v12H4z"/></svg>
+                            <span class="terminal-mark">$</span>
+                            <span class="terminal-text">add time 2h to todo "Find a new name" 26/08</span>
+                        </div>
+                        <div class="terminal-line terminal-res">
+                            <svg class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="text-emerald-800 font-medium">2 hours logged to todo Find a new name on 26/08</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-    </main>
 {% endblock %}
