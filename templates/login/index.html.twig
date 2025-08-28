@@ -1,41 +1,91 @@
+{# templates/login/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-
+{% block title %}Login – WorkTimeFlow{% endblock %}
 
 {% block body %}
-    <!-- #TODO RESTYLE -->
-    {% if error %}
-        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+    <section class="min-h-screen flex items-center justify-center bg-gradient-to-b from-emerald-50 via-white to-white py-16">
+        <div class="w-full max-w-md mx-auto">
 
-    <div class="flex items-center justify-center min-h-screen bg-section_1">
-        <div class="w-full max-w-md p-6 bg-secondary rounded-lg shadow-md">
-            <h2 class="text-2xl font-semibold text-center text-white mb-6"> Login </h2>
-
-            <form action="{{ path('app_login') }}" method="post">
-                <!-- Email  -->
-                <div class="mb-4">
-                    <label for="username" class="block text-sm font-medium text-white mb-1">Email:</label>
-                    <input type="text" id="username" name="_username" value="{{ last_username }}" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            {# Card #}
+            <div class="card-soft p-6 sm:p-8">
+                {# Heading #}
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl font-semibold text-slate-800">Welcome back</h1>
+                    <p class="text-slate-500 text-sm">Sign in to continue</p>
                 </div>
 
-                <!-- Password  -->
-                <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-white mb-1">Password:</label>
-                    <input type="password" id="password" name="_password" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
+                {# Error message #}
+                {% if error %}
+                    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 text-red-700 px-4 py-3 text-sm">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
 
-                <input type="hidden" name="_target_path" value="{{ path('home') }}">
+                <form action="{{ path('app_login') }}" method="post" class="space-y-5">
+                    {# CSRF token #}
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                    {# Optional post-login redirect #}
+                    <input type="hidden" name="_target_path" value="{{ path('home') }}">
 
-                <!-- Submit  -->
-                <button type="submit"
-                        class="w-full py-2.5 text-sm font-medium text-white bg-blue rounded-md hover:bg-blue-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none">
-                    Login
-                </button>
-            </form>
+                    {# Email #}
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-slate-700 mb-1">
+                            Email
+                        </label>
+                        <input
+                                id="username"
+                                name="_username"
+                                type="email"
+                                autocomplete="email"
+                                required
+                                value="{{ last_username }}"
+                                class="block w-full rounded-lg border border-emerald-200 bg-white/90 px-4 py-3 text-slate-800 placeholder-slate-400
+                   focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                placeholder="you@company.com"
+                        >
+                    </div>
+
+                    {# Password #}
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-slate-700 mb-1">
+                            Password
+                        </label>
+                        <input
+                                id="password"
+                                name="_password"
+                                type="password"
+                                autocomplete="current-password"
+                                required
+                                class="block w-full rounded-lg border border-emerald-200 bg-white/90 px-4 py-3 text-slate-800 placeholder-slate-400
+                   focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                placeholder="••••••••"
+                        >
+                    </div>
+
+                    {# Remember / Forgot #}
+                    <div class="flex items-center justify-between">
+                        <label class="inline-flex items-center gap-2 text-sm text-slate-600">
+                            <input type="checkbox" name="_remember_me"
+                                   class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                            Remember me
+                        </label>
+                        <a href="#" class="text-sm text-emerald-700 hover:text-emerald-800">Forgot password?</a>
+                    </div>
+
+                    {# Submit button #}
+                    <button type="submit" class="cta-primary w-full">
+                        Login
+                        <svg class="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M5 12h14m-7-7l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <p class="mt-6 text-center text-sm text-slate-500">
+                    <a href="{{ path('home') }}" class="text-emerald-700 hover:text-emerald-800">Back to home</a>
+                </p>
+            </div>
         </div>
-    </div>
-
+    </section>
 {% endblock %}
