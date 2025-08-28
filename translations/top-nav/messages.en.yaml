@@ -1,0 +1,14 @@
+navbar:
+  brand: "WorkTimeFlow"
+  default_logo_alt: "Default Logo"
+  language_menu: "Language"
+
+  # Short language labels shown in the UI
+  lang:
+    da: "DA"
+    en: "EN"
+
+  # Auth
+  profile_fallback: "Profile"
+  login: "Login"
+  logout: "Logout"

@@ -1,0 +1,43 @@
+default_page:
+  meta:
+    title: "WorkTimeFlow – Moderne tidsstyring"
+
+  hero:
+    pill: "Moderne projektstyring"
+    title: "WorkTimeFlow"
+    subtitle: "Open-source-platform, der effektiviserer dit arbejde med intelligent tidsregistrering, projektstyring og teamsamarbejde — implementér på få minutter med en nem serverinstallation."
+
+  video:
+    title: "Produktdemovideo"
+    subtitle: "Se WorkTimeFlow i aktion"
+    fallback: "Din browser understøtter ikke videotagget."
+
+  cta:
+    admin: "Prøv admin-demo"
+    user: "Prøv bruger-demo"
+
+  features:
+    title: "Nøglefunktioner"
+    subtitle: "Effektive værktøjer designet til moderne teams og effektiv projektstyring"
+    items:
+      command:
+        title: "Kommandogrænseflade"
+        desc: "Kraftfulde terminal-lignende kommandoer til hurtige handlinger og dataindtastning."
+      time:
+        title: "Tidsregistrering"
+        desc: "Nemmere tidsregistrering med naturligt sprog."
+      team:
+        title: "Teamstyring"
+        desc: "Organisér teams, tildel projekter og følg fremdrift problemfrit."
+      analytics:
+        title: "Analyse"
+        desc: "Omfattende indblik i produktivitet og projektstatus."
+
+  commands:
+    title: "Kommandoeksempler"
+    subtitle: "Oplev kraften i naturlige sprogkommandoer for øjeblikkelig produktivitet"
+    responses:
+      client_created: "Kunden \"%client%\" blev oprettet"
+      project_added: "Projektet \"%project%\" blev tilføjet til %client%"
+      todo_added: "Todoen \"%todo%\" blev tilføjet til projektet %project%"
+      time_logged: "%hours% timer registreret på todo %todo% den %date%"

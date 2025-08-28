@@ -1,0 +1,43 @@
+default_page:
+  meta:
+    title: "WorkTimeFlow – Modern Time Management"
+
+  hero:
+    pill: "Modern Project Management"
+    title: "WorkTimeFlow"
+    subtitle: "Open-source platform to streamline your workflow with intelligent time tracking, project management, and team collaboration — deploy in minutes with an easy server install."
+
+  video:
+    title: "Product Demo Video"
+    subtitle: "See WorkTimeFlow in action"
+    fallback: "Your browser does not support the video tag."
+
+  cta:
+    admin: "Try Admin Demo"
+    user: "Try User Demo"
+
+  features:
+    title: "Key Features"
+    subtitle: "Powerful tools designed for modern teams and efficient project management"
+    items:
+      command:
+        title: "Command Interface"
+        desc: "Powerful terminal-style commands for quick actions and data entry."
+      time:
+        title: "Time Tracking"
+        desc: "Effortless time registration with natural language input."
+      team:
+        title: "Team Management"
+        desc: "Organize teams, assign projects, and track progress seamlessly."
+      analytics:
+        title: "Analytics"
+        desc: "Comprehensive insights into productivity and project status."
+
+  commands:
+    title: "Command Examples"
+    subtitle: "Experience the power of natural language commands for instant productivity"
+    responses:
+      client_created: "Client \"%client%\" created successfully"
+      project_added: "Project \"%project%\" added to %client%"
+      todo_added: "Todo \"%todo%\" added to project %project%"
+      time_logged: "%hours% hours logged to todo %todo% on %date%"

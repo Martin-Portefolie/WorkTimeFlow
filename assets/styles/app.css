@@ -9,6 +9,9 @@
         display: flex;
         flex-direction: column;
     }
+    :root {
+        --radius: 0.5rem; /* Tailwind default for lg (8px) */
+    }
 
     main { flex: 1; }
 }
@@ -18,11 +21,16 @@
     /* wrappers */
     .container-landing { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
     .hero-title { @apply text-5xl lg:text-7xl font-extrabold leading-tight bg-gradient-to-r from-slate-900 via-emerald-800 to-teal-700 bg-clip-text text-transparent; }
+    .hero-title-light {
+        @apply text-5xl lg:text-7xl font-extrabold leading-tight
+        bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-600
+        bg-clip-text text-transparent;
+    }
     .hero-sub { @apply text-lg lg:text-2xl text-slate-600 max-w-3xl mx-auto; }
 
     /* pills / badges */
     .pill { @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium; }
-    .pill-emerald { @apply bg-emerald-50 border border-emerald-200 text-emerald-700; }
+    .pill-emerald { @apply bg-emerald-200 border border-emerald-200 text-emerald-700; }
 
     /* cards */
     .card { @apply bg-white rounded-2xl ring-1 ring-slate-900/5 shadow-card; }

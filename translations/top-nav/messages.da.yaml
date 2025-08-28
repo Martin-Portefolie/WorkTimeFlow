@@ -1,0 +1,14 @@
+navbar:
+  brand: "WorkTimeFlow" # keep brand as-is, or translate if you prefer
+  default_logo_alt: "Standardlogo"
+  language_menu: "Sprog"
+
+  # Short language labels shown in the UI
+  lang:
+    da: "DA"
+    en: "EN"
+
+  # Auth
+  profile_fallback: "Profil"
+  login: "Log ind"
+  logout: "Log ud"

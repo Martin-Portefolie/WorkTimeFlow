@@ -1,48 +1,131 @@
 {# templates/components/_navbar.html.twig #}
 {% set company = get_company()|default(null) %}
+{% set current_locale = app.request.locale|lower %}
+{% set is_da = current_locale starts with 'da' %}
+{% set active_locale = is_da ? 'da' : 'en' %}
+{% set other_locale  = is_da ? 'en' : 'da' %}
 
-<header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b" style="border-color: var(--border)">
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-b-1 border-emerald-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between py-3">
 
             {# Left: Logo + Text #}
             <a href="{{ path('home') }}" class="flex items-center space-x-3">
                 {% if company and company.logo %}
-                    <img src="{{ asset(company.logo) }}" alt="{{ company.name }}" class="h-10 w-10 rounded-lg object-cover ">
-                    <span class="text-xl sm:text-2xl font-bold text-slate-800">{{ company.name }}</span>
+                    <img src="{{ asset(company.logo) }}" alt="{{ company.name }}" class="h-10 w-10 rounded-lg object-cover">
+                    <span class="text-xl sm:text-2xl font-bold hero-title-light">{{ company.name }}</span>
                 {% else %}
-                    <img src="{{ asset('images/logo2.svg') }}" alt="Default Logo" class="h-10 w-10 rounded-lg">
-                    <span class="text-xl sm:text-2xl font-bold text-slate-800">WorkTimeFlow</span>
+                    <img src="{{ asset('images/logo2.svg') }}" alt="{{ 'navbar.default_logo_alt'|trans }}" class="h-10 w-10 rounded-lg">
+                    <span class="text-xl sm:text-2xl font-bold hero-title-light">{{ 'navbar.brand'|trans }}</span>
                 {% endif %}
             </a>
 
-            {# Right: Profile / Login / Logout #}
-            <div class="flex items-center space-x-4">
+            {# Right: Language + Auth #}
+            <div class="flex items-center gap-5">
+
+                {# ===== Language dropdown (Stimulus) ===== #}
+                <div data-controller="top-nav--lang-dropdown" class="relative">
+                    <button
+                            type="button"
+                            data-action="
+                          click->top-nav--lang-dropdown#toggle
+                          keydown.enter->top-nav--lang-dropdown#toggle
+                          keydown.space->top-nav--lang-dropdown#toggle
+                        "
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            data-top-nav--lang-dropdown-target="button"
+                            class="inline-flex items-center gap-2 rounded-lg  px-2.5 py-1.5 border border-emerald-300  bg-slate-50 hover:bg-emerald-50"
+                            aria-label="{{ 'navbar.language_menu'|trans }}"
+                    >
+                        {# Active flag #}
+                        {% if active_locale == 'da' %}
+                            {# DK flag #}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512 512" aria-hidden="true">
+                                <mask id="mask-dk"><circle cx="256" cy="256" r="256" fill="#fff"/></mask>
+                                <g mask="url(#mask-dk)">
+                                    <path fill="#d80027" d="M0 0h133.6l32.7 20.3l34-20.3H512v222.6L491.4 256l20.6 33.4V512H200.3l-31.7-20.4l-35 20.4H0V289.4l29.4-33L0 222.7z"/>
+                                    <path fill="#eee" d="M133.6 0v222.6H0v66.8h133.6V512h66.7V289.4H512v-66.8H200.3V0z"/>
+                                </g>
+                            </svg>
+                            <span class="text-sm">{{ 'navbar.lang.da'|trans }}</span>
+                        {% else %}
+                            {# EN flag #}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512 512" aria-hidden="true">
+                                <mask id="mask-en"><circle cx="256" cy="256" r="256" fill="#fff"/></mask>
+                                <g mask="url(#mask-en)">
+                                    <path fill="#eee" d="M256 0L0 256v64l32 32l-32 32v128l22-8l23 8h23l54-32l54 32h32l48-32l48 32h32l54-32l54 32h68l-8-22l8-23v-23l-32-54l32-54v-32l-32-48l32-48v-32l-32-54l32-54V0z"/>
+                                    <path fill="#d80027" d="M224 64v64h160l64-64zm0 128l32 64l-48 48v208h96V304h208v-96H304l16-16zM0 320v64h128l-64 64H0v64h45l131-131v-45l16-16zm336 16l176 176v-45L381 336Z"/>
+                                    <path fill="#0052b4" d="M0 0v256h256V0zm512 68L404 176h108zM404 336l108 108V336zm-228 68L68 512h108zm160 0v108h108z"/>
+                                </g>
+                            </svg>
+                            <span class="text-sm">{{ 'navbar.lang.en'|trans }}</span>
+                        {% endif %}
+                        <svg class="h-4 w-4 text-slate-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 011.08 1.04l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+
+                    <div
+                            data-top-nav--lang-dropdown-target="menu"
+                            class="absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg ring-1 ring-slate-200 p-1 hidden"
+                            role="menu"
+                            aria-label="{{ 'navbar.language_menu'|trans }}"
+                    >
+                        {# Only show the other language in the menu #}
+                        {% if other_locale == 'da' %}
+                            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'_locale': 'da'})) }}"
+                               class="flex items-center gap-2 px-2.5 py-1.5 rounded hover:bg-slate-50 text-sm"
+                               role="menuitem">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512 512" aria-hidden="true">
+                                    <mask id="mask-dk"><circle cx="256" cy="256" r="256" fill="#fff"/></mask>
+                                    <g mask="url(#mask-dk)">
+                                        <path fill="#d80027" d="M0 0h133.6l32.7 20.3l34-20.3H512v222.6L491.4 256l20.6 33.4V512H200.3l-31.7-20.4l-35 20.4H0V289.4l29.4-33L0 222.7z"/>
+                                        <path fill="#eee" d="M133.6 0v222.6H0v66.8h133.6V512h66.7V289.4H512v-66.8H200.3V0z"/>
+                                    </g>
+                                </svg>
+                                <span class="text-sm">{{ 'navbar.lang.da'|trans }}</span>
+                            </a>
+                        {% else %}
+                            <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all | merge({'_locale': 'en'})) }}"
+                               class="flex items-center gap-2 px-2.5 py-1.5 rounded hover:bg-slate-50 text-sm"
+                               role="menuitem">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512 512" aria-hidden="true">
+                                    <mask id="mask-en"><circle cx="256" cy="256" r="256" fill="#fff"/></mask>
+                                    <g mask="url(#mask-en)">
+                                        <path fill="#eee" d="M256 0L0 256v64l32 32l-32 32v128l22-8l23 8h23l54-32l54 32h32l48-32l48 32h32l54-32l54 32h68l-8-22l8-23v-23l-32-54l32-54v-32l-32-48l32-48v-32l-32-54l32-54V0z"/>
+                                        <path fill="#d80027" d="M224 64v64h160l64-64zm0 128l32 64l-48 48v208h96V304h208v-96H304l16-16zM0 320v64h128l-64 64H0v64h45l131-131v-45l16-16zm336 16l176 176v-45L381 336Z"/>
+                                        <path fill="#0052b4" d="M0 0v256h256V0zm512 68L404 176h108zM404 336l108 108V336zm-228 68L68 512h108zm160 0v108h108z"/>
+                                    </g>
+                                </svg>
+                                <span class="text-sm">{{ 'navbar.lang.en'|trans }}</span>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# ===== Auth ===== #}
                 {% if app.user %}
-                    <a href="{{ path('app_user') }}" class="flex items-center space-x-2 text-slate-700 hover:text-emerald-600 transition">
+                    <a href="{{ path('app_user') }}" class="flex items-center gap-2 text-slate-700 hover:text-emerald-600 transition">
                         <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <circle cx="12" cy="7" r="4" stroke-width="2"/>
                             <path d="M5.5 21a7.5 7.5 0 0 1 13 0" stroke-width="2"/>
                         </svg>
-                        <span>{{ app.user.userIdentifier|default('Profile') }}</span>
+                        <span>{{ app.user.userIdentifier|default('navbar.profile_fallback'|trans) }}</span>
                     </a>
-
-                    <a href="{{ path('app_logout') }}" class="flex items-center space-x-2 text-slate-700 hover:text-red-600 transition">
+                    <a href="{{ path('app_logout') }}" class="flex items-center gap-2 text-slate-700 hover:text-red-600 transition">
                         <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         <span>{{ 'navbar.logout'|trans|default('Logout') }}</span>
                     </a>
                 {% else %}
-                    <a href="{{ path('app_login') }}" class="flex items-center space-x-2 text-slate-700 hover:text-emerald-600 transition">
-                        <svg class="h-5 w-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M15 3h4a2 2 0 0 1 2 2v4M10 14l5-5m0 0l-5-5m5 5H3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                    <a href="{{ path('app_login') }}" class="flex items-center gap-2 rounded-lg  px-2.5 py-1.5 border border-emerald-300  bg-slate-50 hover:bg-emerald-50 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21v-2h7V5h-7V3h7q.825 0 1.413.588T21 5v14q0 .825-.587 1.413T19 21zm-2-4l-1.375-1.45l2.55-2.55H3v-2h8.175l-2.55-2.55L10 7l5 5z"/></svg>
                         <span>{{ 'navbar.login'|trans|default('Login') }}</span>
                     </a>
                 {% endif %}
             </div>
-
         </div>
     </div>
 </header>
