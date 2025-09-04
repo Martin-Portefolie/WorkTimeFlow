@@ -33,6 +33,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * @return array<int,array{id:int,email:string,username: ?string,roles: array<int,string>}>
+     */
+    public function fetchListRows(int $limit = 50): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u.id AS id, u.email AS email, u.username AS username, u.roles AS roles')
+            ->orderBy('u.id', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult(); // roles comes back as PHP array with Doctrine JSON type
+    }
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */

@@ -1,0 +1,35 @@
+<section
+        class="rounded-2xl bg-[#0e1116] text-zinc-100 font-mono shadow-sm  border-zinc-800/80"
+        role="region"
+        aria-label="Admin terminal"
+        data-controller="terminal--terminal"
+        data-action="keydown@window->terminal--terminal#hotkeys"
+>
+    <div class=" px-4 py-3 flex items-center gap-2">
+        <span class="text-emerald-400">${{ app.user ? app.user.userIdentifier : 'guest'  }}</span>
+        <input
+                type="text"
+                placeholder="Type a command… try: help"
+                class="flex-1 bg-transparent outline-none placeholder:text-zinc-500 text-zinc-100"
+                autocomplete="off"
+                data-terminal--terminal-target="input"
+                data-action="
+  keydown.enter->terminal--terminal#submit
+  keydown.esc->terminal--terminal#onEsc
+  focus->terminal--terminal#focused
+  blur->terminal--terminal#blurred
+">
+        <button
+                class="px-3 py-1.5 rounded-lg bg-emerald-500/90 hover:bg-emerald-500 text-black text-xs font-semibold"
+                data-action="terminal--terminal#submit"
+                type="button">
+            Run
+        </button>
+    </div>
+
+    <div class="px-4 py-3 text-xs text-zinc-300 space-y-1"
+         data-terminal--terminal-target="output"
+         aria-live="polite">
+        <div>Type <span class="text-emerald-400">help</span> to see available commands.</div>
+    </div>
+</section>
