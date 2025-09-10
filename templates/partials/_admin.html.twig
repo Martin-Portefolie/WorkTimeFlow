@@ -1,35 +1,89 @@
 <section
-        class="rounded-2xl bg-[#0e1116] text-zinc-100 font-mono shadow-sm  border-zinc-800/80"
+        class="terminal-shell"
         role="region"
         aria-label="Admin terminal"
         data-controller="terminal--terminal"
         data-action="keydown@window->terminal--terminal#hotkeys"
+        data-terminal--terminal-run-url-value="{{ path('admin_terminal_run') }}"
 >
-    <div class=" px-4 py-3 flex items-center gap-2">
-        <span class="text-emerald-400">${{ app.user ? app.user.userIdentifier : 'guest'  }}</span>
-        <input
-                type="text"
-                placeholder="Type a command… try: help"
-                class="flex-1 bg-transparent outline-none placeholder:text-zinc-500 text-zinc-100"
-                autocomplete="off"
-                data-terminal--terminal-target="input"
-                data-action="
-  keydown.enter->terminal--terminal#submit
-  keydown.esc->terminal--terminal#onEsc
-  focus->terminal--terminal#focused
-  blur->terminal--terminal#blurred
-">
-        <button
-                class="px-3 py-1.5 rounded-lg bg-emerald-500/90 hover:bg-emerald-500 text-black text-xs font-semibold"
-                data-action="terminal--terminal#submit"
-                type="button">
-            Run
-        </button>
-    </div>
+    <div class="flex min-h-[120px] max-h-[300px] items-stretch">
 
-    <div class="px-4 py-3 text-xs text-zinc-300 space-y-1"
-         data-terminal--terminal-target="output"
-         aria-live="polite">
-        <div>Type <span class="text-emerald-400">help</span> to see available commands.</div>
+        {# === LEFT: Terminal area (75%) === #}
+        <div class="basis-3/4 min-w-0 border-r border-zinc-800/70 flex flex-col">
+            <!-- top row -->
+            <div class="px-4 py-3 flex items-center gap-2 shrink-0">
+        <span class="text-emerald-400">
+          ${{ app.user ? app.user.userIdentifier : 'guest' }}
+        </span>
+                <input
+                        type="text"
+                        placeholder="Type a command… hit: ENTER"
+                        class="flex-1 bg-transparent outline-none placeholder:text-zinc-500 text-zinc-100 text-[15px]"
+                        autocomplete="off"
+                        data-terminal--terminal-target="input"
+                        data-action="
+            keydown.enter->terminal--terminal#submit
+            keydown.esc->terminal--terminal#onEsc
+            focus->terminal--terminal#focused
+            blur->terminal--terminal#blurred
+          "
+                >
+            </div>
+
+            <!-- top divider -->
+            <div class="h-px bg-zinc-800/70 shrink-0"></div>
+
+            <!-- scrollable output -->
+            <div class="flex-1 overflow-y-auto px-4 py-3 text-xs space-y-1
+            bg-[#121418] text-zinc-300"
+                 data-terminal--terminal-target="output"
+                 aria-live="polite">
+                {# output lines are injected here by Stimulus #}
+            </div>
+
+
+            <!-- bottom divider -->
+            <div class="h-px bg-zinc-800/70 shrink-0"></div>
+
+            <!-- footer hint (fixed at bottom) -->
+            <div class="px-4 py-2 text-[11px] text-zinc-400 shrink-0">
+                Type <span class="text-emerald-400">help</span> to see available commands.
+            </div>
+        </div>
+
+        {# === MIDDLE: Blue tile (15%) — Press Shift + T === #}
+        <button
+                type="button"
+                class="group basis-[15%] shrink-0 grid place-items-center relative overflow-hidden
+             bg-blue-500/90 hover:bg-blue-600 transition-colors"
+                data-action="click->terminal--terminal#focusTile"
+                aria-label="Press Shift + T to enter the terminal"
+        >
+      <span class="text-white font-semibold select-none leading-tight text-center">
+        Press<br/>Shift + T
+      </span>
+            <span class="absolute bottom-2 inset-x-0 text-center md:text-[11px] text-[10px] leading-4 text-blue-200
+                   opacity-0 group-hover:opacity-100 transition whitespace-normal px-2">
+        to enter the terminal
+      </span>
+        </button>
+
+        {# === RIGHT: Red tile (10%) — Press ESC === #}
+        <button
+                type="button"
+                class="group basis-[10%] shrink-0 grid place-items-center relative overflow-hidden
+             bg-red-500/90 hover:bg-red-600 transition-colors"
+                data-action="click->terminal--terminal#blurTile"
+                aria-label="Press Esc to leave the terminal"
+        >
+      <span class="text-white font-semibold select-none leading-tight text-center">
+        Press<br/>ESC
+      </span>
+            <span class="absolute bottom-2 inset-x-0 text-center md:text-[11px] text-[10px] leading-4 text-red-200
+                   opacity-0 group-hover:opacity-100 transition whitespace-normal px-2">
+        leave<br/>terminal
+      </span>
+        </button>
+
     </div>
 </section>

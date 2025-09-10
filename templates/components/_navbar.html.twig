@@ -5,7 +5,10 @@
 {% set active_locale = is_da ? 'da' : 'en' %}
 {% set other_locale  = is_da ? 'en' : 'da' %}
 
-<header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-b-1 border-emerald-300">
+<header
+        class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-b-1 border-emerald-300"
+        data-controller="top-nav--layout-nav"
+>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between py-3">
 

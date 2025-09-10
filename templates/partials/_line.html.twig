@@ -1,0 +1,12 @@
+<div class="flex items-start gap-2">
+    {% if success %}
+        <span class="text-green-400 font-mono">&gt;</span>
+    {% else %}
+        <span class="text-red-400 font-mono">&gt;</span>
+    {% endif %}
+
+    <div class="flex-1 space-y-1">
+        <div class="text-zinc-200 font-mono text-sm">{{ input }}</div>
+        <div class="text-zinc-400 text-xs">{{ output|raw }}</div>
+    </div>
+</div>
