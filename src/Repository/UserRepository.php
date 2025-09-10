@@ -34,17 +34,105 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * @return array<int,array{id:int,email:string,username: ?string,roles: array<int,string>}>
+     * Lightweight listing for terminal output (id, email, username, roles),
+     * with optional case-insensitive search on email/username.
+     *
+     * @return array<int,array{id:int,email:string,username:string,roles:array<int,string>}>
      */
-    public function fetchListRows(int $limit = 50): array
+    public function fetchListRowsSearched(int $limit = 50, ?string $q = null): array
     {
-        return $this->createQueryBuilder('u')
-            ->select('u.id AS id, u.email AS email, u.username AS username, u.roles AS roles')
+        $qb = $this->createQueryBuilder('u')
+            ->select(
+                'u.id AS id',
+                'u.email AS email',
+                // Normalize NULL -> '' at the DB layer
+                "COALESCE(u.username, '') AS username",
+                'u.roles AS roles'
+            )
             ->orderBy('u.id', 'ASC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getArrayResult(); // roles comes back as PHP array with Doctrine JSON type
+            ->setMaxResults($limit);
+
+        if ($q !== null && $q !== '') {
+            $qb->andWhere('LOWER(u.email) LIKE :q OR LOWER(u.username) LIKE :q')
+                ->setParameter('q', '%'.mb_strtolower($q).'%');
+        }
+
+        $rows = $qb->getQuery()->getArrayResult();
+
+        return $this->normalizeListRows($rows);
     }
+
+    /**
+     * Find by id OR exact email OR exact username (email/username are case-insensitive).
+     */
+    public function findOneByIdEmailOrUsername(string $idEmailOrUsername): ?User
+    {
+        // Numeric → treat as id
+        if (ctype_digit($idEmailOrUsername)) {
+            $u = $this->find((int) $idEmailOrUsername);
+            if ($u instanceof User) {
+                return $u;
+            }
+        }
+
+        $key = mb_strtolower($idEmailOrUsername);
+
+        // Exact email (case-insensitive)
+        $qb = $this->createQueryBuilder('u')
+            ->where('LOWER(u.email) = :k')
+            ->setParameter('k', $key)
+            ->setMaxResults(1);
+
+        $u = $qb->getQuery()->getOneOrNullResult();
+        if ($u instanceof User) {
+            return $u;
+        }
+
+        // Exact username (case-insensitive)
+        $qb2 = $this->createQueryBuilder('u')
+            ->where('LOWER(u.username) = :k')
+            ->setParameter('k', $key)
+            ->setMaxResults(1);
+
+        return $qb2->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * Normalize list-row shapes so callers always get strict scalars:
+     * - id: int
+     * - email: string
+     * - username: string (never null)
+     * - roles: string[]
+     *
+     * @param array<int,array<string,mixed>> $rows
+     * @return array<int,array{id:int,email:string,username:string,roles:array<int,string>}>
+     */
+    private function normalizeListRows(array $rows): array
+    {
+        foreach ($rows as &$r) {
+            // id
+            $r['id'] = (int) $r['id'];
+
+            // email
+            $r['email'] = trim((string) $r['email']);
+
+            // username (COALESCE already ensured '', but normalize anyway)
+            $r['username'] = trim((string) ($r['username'] ?? ''));
+
+            // roles: ensure array<string>
+            if (!is_array($r['roles'])) {
+                $decoded = json_decode((string) $r['roles'], true);
+                $r['roles'] = is_array($decoded) ? $decoded : [];
+            }
+            $r['roles'] = array_values(array_unique(array_map('strval', $r['roles'])));
+        }
+        unset($r);
+
+        /** @var array<int,array{id:int,email:string,username:string,roles:array<int,string>}> $rows */
+        return $rows;
+    }
+
+
 
     //    /**
     //     * @return User[] Returns an array of User objects
