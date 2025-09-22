@@ -5,6 +5,10 @@
         data-controller="terminal--terminal"
         data-action="keydown@window->terminal--terminal#hotkeys"
         data-terminal--terminal-run-url-value="{{ path('admin_terminal_run') }}"
+        {# pass role-aware allowlist to the controller #}
+        data-terminal--terminal-allowlist-value='{{ (is_granted("ROLE_ADMIN")
+        ? ["help","ping","users:list","users:show"]
+        : ["help","ping"]) | json_encode | raw }}'
 >
     <div class="flex min-h-[120px] max-h-[300px] items-stretch">
 
@@ -57,10 +61,10 @@
                 class="group basis-[15%] shrink-0 grid place-items-center relative overflow-hidden
              bg-blue-500/90 hover:bg-blue-600 transition-colors"
                 data-action="click->terminal--terminal#focusTile"
-                aria-label="Press Shift + T to enter the terminal"
+                aria-label="Press Shift + . to enter the terminal"
         >
       <span class="text-white font-semibold select-none leading-tight text-center">
-        Press<br/>Shift + T
+        Press<br/><span><b>⌘|Ctrl</b> <span> + <span><b>.</b></span>
       </span>
             <span class="absolute bottom-2 inset-x-0 text-center md:text-[11px] text-[10px] leading-4 text-blue-200
                    opacity-0 group-hover:opacity-100 transition whitespace-normal px-2">
@@ -84,6 +88,28 @@
         leave<br/>terminal
       </span>
         </button>
-
+    </div>
+    {# Command palette (hidden by default) #}
+    <div
+            class="fixed inset-0 z-[60] hidden"
+            data-terminal--terminal-target="palette"
+    >
+        <div class="absolute inset-0 bg-black/50" data-action="click->terminal--terminal#closePalette"></div>
+        <div class="absolute left-1/2 top-20 -translate-x-1/2 w-[520px] max-w-[92vw]
+                rounded-xl bg-[#0e1116] ring-1 ring-zinc-800 shadow-xl overflow-hidden">
+            <div class="px-3 py-2 border-b border-zinc-800">
+                <input
+                        type="text"
+                        placeholder="Search commands…"
+                        class="w-full bg-transparent outline-none placeholder:text-zinc-500 text-zinc-100 text-sm"
+                        data-terminal--terminal-target="paletteInput"
+                        data-action="input->terminal--terminal#filterPalette keydown.enter->terminal--terminal#pickFirstPalette keydown.esc->terminal--terminal#closePalette"
+                >
+            </div>
+            <div class="max-h-72 overflow-y-auto text-sm"
+                 data-terminal--terminal-target="paletteList">
+                <!-- items injected -->
+            </div>
+        </div>
     </div>
 </section>
