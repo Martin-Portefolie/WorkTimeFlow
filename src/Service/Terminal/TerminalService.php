@@ -31,7 +31,8 @@ final class TerminalService
         // Allowlists (expand as you add more)
         $adminCommands = [
             'help', 'ping',
-            'users:list', 'users:show', // routed to UserTerminalService
+            'users:list', 'users:show',
+            'users:add',
         ];
         $userCommands  = ['help', 'ping'];
 
@@ -64,6 +65,7 @@ final class TerminalService
             // Users domain
             'users:list' => $this->userModule->listCommand($tokens),
             'users:show' => $this->userModule->showCommand($tokens),
+            'users:add'  => $this->userModule->addCommand($tokens),
 
             default      => ['output' => 'Unhandled admin command', 'success' => false],
         };

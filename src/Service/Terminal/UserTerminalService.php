@@ -2,6 +2,13 @@
 namespace App\Service\Terminal;
 
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use App\Entity\User;
+
 
 /**
  * All user-related terminal commands live here.
@@ -9,7 +16,13 @@ use App\Repository\UserRepository;
  */
 final class UserTerminalService
 {
-    public function __construct(private UserRepository $users) {}
+    public function __construct(
+        private UserRepository $users,
+        private EntityManagerInterface $em,
+        private UserPasswordHasherInterface $hasher,
+        private MailerInterface $mailer,
+        private UrlGeneratorInterface $urls,
+    ){}
 
     /**
      * users:list [limit] [--q=search]
@@ -92,6 +105,97 @@ final class UserTerminalService
         );
 
         return ['output' => $out, 'success' => true];
+    }
+
+    /**
+     * users:add --email=... [--username=...] [--password=...] [--roles=ROLE_USER,ROLE_ADMIN]
+     *
+     * - Generates a random password if --password is omitted (8 hex chars).
+     * - Default roles to ROLE_USER if --roles omitted.
+     * - Sends credentials email using templates/emails/userinfo.html.twig.
+     */
+    public function addCommand(array $tokens): array
+    {
+        ['args'=>$args, 'flags'=>$f] = ArgsParser::parse($tokens);
+
+        $email    = isset($f['email']) ? trim((string)$f['email']) : '';
+        $username = isset($f['username']) ? trim((string)$f['username']) : '';
+        $password = isset($f['password']) ? (string)$f['password'] : null;
+        $rolesStr = isset($f['roles']) ? (string)$f['roles'] : null;
+
+        // Basic validation
+        if ($email === '') {
+            return ['output' => 'Usage: users:add --email=alice@example.com [--username=Alice] [--password=Pass123] [--roles=ROLE_USER,ROLE_ADMIN]', 'success' => false];
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['output' => 'Invalid email format.', 'success' => false];
+        }
+
+        // Ensure email is unique
+        if ($this->users->findOneBy(['email' => $email])) {
+            return ['output' => 'Email already exists.', 'success' => false];
+        }
+
+        // Roles
+        $roles = ['ROLE_USER'];
+        if ($rolesStr !== null && $rolesStr !== '') {
+            $roles = array_values(array_unique(array_filter(array_map('trim', explode(',', $rolesStr)))));
+            if (!$roles) { $roles = ['ROLE_USER']; }
+        }
+
+        // Password
+        $plain = $password ?: bin2hex(random_bytes(4)); // 8 hex chars
+        $user  = new User();
+        $user->setEmail($email);
+        if ($username !== '') {
+            $user->setUsername($username);
+        }
+        $user->setRoles($roles);
+
+        // Hash & set password
+        $user->setPassword($this->hasher->hashPassword($user, $plain));
+
+        try {
+            $this->em->persist($user);
+            $this->em->flush();
+        } catch (UniqueConstraintViolationException) {
+            return ['output' => 'Email already exists (unique constraint).', 'success' => false];
+        } catch (\Throwable $e) {
+            return ['output' => 'Failed to create user: '.$e->getMessage(), 'success' => false];
+        }
+
+        // Prepare & send email (reuse your existing template)
+        $loginUrl = $this->urls->generate('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $emailMsg = (new TemplatedEmail())
+            ->from('no-reply@worktimeflow.local') // or your real domain
+            ->to($user->getEmail())
+            ->subject('Your WORKTIMEFLOW account')
+            ->htmlTemplate('emails/userinfo.html.twig')
+            ->context([
+                'username'   => (string) $user->getUsername(),
+                'user_email' => (string) $user->getEmail(),
+                'password'   => $plain,
+                'login_url'  => $loginUrl,
+            ]);
+
+        try {
+            $this->mailer->send($emailMsg);
+            $sent = true;
+        } catch (\Throwable $e) {
+            $sent = false;
+        }
+
+        $msg = sprintf(
+            'User created: id=%d, email=%s%s. %s',
+            $user->getId(),
+            $user->getEmail(),
+            $user->getUsername() ? ', username='.$user->getUsername() : '',
+            $sent ? 'Email sent.' : 'Email failed to send.'
+        );
+
+        // Deliberately NOT printing the password back into the terminal for safety.
+        return ['output' => $msg, 'success' => true];
     }
 
     /**
