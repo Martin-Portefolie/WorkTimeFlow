@@ -5,6 +5,7 @@ use App\Repository\UserRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Random\RandomException;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -24,6 +25,7 @@ final class UserTerminalService
         private UserPasswordHasherInterface $hasher,
         private MailerInterface $mailer,
         private UrlGeneratorInterface $urls,
+        private Security $security,
     ){}
 
     /**
@@ -58,7 +60,7 @@ final class UserTerminalService
             static fn (array $r) => sprintf(
                 '%d | %s | %s | %s',
                 $r['id'],
-                $r['emails'],
+                $r['email'],
                 ($r['username'] ?? ''),
                 implode(',', $r['roles'])
             ),
@@ -121,57 +123,58 @@ final class UserTerminalService
     {
         ['args'=>$args, 'flags'=>$f] = ArgsParser::parse($tokens);
 
-        $email    = isset($f['emails']) ? trim((string)$f['emails']) : '';
-        $username = isset($f['username']) ? trim((string)$f['username']) : '';
+        // Flags + aliases
+        $email    = isset($f['email']) ? trim((string)$f['email']) : '';
+        $username = isset($f['username']) ? trim((string)$f['username']) : null;
+        if ($username === null && isset($f['name'])) {
+            $username = trim((string)$f['name']); // alias
+        }
         $password = isset($f['password']) ? (string)$f['password'] : null;
-        $rolesStr = isset($f['roles']) ? (string)$f['roles'] : null;
+        $rolesStr = $f['roles'] ?? $f['role'] ?? null;        // accept both
 
-        // Basic validation
         if ($email === '') {
-            return ['output' => 'Usage: users:add --emails=alice@example.com [--username=Alice] [--password=Pass123] [--roles=ROLE_USER,ROLE_ADMIN]', 'success' => false];
+            return ['output' => 'Usage: users:add --email=alice@example.com [--username=Alice|--name=Alice] [--password=Pass123] [--roles=ROLE_USER,ROLE_ADMIN]', 'success' => false];
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return ['output' => 'Invalid emails format.', 'success' => false];
+            return ['output' => 'Invalid email format.', 'success' => false];
+        }
+        if ($this->users->findOneBy(['email' => $email])) {
+            return ['output' => 'Email already exists.', 'success' => false];
         }
 
-        // Ensure emails is unique
-        if ($this->users->findOneBy(['emails' => $email])) {
-            return ['output' => 'Email already exists.', 'success' => false];
+        // Derive username if missing/empty (ensure NOT NULL)
+        if ($username === null || $username === '') {
+            $local = strstr($email, '@', true) ?: $email;
+            $username = $local;
         }
 
         // Roles
         $roles = ['ROLE_USER'];
         if ($rolesStr !== null && $rolesStr !== '') {
-            $roles = array_values(array_unique(array_filter(array_map('trim', explode(',', $rolesStr)))));
-            if (!$roles) { $roles = ['ROLE_USER']; }
+            $roles = $this->normalizeRoles((string)$rolesStr) ?: ['ROLE_USER'];
         }
 
         // Password
         $plain = $password ?: bin2hex(random_bytes(4)); // 8 hex chars
-        $user  = new User();
-        $user->setEmail($email);
-        if ($username !== '') {
-            $user->setUsername($username);
-        }
-        $user->setRoles($roles);
 
-        // Hash & set password
+        // Create
+        $user = new User();
+        $user->setEmail($email);
+        $user->setUsername($username); // ← always set
+        $user->setRoles($roles);
         $user->setPassword($this->hasher->hashPassword($user, $plain));
 
         try {
             $this->em->persist($user);
             $this->em->flush();
-        } catch (UniqueConstraintViolationException) {
-            return ['output' => 'Email already exists (unique constraint).', 'success' => false];
         } catch (\Throwable $e) {
             return ['output' => 'Failed to create user: '.$e->getMessage(), 'success' => false];
         }
 
-        // Prepare & send emails (reuse your existing template)
+        // Email
         $loginUrl = $this->urls->generate('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
-
         $emailMsg = (new TemplatedEmail())
-            ->from('no-reply@worktimeflow.local') // or your real domain
+            ->from('no-reply@worktimeflow.local')
             ->to($user->getEmail())
             ->subject('Your WORKTIMEFLOW account')
             ->htmlTemplate('admin/emails/user_created.html.twig')
@@ -182,22 +185,18 @@ final class UserTerminalService
                 'login_url'  => $loginUrl,
             ]);
 
-        try {
-            $this->mailer->send($emailMsg);
-            $sent = true;
-        } catch (\Throwable $e) {
-            $sent = false;
-        }
+        $sent = false;
+        try { $this->mailer->send($emailMsg); $sent = true; } catch (\Throwable $e) {}
 
         $msg = sprintf(
-            'User created: id=%d, emails=%s%s. %s',
+            'User created: id=%d, email=%s, username=%s, roles=%s. %s',
             $user->getId(),
             $user->getEmail(),
-            $user->getUsername() ? ', username='.$user->getUsername() : '',
+            $user->getUsername(),
+            implode(',', $user->getRoles()),
             $sent ? 'Email sent.' : 'Email failed to send.'
         );
 
-        // Deliberately NOT printing the password back into the terminal for safety.
         return ['output' => $msg, 'success' => true];
     }
 
@@ -217,7 +216,7 @@ final class UserTerminalService
         $rolesStr = $f['roles'] ?? $f['role'] ?? null;
 
         if ($target === '') {
-            return ['output'=>'Usage: users:update <id|emails> [--emails=..] [--username=..] [--roles=ROLE_X,ROLE_Y]', 'success'=>false];
+            return ['output'=>'Usage: users:update <id|email> [--email=..] [--username=..] [--roles=ROLE_X,ROLE_Y]', 'success'=>false];
         }
 
         $user = $this->users->findOneByIdOrEmailInsensitive($target);
@@ -232,12 +231,12 @@ final class UserTerminalService
             if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
                 return ['output'=>'Invalid emails format.', 'success'=>false];
             }
-            $existing = $this->users->findOneBy(['emails' => $newEmail]);
+            $existing = $this->users->findOneBy(['email' => $newEmail]);
             if ($existing && $existing->getId() !== $user->getId()) {
                 return ['output'=>'Email already in use by another account.', 'success'=>false];
             }
             $user->setEmail($newEmail);
-            $changed[] = 'emails';
+            $changed[] = 'email';
         }
 
         // Username update
@@ -335,6 +334,89 @@ final class UserTerminalService
             'success' => true
         ];
     }
+
+    /**
+     * users:delete <id|email> [--force]
+     *
+     * - Resolves a user by numeric id or case-insensitive email.
+     * - Detaches teams (ManyToMany).
+     * - Detaches timelogs by setting Timelog.user = null (safe, given your entity API).
+     * - If related records exist and --force is NOT provided, returns a warning and does nothing.
+     */
+    public function deleteCommand(array $tokens): array
+    {
+        ['args' => $args, 'flags' => $flags] = ArgsParser::parse($tokens);
+
+        $target = $args[0] ?? '';
+        if ($target === '') {
+            return ['output' => 'Usage: users:delete <id|email> [--force]', 'success' => false];
+        }
+
+        $user = $this->users->findOneByIdOrEmailInsensitive($target);
+        if (!$user) {
+            return ['output' => 'User not found (by id/email).', 'success' => false];
+        }
+
+        // 🛡️ Self-protection: don’t allow deleting yourself
+        if ($this->security->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
+            $me = $this->security->getUser();
+            if (method_exists($me, 'getId') && $user->getId() === $me->getId()) {
+                return ['output' => 'Refusing to delete the currently logged-in account.', 'success' => false];
+            }
+        }
+
+        // Count related records to warn before destructive action
+        $teamsCount   = $user->getTeams()->count();
+        $timelogsCount = $user->getTimelogs()->count();
+
+        $hasRelations = ($teamsCount > 0) || ($timelogsCount > 0);
+        $force = isset($flags['force']) && $flags['force'] !== false;
+
+        if ($hasRelations && !$force) {
+            return [
+                'output'  => sprintf(
+                    'Refusing to delete. Found %d team link(s) and %d timelog(s). Re-run with --force to detach and delete.',
+                    $teamsCount, $timelogsCount
+                ),
+                'success' => false
+            ];
+        }
+
+        // Detach teams (inverse side). This removes join-table rows.
+        // Because User is the inverse side (inversedBy="users"), we remove links from the owning side as well.
+        $detachedTeams = 0;
+        foreach ($user->getTeams() as $team) {
+            $user->removeTeam($team); // your entity has removeTeam()
+            $detachedTeams++;
+        }
+
+        // Detach timelogs by nulling the owning side
+        $detachedLogs = 0;
+        foreach ($user->getTimelogs() as $log) {
+            $log->setUser(null); // Timelog::setUser(?User) exists in your code path
+            $detachedLogs++;
+        }
+
+        // Finally remove the user
+        $id    = $user->getId();
+        $email = (string) $user->getEmail();
+
+        try {
+            $this->em->remove($user);
+            $this->em->flush();
+        } catch (\Throwable $e) {
+            return ['output' => 'Failed to delete user: '.$e->getMessage(), 'success' => false];
+        }
+
+        return [
+            'output'  => sprintf(
+                'Deleted user id=%d (%s). Detached %d team link(s), %d timelog(s).',
+                $id, $email, $detachedTeams, $detachedLogs
+            ),
+            'success' => true
+        ];
+    }
+
 
     /** Normalize comma-separated roles to ROLE_* and dedup. */
     private function normalizeRoles(string $rolesCsv): array

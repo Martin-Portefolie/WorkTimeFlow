@@ -31,10 +31,13 @@ final class TerminalService
         // Allowlists (expand as you add more)
         $adminCommands = [
             'help', 'ping',
-            'users:list', 'users:show',
+            'users:list',
+            'users:show',
             'users:add',
             'users:update',
             'users:forgot-password',
+            'users:delete'
+
         ];
         $userCommands  = ['help', 'ping'];
 
@@ -67,6 +70,7 @@ final class TerminalService
             'users:add'            => $this->userModule->addCommand($tokens),
             'users:update'         => $this->userModule->updateCommand($tokens),
             'users:forgot-password'=> $this->userModule->forgotPasswordCommand($tokens),
+            'users:delete'         => $this->userModule->deleteCommand($tokens),
             default                => ['output'=>'Unhandled admin command','success'=>false],
         };
     }

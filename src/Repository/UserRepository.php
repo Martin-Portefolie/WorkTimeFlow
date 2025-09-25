@@ -34,18 +34,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Lightweight listing for terminal output (id, emails, username, roles),
-     * with optional case-insensitive search on emails/username.
+     * Lightweight listing for terminal output (id, email, username, roles),
+     * with optional case-insensitive search on email/username.
      *
-     * @return array<int,array{id:int,emails:string,username:string,roles:array<int,string>}>
+     * @return array<int,array{id:int,email:string,username:string,roles:array<int,string>}>
      */
     public function fetchListRowsSearched(int $limit = 50, ?string $q = null): array
     {
         $qb = $this->createQueryBuilder('u')
             ->select(
                 'u.id AS id',
-                'u.emails AS emails',
-                // Normalize NULL -> '' at the DB layer
+                'u.email AS email',
                 "COALESCE(u.username, '') AS username",
                 'u.roles AS roles'
             )
@@ -53,7 +52,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setMaxResults($limit);
 
         if ($q !== null && $q !== '') {
-            $qb->andWhere('LOWER(u.emails) LIKE :q OR LOWER(u.username) LIKE :q')
+            $qb->andWhere('LOWER(u.email) LIKE :q OR LOWER(u.username) LIKE :q')
                 ->setParameter('q', '%'.mb_strtolower($q).'%');
         }
 
@@ -63,11 +62,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Find by id OR exact emails OR exact username (emails/username are case-insensitive).
+     * Find by id OR exact email OR exact username (email/username are case-insensitive).
      */
     public function findOneByIdEmailOrUsername(string $idEmailOrUsername): ?User
     {
-        // Numeric → treat as id
         if (ctype_digit($idEmailOrUsername)) {
             $u = $this->find((int) $idEmailOrUsername);
             if ($u instanceof User) {
@@ -77,9 +75,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $key = mb_strtolower($idEmailOrUsername);
 
-        // Exact emails (case-insensitive)
+        // Exact email (case-insensitive)
         $qb = $this->createQueryBuilder('u')
-            ->where('LOWER(u.emails) = :k')
+            ->where('LOWER(u.email) = :k')
             ->setParameter('k', $key)
             ->setMaxResults(1);
 
@@ -89,61 +87,50 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         }
 
         // Exact username (case-insensitive)
-        $qb2 = $this->createQueryBuilder('u')
-            ->where('LOWER(u.username) = :k')
-            ->setParameter('k', $key)
-            ->setMaxResults(1);
-
-        return $qb2->getQuery()->getOneOrNullResult();
-    }
-
-
-    /**
-     * Resolve a user by ID (numeric string ok) OR emails (case-insensitive).
-     */
-    public function findOneByIdOrEmailInsensitive(string $idOrEmail): ?User
-    {
-        // Treat digits-only as ID
-        if (ctype_digit($idOrEmail)) {
-            $u = $this->find((int) $idOrEmail);
-            if ($u instanceof User) return $u;
-            // fall-through to emails check just in case
-        }
-
-        $key = mb_strtolower($idOrEmail);
-
         return $this->createQueryBuilder('u')
-            ->where('LOWER(u.emails) = :k')
+            ->where('LOWER(u.username) = :k')
             ->setParameter('k', $key)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
     }
 
+    /**
+     * Resolve a user by ID (numeric string ok) OR email (case-insensitive).
+     */
+    public function findOneByIdOrEmailInsensitive(string $idOrEmail): ?User
+    {
+        if (ctype_digit($idOrEmail)) {
+            $u = $this->find((int) $idOrEmail);
+            if ($u instanceof User) return $u;
+        }
+
+        $key = mb_strtolower($idOrEmail);
+
+        return $this->createQueryBuilder('u')
+            ->where('LOWER(u.email) = :k')
+            ->setParameter('k', $key)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
     /**
      * Normalize list-row shapes so callers always get strict scalars:
      * - id: int
-     * - emails: string
+     * - email: string
      * - username: string (never null)
      * - roles: string[]
      *
      * @param array<int,array<string,mixed>> $rows
-     * @return array<int,array{id:int,emails:string,username:string,roles:array<int,string>}>
+     * @return array<int,array{id:int,email:string,username:string,roles:array<int,string>}>
      */
     private function normalizeListRows(array $rows): array
     {
         foreach ($rows as &$r) {
-            // id
             $r['id'] = (int) $r['id'];
-
-            // emails
-            $r['emails'] = trim((string) $r['emails']);
-
-            // username (COALESCE already ensured '', but normalize anyway)
+            $r['email'] = trim((string) ($r['email'] ?? ''));
             $r['username'] = trim((string) ($r['username'] ?? ''));
-
-            // roles: ensure array<string>
             if (!is_array($r['roles'])) {
                 $decoded = json_decode((string) $r['roles'], true);
                 $r['roles'] = is_array($decoded) ? $decoded : [];
@@ -152,34 +139,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         }
         unset($r);
 
-        /** @var array<int,array{id:int,emails:string,username:string,roles:array<int,string>}> $rows */
+        /** @var array<int,array{id:int,email:string,username:string,roles:array<int,string>}> $rows */
         return $rows;
     }
-
-
-
-    //    /**
-    //     * @return User[] Returns an array of User objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?User
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

@@ -7,7 +7,7 @@
         data-terminal--terminal-run-url-value="{{ path('admin_terminal_run') }}"
         {# pass role-aware allowlist to the controller #}
         data-terminal--terminal-allowlist-value='{{ (is_granted("ROLE_ADMIN")
-    ? ["help","ping","users:list","users:show","users:add", "users:update","users:forgot-password"]
+    ? ["help","ping","users:list","users:show","users:add", "users:update","users:forgot-password", "users:delete"]
     : ["help","ping"]) | json_encode | raw }}'
 >
     <div class="flex min-h-[120px] max-h-[300px] items-stretch">
