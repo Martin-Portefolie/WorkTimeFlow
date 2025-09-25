@@ -34,17 +34,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Lightweight listing for terminal output (id, email, username, roles),
-     * with optional case-insensitive search on email/username.
+     * Lightweight listing for terminal output (id, emails, username, roles),
+     * with optional case-insensitive search on emails/username.
      *
-     * @return array<int,array{id:int,email:string,username:string,roles:array<int,string>}>
+     * @return array<int,array{id:int,emails:string,username:string,roles:array<int,string>}>
      */
     public function fetchListRowsSearched(int $limit = 50, ?string $q = null): array
     {
         $qb = $this->createQueryBuilder('u')
             ->select(
                 'u.id AS id',
-                'u.email AS email',
+                'u.emails AS emails',
                 // Normalize NULL -> '' at the DB layer
                 "COALESCE(u.username, '') AS username",
                 'u.roles AS roles'
@@ -53,7 +53,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setMaxResults($limit);
 
         if ($q !== null && $q !== '') {
-            $qb->andWhere('LOWER(u.email) LIKE :q OR LOWER(u.username) LIKE :q')
+            $qb->andWhere('LOWER(u.emails) LIKE :q OR LOWER(u.username) LIKE :q')
                 ->setParameter('q', '%'.mb_strtolower($q).'%');
         }
 
@@ -63,7 +63,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Find by id OR exact email OR exact username (email/username are case-insensitive).
+     * Find by id OR exact emails OR exact username (emails/username are case-insensitive).
      */
     public function findOneByIdEmailOrUsername(string $idEmailOrUsername): ?User
     {
@@ -77,9 +77,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $key = mb_strtolower($idEmailOrUsername);
 
-        // Exact email (case-insensitive)
+        // Exact emails (case-insensitive)
         $qb = $this->createQueryBuilder('u')
-            ->where('LOWER(u.email) = :k')
+            ->where('LOWER(u.emails) = :k')
             ->setParameter('k', $key)
             ->setMaxResults(1);
 
@@ -97,15 +97,39 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb2->getQuery()->getOneOrNullResult();
     }
 
+
+    /**
+     * Resolve a user by ID (numeric string ok) OR emails (case-insensitive).
+     */
+    public function findOneByIdOrEmailInsensitive(string $idOrEmail): ?User
+    {
+        // Treat digits-only as ID
+        if (ctype_digit($idOrEmail)) {
+            $u = $this->find((int) $idOrEmail);
+            if ($u instanceof User) return $u;
+            // fall-through to emails check just in case
+        }
+
+        $key = mb_strtolower($idOrEmail);
+
+        return $this->createQueryBuilder('u')
+            ->where('LOWER(u.emails) = :k')
+            ->setParameter('k', $key)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+
     /**
      * Normalize list-row shapes so callers always get strict scalars:
      * - id: int
-     * - email: string
+     * - emails: string
      * - username: string (never null)
      * - roles: string[]
      *
      * @param array<int,array<string,mixed>> $rows
-     * @return array<int,array{id:int,email:string,username:string,roles:array<int,string>}>
+     * @return array<int,array{id:int,emails:string,username:string,roles:array<int,string>}>
      */
     private function normalizeListRows(array $rows): array
     {
@@ -113,8 +137,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             // id
             $r['id'] = (int) $r['id'];
 
-            // email
-            $r['email'] = trim((string) $r['email']);
+            // emails
+            $r['emails'] = trim((string) $r['emails']);
 
             // username (COALESCE already ensured '', but normalize anyway)
             $r['username'] = trim((string) ($r['username'] ?? ''));
@@ -128,7 +152,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         }
         unset($r);
 
-        /** @var array<int,array{id:int,email:string,username:string,roles:array<int,string>}> $rows */
+        /** @var array<int,array{id:int,emails:string,username:string,roles:array<int,string>}> $rows */
         return $rows;
     }
 

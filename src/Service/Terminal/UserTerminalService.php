@@ -2,7 +2,9 @@
 namespace App\Service\Terminal;
 
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
+use Random\RandomException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -43,7 +45,7 @@ final class UserTerminalService
         // Positional arg #0 can be a numeric limit; default to 50
         $limit = (isset($args[0]) && ctype_digit($args[0])) ? (int) $args[0] : 50;
 
-        // Optional case-insensitive search across email/username
+        // Optional case-insensitive search across emails/username
         $q = isset($flags['q']) ? (string) $flags['q'] : null;
 
         $rows = $this->users->fetchListRowsSearched($limit, $q);
@@ -56,8 +58,8 @@ final class UserTerminalService
             static fn (array $r) => sprintf(
                 '%d | %s | %s | %s',
                 $r['id'],
-                $r['email'],
-                (string) ($r['username'] ?? ''),
+                $r['emails'],
+                ($r['username'] ?? ''),
                 implode(',', $r['roles'])
             ),
             $rows
@@ -68,7 +70,7 @@ final class UserTerminalService
     }
 
     /**
-     * users:show <id|email|username>
+     * users:show <id|emails|username>
      *
      * Examples:
      *  - users:show 3
@@ -82,7 +84,7 @@ final class UserTerminalService
     {
         // Must have exactly one identifier token
         if (count($tokens) !== 1) {
-            return ['output' => 'Usage: users:show <id|email|username>', 'success' => false];
+            return ['output' => 'Usage: users:show <id|emails|username>', 'success' => false];
         }
 
         $key = $tokens[0];
@@ -97,7 +99,7 @@ final class UserTerminalService
         $username = htmlspecialchars((string) $u->getUsername(), ENT_QUOTES, 'UTF-8');
 
         $out = sprintf(
-            "id: %d<br>email: %s<br>username: %s<br>roles: %s",
+            "id: %d<br>emails: %s<br>username: %s<br>roles: %s",
             $u->getId(),
             $email,
             $username,
@@ -108,31 +110,32 @@ final class UserTerminalService
     }
 
     /**
-     * users:add --email=... [--username=...] [--password=...] [--roles=ROLE_USER,ROLE_ADMIN]
+     * users:add --emails=... [--username=...] [--password=...] [--roles=ROLE_USER,ROLE_ADMIN]
      *
      * - Generates a random password if --password is omitted (8 hex chars).
      * - Default roles to ROLE_USER if --roles omitted.
-     * - Sends credentials email using templates/emails/userinfo.html.twig.
+     * - Sends credentials emails using templates/emails/user_created.html.twig.
+     * @throws RandomException
      */
     public function addCommand(array $tokens): array
     {
         ['args'=>$args, 'flags'=>$f] = ArgsParser::parse($tokens);
 
-        $email    = isset($f['email']) ? trim((string)$f['email']) : '';
+        $email    = isset($f['emails']) ? trim((string)$f['emails']) : '';
         $username = isset($f['username']) ? trim((string)$f['username']) : '';
         $password = isset($f['password']) ? (string)$f['password'] : null;
         $rolesStr = isset($f['roles']) ? (string)$f['roles'] : null;
 
         // Basic validation
         if ($email === '') {
-            return ['output' => 'Usage: users:add --email=alice@example.com [--username=Alice] [--password=Pass123] [--roles=ROLE_USER,ROLE_ADMIN]', 'success' => false];
+            return ['output' => 'Usage: users:add --emails=alice@example.com [--username=Alice] [--password=Pass123] [--roles=ROLE_USER,ROLE_ADMIN]', 'success' => false];
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return ['output' => 'Invalid email format.', 'success' => false];
+            return ['output' => 'Invalid emails format.', 'success' => false];
         }
 
-        // Ensure email is unique
-        if ($this->users->findOneBy(['email' => $email])) {
+        // Ensure emails is unique
+        if ($this->users->findOneBy(['emails' => $email])) {
             return ['output' => 'Email already exists.', 'success' => false];
         }
 
@@ -164,14 +167,14 @@ final class UserTerminalService
             return ['output' => 'Failed to create user: '.$e->getMessage(), 'success' => false];
         }
 
-        // Prepare & send email (reuse your existing template)
+        // Prepare & send emails (reuse your existing template)
         $loginUrl = $this->urls->generate('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $emailMsg = (new TemplatedEmail())
             ->from('no-reply@worktimeflow.local') // or your real domain
             ->to($user->getEmail())
             ->subject('Your WORKTIMEFLOW account')
-            ->htmlTemplate('emails/userinfo.html.twig')
+            ->htmlTemplate('admin/emails/user_created.html.twig')
             ->context([
                 'username'   => (string) $user->getUsername(),
                 'user_email' => (string) $user->getEmail(),
@@ -187,7 +190,7 @@ final class UserTerminalService
         }
 
         $msg = sprintf(
-            'User created: id=%d, email=%s%s. %s',
+            'User created: id=%d, emails=%s%s. %s',
             $user->getId(),
             $user->getEmail(),
             $user->getUsername() ? ', username='.$user->getUsername() : '',
@@ -197,6 +200,155 @@ final class UserTerminalService
         // Deliberately NOT printing the password back into the terminal for safety.
         return ['output' => $msg, 'success' => true];
     }
+
+    /**
+     * users:update <id|emails> [--emails=...] [--username=...] [--roles=ROLE_X,ROLE_Y]
+     * - No password change here.
+     * - Email must be valid + unique (if changed).
+     * - Roles replace the entire set (normalized to ROLE_*). If omitted, roles unchanged.
+     */
+    public function updateCommand(array $tokens): array
+    {
+        // Parse: first positional is the target (id or emails)
+        ['args'=>$args, 'flags'=>$f] = ArgsParser::parse($tokens);
+        $target   = $args[0] ?? '';
+        $newEmail = isset($f['emails']) ? trim((string)$f['emails']) : null;
+        $username = isset($f['username']) ? trim((string)$f['username']) : null;
+        $rolesStr = $f['roles'] ?? $f['role'] ?? null;
+
+        if ($target === '') {
+            return ['output'=>'Usage: users:update <id|emails> [--emails=..] [--username=..] [--roles=ROLE_X,ROLE_Y]', 'success'=>false];
+        }
+
+        $user = $this->users->findOneByIdOrEmailInsensitive($target);
+        if (!$user) {
+            return ['output'=>'User not found (by id/emails).', 'success'=>false];
+        }
+
+        $changed = [];
+
+        // Email update (validate + unique)
+        if ($newEmail !== null) {
+            if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+                return ['output'=>'Invalid emails format.', 'success'=>false];
+            }
+            $existing = $this->users->findOneBy(['emails' => $newEmail]);
+            if ($existing && $existing->getId() !== $user->getId()) {
+                return ['output'=>'Email already in use by another account.', 'success'=>false];
+            }
+            $user->setEmail($newEmail);
+            $changed[] = 'emails';
+        }
+
+        // Username update
+        if ($username !== null) {
+            $user->setUsername($username);
+            $changed[] = 'username';
+        }
+
+        // Roles update (replace entire set if provided)
+        if ($rolesStr !== null && $rolesStr !== '') {
+            $roles = $this->normalizeRoles((string)$rolesStr);
+            if (!$roles) {
+                return ['output'=>'No valid roles provided.', 'success'=>false];
+            }
+            $user->setRoles($roles);
+            $changed[] = 'roles';
+        }
+
+        if (!$changed) {
+            return ['output'=>'Nothing to update. Provide at least one of --emails, --username, --roles.', 'success'=>false];
+        }
+
+        try {
+            $this->em->flush();
+        } catch (\Throwable $e) {
+            return ['output'=>'Failed to update user: '.$e->getMessage(), 'success'=>false];
+        }
+
+        return [
+            'output'  => sprintf('Updated user id=%d (%s). Changed: %s',
+                $user->getId(),
+                $user->getEmail(),
+                implode(', ', $changed)
+            ),
+            'success' => true
+        ];
+    }
+    /**
+     * users:forgot-password <id|emails>
+     * - Generates a new temporary password, sets it, emails the user.
+     * - Terminal does NOT print the password back.
+     */
+    public function forgotPasswordCommand(array $tokens): array
+    {
+        ['args'=>$args] = ArgsParser::parse($tokens);
+        $target = $args[0] ?? '';
+        if ($target === '') {
+            return ['output'=>'Usage: users:forgot-password <id|emails>', 'success'=>false];
+        }
+
+        $user = $this->users->findOneByIdOrEmailInsensitive($target);
+        if (!$user) {
+            return ['output'=>'User not found (by id/emails).', 'success'=>false];
+        }
+
+        // Generate temporary password (8 hex chars) — adjust length if you prefer
+        $temp = bin2hex(random_bytes(4));
+        $user->setPassword($this->hasher->hashPassword($user, $temp));
+
+        try {
+            $this->em->flush();
+        } catch (\Throwable $e) {
+            return ['output'=>'Failed to reset password: '.$e->getMessage(), 'success'=>false];
+        }
+
+        // Send emails (reuse your template or make a dedicated "reset" subject)
+        $loginUrl = $this->urls->generate('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $emailMsg = (new TemplatedEmail())
+            ->from('no-reply@worktimeflow.local')
+            ->to($user->getEmail())
+            ->subject('WORKTIMEFLOW — Password reset')
+            ->htmlTemplate('admin/emails/password_reset.html.twig')
+            ->context([
+                'username'   => (string) $user->getUsername(),
+                'user_email' => (string) $user->getEmail(),
+                'password'   => $temp,
+                'login_url'  => $loginUrl,
+            ]);
+
+        $sent = false;
+        try {
+            $this->mailer->send($emailMsg);
+            $sent = true;
+        } catch (\Throwable $e) {
+            // swallow and report
+        }
+
+        return [
+            'output'  => sprintf('Temporary password set for id=%d (%s). %s',
+                $user->getId(),
+                $user->getEmail(),
+                $sent ? 'Email sent.' : 'Email failed to send.'
+            ),
+            'success' => true
+        ];
+    }
+
+    /** Normalize comma-separated roles to ROLE_* and dedup. */
+    private function normalizeRoles(string $rolesCsv): array
+    {
+        $parts = array_map('trim', explode(',', $rolesCsv));
+        $norm  = array_map(
+            static fn(string $r) => str_starts_with($r = strtoupper($r), 'ROLE_') ? $r : ('ROLE_'.$r),
+            $parts
+        );
+        // Remove empties, dedup
+        $norm = array_values(array_unique(array_filter($norm)));
+        return $norm;
+    }
+
 
     /**
      * Optional: profile-side commands (non-admin) can still live here.

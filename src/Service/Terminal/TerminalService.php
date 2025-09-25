@@ -33,6 +33,8 @@ final class TerminalService
             'help', 'ping',
             'users:list', 'users:show',
             'users:add',
+            'users:update',
+            'users:forgot-password',
         ];
         $userCommands  = ['help', 'ping'];
 
@@ -51,25 +53,24 @@ final class TerminalService
     }
 
     /** @return array{output:string, success:bool} */
+
     private function handleAdmin(string $input): array
     {
-        // Tokenize (keep original tokens to pass to modules)
         $tokens = preg_split('/\s+/', trim($input)) ?: [];
         $cmd    = array_shift($tokens) ?? '';
 
-        // Simple router: delegate domain-specific commands to their modules
         return match ($cmd) {
-            'help'       => ['output' => 'Available (admin): ping, users:list, users:show', 'success' => true],
-            'ping'       => ['output' => 'pong (admin)', 'success' => true],
-
-            // Users domain
-            'users:list' => $this->userModule->listCommand($tokens),
-            'users:show' => $this->userModule->showCommand($tokens),
-            'users:add'  => $this->userModule->addCommand($tokens),
-
-            default      => ['output' => 'Unhandled admin command', 'success' => false],
+            'help'                 => ['output'=>'Available (admin): ping, users:list, users:show, users:add, users:update, users:forgot-password','success'=>true],
+            'ping'                 => ['output'=>'pong (admin)','success'=>true],
+            'users:list'           => $this->userModule->listCommand($tokens),
+            'users:show'           => $this->userModule->showCommand($tokens),
+            'users:add'            => $this->userModule->addCommand($tokens),
+            'users:update'         => $this->userModule->updateCommand($tokens),
+            'users:forgot-password'=> $this->userModule->forgotPasswordCommand($tokens),
+            default                => ['output'=>'Unhandled admin command','success'=>false],
         };
     }
+
 
     /** @return array{output:string, success:bool} */
     private function handleUser(string $input): array

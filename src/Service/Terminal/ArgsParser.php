@@ -9,12 +9,12 @@ namespace App\Service\Terminal;
  *  - named flags (options starting with "--")
  *
  * Example:
- *   input tokens: ["users:add", "--email=alice@example.com", "--roles=ROLE_ADMIN,ROLE_USER", "123"]
+ *   input tokens: ["users:add", "--emails=alice@example.com", "--roles=ROLE_ADMIN,ROLE_USER", "123"]
  *   parse result:
  *     [
  *       'args'  => ["123"],   // plain positional values
  *       'flags' => [          // options with "--"
- *          'email' => "alice@example.com",
+ *          'emails' => "alice@example.com",
  *          'roles' => "ROLE_ADMIN,ROLE_USER"
  *       ]
  *     ]
@@ -34,7 +34,7 @@ final class ArgsParser
     public static function parse(array $tokens): array
     {
         $args  = [];  // Positional arguments, e.g. "123"
-        $flags = [];  // Named flags, e.g. ["email" => "alice@example.com"]
+        $flags = [];  // Named flags, e.g. ["emails" => "alice@example.com"]
 
         foreach ($tokens as $t) {
             // If it starts with "--", treat it as a flag

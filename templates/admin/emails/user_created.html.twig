@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Welcome to WORKTIMEFLOW</title>
+    <style>
+        /* Basic, emails-safe styles (inline CSS preferred for broad client support) */
+        body { margin:0; padding:20px; background:#f4f4f4; font-family:Arial,Helvetica,sans-serif; color:#1f2937; }
+        .container { max-width:600px; margin:0 auto; background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 0 10px rgba(0,0,0,.08); }
+        .header { background:#10b981; color:#ffffff; text-align:center; padding:18px; }
+        .content { padding:20px 22px; }
+        .footer  { padding:12px 22px 20px; text-align:center; font-size:12px; color:#6b7280; }
+        h2 { margin:0; font-size:20px; line-height:1.3; }
+        p  { margin:0 0 12px; line-height:1.55; }
+        ul { margin:12px 0; padding:12px 14px; background:#f3f4f6; border-radius:6px; }
+        li { margin:6px 0; }
+        .password { color:#dc2626; font-weight:bold; }
+        .btn {
+            display:inline-block; background:#10b981; color:#111827; text-decoration:none;
+            padding:10px 16px; border-radius:6px; font-weight:bold; margin-top:8px;
+        }
+        .muted { color:#6b7280; font-size:12px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>Welcome to WORKTIMEFLOW</h2>
+    </div>
+
+    <div class="content">
+        <p>Hello <strong>{{ username }}</strong>,</p>
+        <p>Your WORKTIMEFLOW account has been created.</p>
+
+        <p><strong>Your login details:</strong></p>
+        <ul>
+            <li><strong>Email:</strong> {{ user_email }}</li>
+            <li><strong>Temporary password:</strong> <span class="password">{{ password }}</span></li>
+        </ul>
+
+        <p>
+            <strong>Security tip:</strong> Please sign in as soon as possible and
+            <strong>change your password</strong> from your account/profile settings.
+        </p>
+
+        <p>
+            <a class="btn" href="{{ login_url }}">Log in to WORKTIMEFLOW</a>
+        </p>
+
+        <p class="muted">
+            If you didn’t expect this account, please contact your administrator.
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>Best regards,<br><strong>WORKTIMEFLOW Team</strong></p>
+    </div>
+</div>
+</body>
+</html>
