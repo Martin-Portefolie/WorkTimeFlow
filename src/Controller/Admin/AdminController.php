@@ -20,12 +20,18 @@ final class AdminController extends AbstractController
     public function run(Request $request, TerminalService $terminal): Response
     {
         $input  = (string) $request->request->get('input', '');
-        $result = $terminal->execute($input); // ['output' => ..., 'success' => bool]
+        $result = $terminal->execute($input);
+
+        $output = $result['output'] ?? null;
+        if (!$output && isset($result['view'])) {
+            $output = $this->renderView($result['view'], $result['vars'] ?? []);
+        }
 
         return $this->render('partials/_line.html.twig', [
             'input'   => $input,
-            'output'  => $result['output'] ?? '',
-            'success' => (bool) ($result['success'] ?? false),
+            'output'  => $output ?? '',
+            'success' => (bool)($result['success'] ?? false),
+            'user'    => $this->getUser()?->getUserIdentifier() ?? 'guest',
         ]);
     }
 

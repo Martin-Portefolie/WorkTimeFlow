@@ -53,6 +53,14 @@
     /* --- terminal positioning & shell --- */
     .terminal-sticky { @apply sticky z-40 top-[var(--nav-h)]; }
     .terminal-shell  { @apply  border border-zinc-800/80 bg-[#0e1116] text-zinc-100 font-mono shadow-md; }
+    /* --- Terminal objects --- */
+    @layer components {
+        .term-cmd   { @apply text-emerald-400 font-mono; }   /* canonical commands */
+        .term-alias { @apply text-amber-300 font-mono; }     /* short aliases */
+        .term-flag  { @apply text-sky-400 font-mono; }       /* --flags */
+        .term-kbd   { @apply px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono text-[11px]; } /* keycaps */
+        .term-note  { @apply text-zinc-400; }
+    }
 
     /* optional: consistent admin container width */
     .container-admin { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }

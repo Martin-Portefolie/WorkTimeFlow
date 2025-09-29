@@ -1,6 +1,15 @@
-// assets/controllers/terminal/terminal_controller.js
 import { Controller } from '@hotwired/stimulus';
 
+const ALIASES = {
+    'u.l':  'users:list',
+    'u.s':  'users:show',
+    'u.a':  'users:add',
+    'u.u':  'users:update',
+    'u.fp': 'users:forgot-password',
+    'u.off':'users:deactivate',
+    'u.on': 'users:activate',
+    'u.del':'users:delete',
+};
 export default class extends Controller {
     static targets = ['input', 'output', 'suggestions', 'palette', 'paletteInput', 'paletteList'];
     static values = { runUrl: String, allowlist: Array };
@@ -33,32 +42,36 @@ export default class extends Controller {
         const raw = (this.inputTarget.value || '').trim();
         if (!raw) return;
 
-        // Save to history as a single entry (full line)
+        // Save full line in history
         this.history.push(raw);
         this.historyIndex = null;
 
-        // Execute sequentially
+        // Split by ';' and run sequentially
         const commands = raw.split(';').map(s => s.trim()).filter(Boolean);
         for (const cmd of commands) {
             // client-only clear
-            if (['clear', 'cls'].includes(cmd.toLowerCase())) {
+            if (['clear','cls'].includes(cmd.toLowerCase())) {
                 this.clearOutput();
                 continue;
             }
 
-            // role-aware client filter (optional convenience; server still enforces)
-            const first = (cmd.split(/\s+/)[0] || '');
-            if (this.allowlistValue && !this.allowlistValue.includes(first)) {
+            // ---- NEW: alias normalization BEFORE allowlist check ----
+            const firstToken = (cmd.split(/\s+/)[0] || '');
+            const canonical  = ALIASES[firstToken] || firstToken;
+
+            // Role-aware client filter; server still enforces
+            if (this.allowlistValue && !this.allowlistValue.includes(canonical)) {
                 const wrapper = document.createElement('div');
-                wrapper.innerHTML = this.renderLine(cmd, `${first} is not viable`, false);
+                wrapper.innerHTML = this.renderLine(cmd, `${firstToken} is not viable`, false);
                 this.outputTarget.prepend(wrapper.firstElementChild || wrapper);
                 continue;
             }
 
-            // echo then fetch
+            // Echo then POST (you can send `cmd` as-is; server also normalizes)
             const pending = document.createElement('div');
             pending.textContent = `> ${cmd}`;
             this.outputTarget.prepend(pending);
+
             try {
                 const form = new FormData();
                 form.append('input', cmd);
@@ -79,7 +92,6 @@ export default class extends Controller {
         this.inputTarget.value = '';
         this.inputTarget.focus();
     }
-
     /* ========== Keyboard (window) ========== */
     hotkeys(event) {
         const key = event.key.toLowerCase();
