@@ -48,6 +48,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Timelog::class, mappedBy: 'user')]
     private Collection $timelogs;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    private ?bool $isActive = true;
+
     public function __construct()
     {
         $this->teams = new ArrayCollection();
@@ -192,6 +195,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+    public function setIsActive(bool $active): self
+    {
+        $this->isActive = $active;
         return $this;
     }
 }

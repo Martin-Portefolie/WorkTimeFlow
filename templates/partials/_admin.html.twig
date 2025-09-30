@@ -5,16 +5,15 @@
         data-controller="terminal--terminal"
         data-action="keydown@window->terminal--terminal#hotkeys"
         data-terminal--terminal-run-url-value="{{ path('admin_terminal_run') }}"
-        {# pass role-aware allowlist to the controller #}
         data-terminal--terminal-allowlist-value='{{ (is_granted("ROLE_ADMIN")
-    ? ["help","ping","users:list","users:show","users:add", "users:update","users:forgot-password", "users:delete"]
-    : ["help","ping"]) | json_encode | raw }}'
+        ? ["help","ping","users:list","users:show","users:add","users:update","users:forgot-password","users:delete"]
+        : ["help","ping"]) | json_encode | raw }}'
 >
-    <div class="flex min-h-[120px] max-h-[300px] items-stretch">
+    <div class="flex min-h-[140px] max-h-[300px] items-stretch">
 
-        {# === LEFT: Terminal area (75%) === #}
+        {# === LEFT (75%) — terminal === #}
         <div class="basis-3/4 min-w-0 border-r border-zinc-800/70 flex flex-col">
-            <!-- top row -->
+            <!-- input row -->
             <div class="px-4 py-3 flex items-center gap-2 shrink-0">
         <span class="text-emerald-400">
           ${{ app.user ? app.user.userIdentifier : 'guest' }}
@@ -29,74 +28,80 @@
             keydown.enter->terminal--terminal#submit
             keydown.esc->terminal--terminal#onEsc
             focus->terminal--terminal#focused
-            blur->terminal--terminal#blurred
-          "
+            blur->terminal--terminal#blurred"
                 >
             </div>
 
-            <!-- top divider -->
-            <div class="h-px bg-zinc-800/70 shrink-0"></div>
+            <div class="term-divider shrink-0"></div>
 
-            <!-- scrollable output -->
-            <div class="flex-1 overflow-y-auto px-4 py-3 text-xs space-y-1
-            bg-[#121418] text-zinc-300"
-                 data-terminal--terminal-target="output"
-                 aria-live="polite">
-                {# output lines are injected here by Stimulus #}
+            <!-- output -->
+            <div
+                    class="flex-1 overflow-y-auto px-4 py-3 text-xs space-y-1 bg-[#121418] text-zinc-300"
+                    data-terminal--terminal-target="output"
+                    aria-live="polite">
+                {# lines injected by Stimulus #}
             </div>
 
+            <div class="term-divider shrink-0"></div>
 
-            <!-- bottom divider -->
-            <div class="h-px bg-zinc-800/70 shrink-0"></div>
-
-            <!-- footer hint (fixed at bottom) -->
-            <div class="px-4 py-2 text-[11px] text-zinc-400 shrink-0">
-                Type <span class="text-emerald-400">help</span> to see available commands.
+            <!-- footer hints -->
+            <div class="term-footer">
+                <div>Type <span class="text-emerald-400">help</span> to see available commands.</div>
+                <div class="term-shortcuts">
+    <span class="term-shortcut">
+      <img src="{{ asset('icons/keyboard_icons/ctrl_cmd-key.png') }}" class="keycap-img" alt="Ctrl or Cmd">
+      <span class="text-xl">+</span>
+      <img src="{{ asset('icons/keyboard_icons/forward_slash-key.png') }}" class="keycap-img" alt="/">
+      <span>Open command palette</span>
+    </span>
+                    <span class="term-shortcut">
+      <img src="{{ asset('icons/keyboard_icons/upanddown-key.png') }}" class="keycap-img" alt="Up and Down">
+      <span>Cycle through previous commands</span>
+    </span>
+                </div>
             </div>
+
         </div>
 
-        {# === MIDDLE: Blue tile (15%) — Press Shift + T === #}
+        {# === MIDDLE (15%) — focus tile === #}
         <button
                 type="button"
-                class="group basis-[15%] shrink-0 grid place-items-center relative overflow-hidden
-             bg-blue-500/90 hover:bg-blue-600 transition-colors"
+                class="group tile tile-blue basis-[15%] shrink-0"
                 data-action="click->terminal--terminal#focusTile"
-                aria-label="Press Shift + . to enter the terminal"
+                aria-label="Focus the terminal"
         >
-      <span class="text-white font-semibold select-none leading-tight text-center">
-        Press<br/><span><b>⌘|Ctrl</b> </span> + <span><b class="text-3xl ">.</b></span>
+      <span class="tile-label space-y-1">
+        <div>Press</div>
+        <div class="flex items-center justify-center gap-1">
+          <img class="keycap-img-lg" src="{{ asset('icons/keyboard_icons/ctrl_cmd-key.png') }}" alt="Cmd or Ctrl">
+          <span class="text-2xl">+</span>
+          <img class="keycap-img-lg" src="{{ asset('icons/keyboard_icons/period-key.png') }}" alt="Period">
+        </div>
       </span>
-            <span class="absolute bottom-2 inset-x-0 text-center md:text-[11px] text-[10px] leading-4 text-blue-200
-                   opacity-0 group-hover:opacity-100 transition whitespace-normal px-2">
-        to enter the terminal
-      </span>
+            <span class="tile-sub">focus terminal</span>
         </button>
 
-        {# === RIGHT: Red tile (10%) — Press ESC === #}
+        {# === RIGHT (10%) — blur tile === #}
         <button
                 type="button"
-                class="group basis-[10%] shrink-0 grid place-items-center relative overflow-hidden
-             bg-red-500/90 hover:bg-red-600 transition-colors"
+                class="group tile tile-red basis-[10%] shrink-0"
                 data-action="click->terminal--terminal#blurTile"
-                aria-label="Press Esc to leave the terminal"
+                aria-label="Leave the terminal"
         >
-      <span class="text-white font-semibold select-none leading-tight text-center">
-        Press<br/>ESC
+      <span class="tile-label space-y-1">
+        <div>Press</div>
+        <div>
+          <img class="keycap-img-lg" src="{{ asset('icons/keyboard_icons/esc-key.png') }}" alt="Escape key">
+        </div>
       </span>
-            <span class="absolute bottom-2 inset-x-0 text-center md:text-[11px] text-[10px] leading-4 text-red-200
-                   opacity-0 group-hover:opacity-100 transition whitespace-normal px-2">
-        leave<br/>terminal
-      </span>
+            <span class="tile-sub">leave terminal</span>
         </button>
     </div>
-    {# Command palette (hidden by default) #}
-    <div
-            class="fixed inset-0 z-[60] hidden"
-            data-terminal--terminal-target="palette"
-    >
+
+    {# === Command palette (unchanged) === #}
+    <div class="fixed inset-0 z-[60] hidden" data-terminal--terminal-target="palette">
         <div class="absolute inset-0 bg-black/50" data-action="click->terminal--terminal#closePalette"></div>
-        <div class="absolute left-1/2 top-20 -translate-x-1/2 w-[520px] max-w-[92vw]
-                rounded-xl bg-[#0e1116] ring-1 ring-zinc-800 shadow-xl overflow-hidden">
+        <div class="absolute left-1/2 top-20 -translate-x-1/2 w-[520px] max-w-[92vw] rounded-xl bg-[#0e1116] ring-1 ring-zinc-800 shadow-xl overflow-hidden">
             <div class="px-3 py-2 border-b border-zinc-800">
                 <input
                         type="text"
@@ -106,8 +111,7 @@
                         data-action="input->terminal--terminal#filterPalette keydown.enter->terminal--terminal#pickFirstPalette keydown.esc->terminal--terminal#closePalette"
                 >
             </div>
-            <div class="max-h-72 overflow-y-auto text-sm"
-                 data-terminal--terminal-target="paletteList">
+            <div class="max-h-72 overflow-y-auto text-sm" data-terminal--terminal-target="paletteList">
                 <!-- items injected -->
             </div>
         </div>

@@ -58,7 +58,9 @@ final class TerminalService
             'users:add',
             'users:update',
             'users:forgot-password',
-            'users:delete'
+            'users:delete',
+            'users:deactivate',
+            'users:activate',
 
         ];
         $userCommands  = ['help', 'ping'];
@@ -94,7 +96,9 @@ final class TerminalService
                         ['alias'=>'u.a',  'cmd'=>'users:add',             'note'=>'create user & email credentials'],
                         ['alias'=>'u.u',  'cmd'=>'users:update',          'note'=>'update email/username/roles'],
                         ['alias'=>'u.fp', 'cmd'=>'users:forgot-password', 'note'=>'set temp password & email user'],
-                        ['alias'=>'u.del','cmd'=>'users:delete',          'note'=>'hard delete (consider deactivate)'],
+                        ['alias'=>'u.del','cmd'=>'users:delete',          'note'=>'hard delete ()'],
+                        ['alias'=>'u.off','cmd'=>'users:deactivate',      'note'=>'disable login (soft off)'],
+                        ['alias'=>'u.on', 'cmd'=>'users:activate',        'note'=>'enable login'],
                     ],
                 ],
                 'success' => true,

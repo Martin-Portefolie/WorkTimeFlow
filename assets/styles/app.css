@@ -54,13 +54,32 @@
     .terminal-sticky { @apply sticky z-40 top-[var(--nav-h)]; }
     .terminal-shell  { @apply  border border-zinc-800/80 bg-[#0e1116] text-zinc-100 font-mono shadow-md; }
     /* --- Terminal objects --- */
-    @layer components {
-        .term-cmd   { @apply text-emerald-400 font-mono; }   /* canonical commands */
-        .term-alias { @apply text-amber-300 font-mono; }     /* short aliases */
-        .term-flag  { @apply text-sky-400 font-mono; }       /* --flags */
-        .term-kbd   { @apply px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono text-[11px]; } /* keycaps */
-        .term-note  { @apply text-zinc-400; }
-    }
+
+    /* Thin divider used above output and above footer */
+    .term-divider { @apply h-px bg-zinc-800/70; }
+
+    /* Footer hints (two rows) */
+    .term-footer    { @apply px-4 py-2 text-[11px] text-zinc-400 flex flex-col gap-1; }
+    .term-shortcuts { @apply flex items-center gap-3 flex-wrap; }
+    .term-shortcut  { @apply inline-flex items-center gap-1.5; }
+
+    /* Keycap image sizing so layout doesn’t jump */
+    .keycap-img    { @apply h-8 w-auto select-none pointer-events-none; }
+    .keycap-img-lg { @apply h-16 w-auto select-none pointer-events-none; }
+
+    /* Right-side tiles */
+    .tile       { @apply grid place-items-center relative overflow-hidden transition-colors; }
+    .tile-blue  { @apply bg-blue-500/90 hover:bg-blue-600; }
+    .tile-red   { @apply bg-red-500/90 hover:bg-red-600; }
+    .tile-label { @apply text-white font-semibold leading-tight text-center; }
+    .tile-sub   { @apply absolute bottom-2 inset-x-0 text-center text-[10px] md:text-[11px] leading-4 text-white/70 opacity-0 group-hover:opacity-100 transition px-2; }
+
+    /* Help view colors (you already have these — keep just one copy) */
+    .term-cmd   { @apply text-emerald-400 font-mono; }   /* canonical commands */
+    .term-alias { @apply text-amber-300 font-mono; }     /* short aliases */
+    .term-flag  { @apply text-sky-400 font-mono; }       /* --flags */
+    .term-kbd   { @apply px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono text-[11px]; }
+    .term-note  { @apply text-zinc-400; }
 
     /* optional: consistent admin container width */
     .container-admin { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }

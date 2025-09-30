@@ -431,6 +431,47 @@ final class UserTerminalService
         return $norm;
     }
 
+    public function deactivateCommand(array $tokens): array
+    {
+        ['args'=>$args] = ArgsParser::parse($tokens);
+        $target = $args[0] ?? '';
+        if ($target === '') {
+            return ['output'=>'Usage: users:deactivate <id|email>', 'success'=>false];
+        }
+
+        $user = $this->users->findOneByIdOrEmailInsensitive($target);
+        if (!$user) return ['output'=>'User not found (by id/email).', 'success'=>false];
+
+        if (method_exists($this->security->getUser(), 'getId')
+            && $this->security->getUser()?->getId() === $user->getId()) {
+            return ['output'=>'Refusing to deactivate the currently logged-in account.', 'success'=>false];
+        }
+
+        $user->setIsActive(false);
+        try { $this->em->flush(); }
+        catch (\Throwable $e) { return ['output'=>'Failed to deactivate user: '.$e->getMessage(), 'success'=>false]; }
+
+        return ['output'=>sprintf('User id=%d (%s) deactivated.', $user->getId(), $user->getEmail()), 'success'=>true];
+    }
+
+    public function activateCommand(array $tokens): array
+    {
+        ['args'=>$args] = ArgsParser::parse($tokens);
+        $target = $args[0] ?? '';
+        if ($target === '') {
+            return ['output'=>'Usage: users:activate <id|email>', 'success'=>false];
+        }
+
+        $user = $this->users->findOneByIdOrEmailInsensitive($target);
+        if (!$user) return ['output'=>'User not found (by id/email).', 'success'=>false];
+
+        $user->setIsActive(true);
+        try { $this->em->flush(); }
+        catch (\Throwable $e) { return ['output'=>'Failed to activate user: '.$e->getMessage(), 'success'=>false]; }
+
+        return ['output'=>sprintf('User id=%d (%s) activated.', $user->getId(), $user->getEmail()), 'success'=>true];
+    }
+
 
     /**
      * Optional: profile-side commands (non-admin) can still live here.
