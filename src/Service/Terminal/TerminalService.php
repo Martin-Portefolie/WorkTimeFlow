@@ -91,7 +91,7 @@ final class TerminalService
                 'view' => 'partials/_help_admin.html.twig',
                 'vars' => [
                     'aliases' => [
-                        ['alias'=>'u.l',  'cmd'=>'users:list',            'note'=>'list users (limit 50, --q=search)'],
+                        ['alias'=>'u.l',  'cmd'=>'users:list',            'note'=>'list users (default: active only; flags: --q=search, --is-active=active|inactive|all)'],
                         ['alias'=>'u.s',  'cmd'=>'users:show',            'note'=>'show one by id/email'],
                         ['alias'=>'u.a',  'cmd'=>'users:add',             'note'=>'create user & email credentials'],
                         ['alias'=>'u.u',  'cmd'=>'users:update',          'note'=>'update email/username/roles'],
@@ -110,6 +110,8 @@ final class TerminalService
             'users:update'           => $this->userModule->updateCommand($tokens),
             'users:forgot-password'  => $this->userModule->forgotPasswordCommand($tokens),
             'users:delete'           => $this->userModule->deleteCommand($tokens),
+            'users:deactivate'       => $this->userModule->deactivateCommand($tokens),
+            'users:activate'         => $this->userModule->activateCommand($tokens),
             default                  => ['output'=>'Unhandled admin command','success'=>false],
         };
     }

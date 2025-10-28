@@ -41,35 +41,51 @@ final class UserTerminalService
      */
     public function listCommand(array $tokens): array
     {
-        // Split tokens into positional args + flags (via ArgsParser)
         ['args' => $args, 'flags' => $flags] = ArgsParser::parse($tokens);
 
-        // Positional arg #0 can be a numeric limit; default to 50
         $limit = (isset($args[0]) && ctype_digit($args[0])) ? (int) $args[0] : 50;
+        $q     = isset($flags['q']) ? (string) $flags['q'] : null;
 
-        // Optional case-insensitive search across emails/username
-        $q = isset($flags['q']) ? (string) $flags['q'] : null;
+        // Map --is-active to a tri-state: true/false/null
+        $raw = isset($flags['is-active']) ? strtolower((string)$flags['is-active']) : null;
 
-        $rows = $this->users->fetchListRowsSearched($limit, $q);
+        $isActive = true; // default: only active
+        if ($raw !== null) {
+            $truthy  = ['1','true','yes','y','on','active'];
+            $falsy   = ['0','false','no','n','off','inactive'];
+            $neutral = ['all','*','any'];
+
+            if (in_array($raw, $truthy, true)) {
+                $isActive = true;
+            } elseif (in_array($raw, $falsy, true)) {
+                $isActive = false;
+            } elseif (in_array($raw, $neutral, true)) {
+                $isActive = null; // no filter
+            } else {
+                // if someone passes a weird value, keep default (true) but hint in output
+            }
+        }
+
+        $rows = $this->users->fetchListRowsSearched($limit, $q, $isActive);
         if (!$rows) {
             return ['output' => 'No users found.', 'success' => true];
         }
 
-        // Build compact table-like lines
         $lines = array_map(
             static fn (array $r) => sprintf(
-                '%d | %s | %s | %s',
+                '%d | %s | %s | %s%s',
                 $r['id'],
                 $r['email'],
                 ($r['username'] ?? ''),
-                implode(',', $r['roles'])
+                implode(',', $r['roles']),
+                (isset($r['active']) && $r['active'] === false) ? ' (inactive)' : ''
             ),
             $rows
         );
 
-        // Join with <br> so the terminal renders each on its own line
         return ['output' => implode('<br>', $lines), 'success' => true];
     }
+
 
     /**
      * users:show <id|emails|username>

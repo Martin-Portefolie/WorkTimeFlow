@@ -39,14 +39,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      *
      * @return array<int,array{id:int,email:string,username:string,roles:array<int,string>}>
      */
-    public function fetchListRowsSearched(int $limit = 50, ?string $q = null): array
+    public function fetchListRowsSearched(int $limit = 50, ?string $q = null, ?bool $isActive = true): array
     {
         $qb = $this->createQueryBuilder('u')
             ->select(
                 'u.id AS id',
                 'u.email AS email',
                 "COALESCE(u.username, '') AS username",
-                'u.roles AS roles'
+                'u.roles AS roles',
+                'u.isActive AS active',
             )
             ->orderBy('u.id', 'ASC')
             ->setMaxResults($limit);
@@ -54,6 +55,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         if ($q !== null && $q !== '') {
             $qb->andWhere('LOWER(u.email) LIKE :q OR LOWER(u.username) LIKE :q')
                 ->setParameter('q', '%'.mb_strtolower($q).'%');
+        }
+
+        if ($isActive !== null) {
+            $qb->andWhere('u.isActive = :act')->setParameter('act', $isActive);
         }
 
         $rows = $qb->getQuery()->getArrayResult();
@@ -136,6 +141,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 $r['roles'] = is_array($decoded) ? $decoded : [];
             }
             $r['roles'] = array_values(array_unique(array_map('strval', $r['roles'])));
+            $r['active'] = (bool) ($r['active'] ?? false);
         }
         unset($r);
 
