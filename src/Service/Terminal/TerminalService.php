@@ -88,7 +88,7 @@ final class TerminalService
 
         return match ($cmd) {
             'help' => [
-                'view' => 'partials/_help_admin.html.twig',
+                'view' => 'terminal/_help_admin.html.twig',
                 'vars' => [
                     'aliases' => [
                         ['alias'=>'u.l',  'cmd'=>'users:list',            'note'=>'list users (default: active only; flags: --q=search, --is-active=active|inactive|all)'],
