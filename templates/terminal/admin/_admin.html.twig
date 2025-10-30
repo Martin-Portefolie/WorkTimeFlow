@@ -6,7 +6,10 @@
         data-action="keydown@window->terminal--terminal#hotkeys"
         data-terminal--terminal-run-url-value="{{ path('admin_terminal_run') }}"
         data-terminal--terminal-allowlist-value='{{ (is_granted("ROLE_ADMIN")
-        ? ["help","ping","users:list","users:show","users:add","users:update","users:forgot-password","users:delete", "users:deactivate","users:activate"]
+        ? ["help","ping",
+            "users:list","users:show","users:add","users:update","users:forgot-password","users:delete", "users:deactivate","users:activate",
+            "clients:list","clients:show","clients:add","clients:update","clients:delete"
+        ]
         : ["help","ping"]) | json_encode | raw }}'
 >
     <div class="flex min-h-[140px] max-h-[300px] items-stretch">

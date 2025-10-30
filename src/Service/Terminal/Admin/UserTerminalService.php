@@ -1,16 +1,16 @@
 <?php
-namespace App\Service\Terminal;
+namespace App\Service\Terminal\Admin;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use App\Service\Terminal\ArgsParser;
 use Doctrine\ORM\EntityManagerInterface;
 use Random\RandomException;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use App\Entity\User;
 
 
 /**

@@ -9,11 +9,17 @@ const ALIASES = {
     'u.off':'users:deactivate',
     'u.on': 'users:activate',
     'u.del':'users:delete',
+    'c.l':'clients:list',
+    'c.s':'clients:show',
+    'c.a':'clients:add',
+    'c.u':'clients:update',
+    'c.del':'clients:delete',
+
 };
 export default class extends Controller {
     static targets = ['input', 'output', 'suggestions', 'palette', 'paletteInput', 'paletteList'];
     static values = { runUrl: String, allowlist: Array };
-
+    awaiting = false; // when true, bypass allowlist (wizard step)
     connect() {
         // Identify user (prefix selector matches your "$email" span)
         const userText = document.querySelector('span.text-emerald-400')?.textContent || '$guest';
@@ -59,8 +65,9 @@ export default class extends Controller {
             const firstToken = (cmd.split(/\s+/)[0] || '');
             const canonical  = ALIASES[firstToken] || firstToken;
 
-            // Role-aware client filter; server still enforces
-            if (this.allowlistValue && !this.allowlistValue.includes(canonical)) {
+            // Role-aware client filter; server still enforces.
+            // BUT: if a wizard is awaiting input, bypass allowlist.
+            if (!this.awaiting && this.allowlistValue && !this.allowlistValue.includes(canonical)) {
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = this.renderLine(cmd, `${firstToken} is not viable`, false);
                 this.outputTarget.prepend(wrapper.firstElementChild || wrapper);
@@ -83,7 +90,14 @@ export default class extends Controller {
                 const html = await res.text();
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = html;
-                pending.replaceWith(wrapper.firstElementChild || wrapper);
+                const lineEl = wrapper.firstElementChild || wrapper;
+                pending.replaceWith(lineEl);
+                // Update awaiting flag for next input (wizard mode)
+                if (lineEl && lineEl.getAttribute) {
+                    this.awaiting = lineEl.getAttribute('data-await') === '1';
+                } else {
+                    this.awaiting = false;
+                                    }
             } catch (e) {
                 pending.textContent = `Error: ${e.message}`;
             }

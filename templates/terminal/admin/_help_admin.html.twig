@@ -15,8 +15,15 @@
         {% endfor %}
     </ul>
 
+
     <div class="font-medium text-zinc-200 mt-4">Client commands</div>
-    <div class="term-note">Coming soon…</div>
+    <ul class="list-disc pl-5 space-y-1">
+        <li><span class="term-cmd">clients:list</span> <span class="term-note">— flags: --q=&lt;search&gt; [limit]</span></li>
+        <li><span class="term-cmd">clients:show &lt;id|name|email&gt;</span></li>
+        <li><span class="term-cmd">clients:add --name="Heste-status Aps"</span> <span class="term-note">[--email= --phone= --contact= --address= --postal= --city= --country=]</span></li>
+        <li><span class="term-cmd">clients:update &lt;id|name|email&gt;</span> <span class="term-note">[--name= --email= --phone= --contact= --address= --postal= --city= --country=]</span></li>
+        <li><span class="term-cmd">clients:delete &lt;id|name|email&gt;</span></li>
+    </ul>
 
     <div class="mt-3 text-[12px] text-zinc-400">
         Shortcuts:
