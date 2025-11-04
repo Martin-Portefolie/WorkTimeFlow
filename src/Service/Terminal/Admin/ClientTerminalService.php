@@ -30,17 +30,6 @@ final class ClientTerminalService
         private Security $security,
     ) {}
 
-    /**
-     * clients:list [limit] [--q=search]
-     *
-     * Examples:
-     *  - clients:list
-     *  - clients:list 25
-     *  - clients:list --q=heste
-     *
-     * @param array<int,string> $tokens
-     * @return array{output:string, success:bool}
-     */
     public function listCommand(array $tokens): array
     {
         ['args' => $args, 'flags' => $flags] = ArgsParser::parse($tokens);
@@ -54,60 +43,72 @@ final class ClientTerminalService
             return ['output' => 'No clients found.', 'success' => true];
         }
 
-        $lines = array_map(
-            static fn (array $r) => sprintf(
-                '%d | %s | %s | %s | %s',
-                $r['id'],
-                htmlspecialchars($r['name'] ?? '', ENT_QUOTES, 'UTF-8'),
-                htmlspecialchars($r['contactEmail'] ?? '—', ENT_QUOTES, 'UTF-8'),
-                htmlspecialchars($r['city'] ?? '—', ENT_QUOTES, 'UTF-8'),
-                htmlspecialchars($r['country'] ?? '—', ENT_QUOTES, 'UTF-8'),
-            ),
-            $rows
-        );
+        // Normalize & escape (but keep plain text for width calc)
+        $data = array_map(function(array $r) {
+            return [
+                'id'      => (string)($r['id'] ?? ''),
+                'name'    => (string)($r['name'] ?? ''),
+                'email'   => (string)($r['contactEmail'] ?? ''),
+                'city'    => (string)($r['city'] ?? ''),
+                'country' => (string)($r['country'] ?? ''),
+            ];
+        }, $rows);
 
-        $header = 'id | name | email | city | country';
-        return ['output' => $header."\n".implode("\n", $lines), 'success' => true];
-    }
-
-    /**
-     * clients:show <id|name|email>
-     */
-    public function showCommand(array $tokens): array
-    {
-        if (!isset($tokens[0])) {
-            return ['output' => 'Usage: clients:show <id|name|email>', 'success' => false];
-        }
-
-        $key = $tokens[0];
-        $c   = $this->clients->findOneByIdNameOrEmail($key);
-
-        if (!$c) return ['output' => 'Client not found.', 'success' => false];
-
-        $rows = [
-            ['ID',        $c->getId()],
-            ['Name',      $c->getName()],
-            ['Email',     $c->getContactEmail() ?? '—'],
-            ['Phone',     $c->getContactPhone() ?? '—'],
-            ['Contact',   $c->getContactPerson() ?? '—'],
-            ['Address',   $c->getAdress() ?? '—'],
-            ['Postal',    $c->getPostalCode() ?? '—'],
-            ['City',      $c->getCity() ?? '—'],
-            ['Country',   $c->getCountry() ?? '—'],
+        // Compute dynamic widths (with sane minimums)
+        $w = [
+            'id'      => max(2,  strlen('ID'),      ...array_map(fn($r)=>mb_strlen($r['id']),      $data)),
+            'name'    => max(18, strlen('Name'),    ...array_map(fn($r)=>mb_strlen($r['name']),    $data)),
+            'email'   => max(20, strlen('Email'),   ...array_map(fn($r)=>mb_strlen($r['email']),   $data)),
+            'city'    => max(12, strlen('City'),    ...array_map(fn($r)=>mb_strlen($r['city']),    $data)),
+            'country' => max(10, strlen('Country'), ...array_map(fn($r)=>mb_strlen($r['country']), $data)),
         ];
 
-        $html = '<div class="space-y-0.5">';
-        foreach ($rows as [$k, $v]) {
-            $html .= sprintf(
-                '<div><span class="text-zinc-400">%s:</span> <span class="text-zinc-200">%s</span></div>',
-                htmlspecialchars((string)$k, ENT_QUOTES, 'UTF-8'),
-                htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8')
+        // Header + divider
+        $header = sprintf(
+            '%s | %s | %s | %s | %s',
+            $this->mb_pad('ID',      $w['id']),
+            $this->mb_pad('Name',    $w['name']),
+            $this->mb_pad('Email',   $w['email']),
+            $this->mb_pad('City',    $w['city']),
+            $this->mb_pad('Country', $w['country']),
+        );
+        $divider = str_repeat('-', mb_strlen($header));
+
+        // Rows
+        $lines = [];
+        foreach ($data as $r) {
+            $lines[] = sprintf(
+                '%s | %s | %s | %s | %s',
+                $this->mb_pad($r['id'],      $w['id']),
+                $this->mb_pad($r['name'],    $w['name']),
+                $this->mb_pad($r['email'] ?: '—',   $w['email']),
+                $this->mb_pad($r['city']  ?: '—',   $w['city']),
+                $this->mb_pad($r['country'] ?: '—', $w['country']),
             );
         }
-        $html .= '</div>';
+
+        // Wrap in <pre> so spacing is preserved; escape everything once at the end
+        $table = implode("\n", [$header, $divider, ...$lines]);
+        $html  = '<pre class="text-[11px] leading-[1.25] text-zinc-400">'. $this->h($table) .'</pre>';
+
 
         return ['output' => $html, 'success' => true];
     }
+
+    /** HTML-escape helper */
+    private function h(string $s): string
+    {
+        return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+    }
+
+    /** Multibyte-safe right-pad to fixed width (spaces) */
+    private function mb_pad(string $text, int $width): string
+    {
+        $len = mb_strlen($text);
+        if ($len >= $width) return $text;
+        return $text . str_repeat(' ', $width - $len);
+    }
+
 
     /**
      * clients:add --name="Acme A/S" [--email= --phone= --contact= --address= --postal= --city= --country=]

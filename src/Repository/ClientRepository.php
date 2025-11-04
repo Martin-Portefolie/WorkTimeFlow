@@ -16,14 +16,12 @@ class ClientRepository extends ServiceEntityRepository
         parent::__construct($registry, Client::class);
     }
 
-    /**
-     * @return array<int,array{id:int,name:string,contactEmail:?string,city:?string,country:?string}>
-     */
+
     public function fetchListRowsSearched(int $limit, ?string $q): array
     {
         $qb = $this->createQueryBuilder('c')
             ->select('c.id','c.name','c.contactEmail','c.city','c.country')
-            ->orderBy('c.name','ASC')
+            ->orderBy('c.id','ASC')
             ->setMaxResults($limit);
 
         if ($q) {
