@@ -44,48 +44,92 @@ final class UserTerminalService
         ['args' => $args, 'flags' => $flags] = ArgsParser::parse($tokens);
 
         $limit = (isset($args[0]) && ctype_digit($args[0])) ? (int) $args[0] : 50;
-        $q     = isset($flags['q']) ? (string) $flags['q'] : null;
+        $limit = max(1, min(100, $limit));
 
-        // Map --is-active to a tri-state: true/false/null
-        $raw = isset($flags['is-active']) ? strtolower((string)$flags['is-active']) : null;
+        $q       = isset($flags['q']) ? (string) $flags['q'] : null;
+        $raw     = isset($flags['is-active']) ? strtolower((string)$flags['is-active']) : null;
 
-        $isActive = true; // default: only active
+        // Tri-state: true / false / null (no filter)
+        $isActive = true; // default: active only
         if ($raw !== null) {
             $truthy  = ['1','true','yes','y','on','active'];
             $falsy   = ['0','false','no','n','off','inactive'];
             $neutral = ['all','*','any'];
-
-            if (in_array($raw, $truthy, true)) {
-                $isActive = true;
-            } elseif (in_array($raw, $falsy, true)) {
-                $isActive = false;
-            } elseif (in_array($raw, $neutral, true)) {
-                $isActive = null; // no filter
-            } else {
-                // if someone passes a weird value, keep default (true) but hint in output
-            }
+            if (in_array($raw, $truthy, true))      $isActive = true;
+            elseif (in_array($raw, $falsy, true))   $isActive = false;
+            elseif (in_array($raw, $neutral, true)) $isActive = null;
         }
 
+        // Expecting: id, email, username, roles(array), active(bool) from your repo helper
         $rows = $this->users->fetchListRowsSearched($limit, $q, $isActive);
         if (!$rows) {
             return ['output' => 'No users found.', 'success' => true];
         }
 
-        $lines = array_map(
-            static fn (array $r) => sprintf(
-                '%d | %s | %s | %s%s',
-                $r['id'],
-                $r['email'],
-                ($r['username'] ?? ''),
-                implode(',', $r['roles']),
-                (isset($r['active']) && $r['active'] === false) ? ' (inactive)' : ''
-            ),
-            $rows
-        );
+        // Normalize for width calc (plain text)
+        $data = array_map(function(array $r) {
+            return [
+                'id'       => (string)($r['id'] ?? ''),
+                'email'    => (string)($r['email'] ?? ''),
+                'username' => (string)($r['username'] ?? ''),
+                'roles'    => is_array($r['roles'] ?? null) ? implode(',', $r['roles']) : (string)($r['roles'] ?? ''),
+                'active'   => array_key_exists('active', $r) ? ((bool)$r['active'] ? 'yes' : 'no') : '—',
+            ];
+        }, $rows);
 
-        return ['output' => implode('<br>', $lines), 'success' => true];
+        // Column widths (sane minimums)
+        $w = [
+            'id'       => max(2,  strlen('ID'),       ...array_map(fn($r)=>mb_strlen($r['id']),       $data)),
+            'email'    => max(22, strlen('Email'),    ...array_map(fn($r)=>mb_strlen($r['email']),    $data)),
+            'username' => max(14, strlen('Username'), ...array_map(fn($r)=>mb_strlen($r['username']), $data)),
+            'roles'    => max(16, strlen('Roles'),    ...array_map(fn($r)=>mb_strlen($r['roles']),    $data)),
+            'active'   => max(6,  strlen('Active'),   ...array_map(fn($r)=>mb_strlen($r['active']),   $data)),
+        ];
+
+        // Header + divider
+        $header = sprintf(
+            '%s | %s | %s | %s | %s',
+            $this->mb_pad('ID',       $w['id']),
+            $this->mb_pad('Email',    $w['email']),
+            $this->mb_pad('Username', $w['username']),
+            $this->mb_pad('Roles',    $w['roles']),
+            $this->mb_pad('Active',   $w['active']),
+        );
+        $divider = str_repeat('-', mb_strlen($header));
+
+        // Rows
+        $lines = [];
+        foreach ($data as $r) {
+            $lines[] = sprintf(
+                '%s | %s | %s | %s | %s',
+                $this->mb_pad($r['id'],       $w['id']),
+                $this->mb_pad($r['email'] ?: '—',    $w['email']),
+                $this->mb_pad($r['username'] ?: '—', $w['username']),
+                $this->mb_pad($r['roles'] ?: '—',    $w['roles']),
+                $this->mb_pad($r['active'],          $w['active']),
+            );
+        }
+
+        // Final HTML (muted grey like your terminal)
+        $table = implode("\n", [$header, $divider, ...$lines]);
+        $html  = '<pre class="text-[11px] leading-[1.25] text-zinc-400">'.$this->h($table).'</pre>';
+
+        return ['output' => $html, 'success' => true];
     }
 
+    /** HTML-escape helper (add once if you don’t already have it) */
+    private function h(string $s): string
+    {
+        return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+    }
+
+    /** Multibyte-safe right-pad to fixed width */
+    private function mb_pad(string $text, int $width): string
+    {
+        $len = mb_strlen($text);
+        if ($len >= $width) return $text;
+        return $text . str_repeat(' ', $width - $len);
+    }
 
     /**
      * users:show <id|emails|username>
