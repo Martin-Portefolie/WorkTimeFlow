@@ -32,6 +32,10 @@ export default class extends Controller {
         this.historyIndex = null; // null => not navigating
     }
 
+    scrollToBottom() {
+        try { this.outputTarget.scrollTop = this.outputTarget.scrollHeight; } catch {}
+    }
+
     /* ========== UI helpers ========== */
     focusTile() {
         this.inputTarget.focus();
@@ -44,16 +48,24 @@ export default class extends Controller {
     }
 
     /* ========== Submit (supports "cmd1; cmd2" etc.) ========== */
-    async submit() {
-        const raw = (this.inputTarget.value || '').trim();
-        if (!raw) return;
+  async submit() {
+              // Don't trim yet; blank lines are meaningful during wizard (Enter = null)
+                  const raw = (this.inputTarget.value || '');
+           const isAwait = this.awaiting === true;
 
-        // Save full line in history
-        this.history.push(raw);
-        this.historyIndex = null;
+                  // If not awaiting and empty after trim, ignore
+                      if (!isAwait && raw.trim() === '') return;
 
-        // Split by ';' and run sequentially
-        const commands = raw.split(';').map(s => s.trim()).filter(Boolean);
+                  // Only store in history when it's a real command (not wizard answer)
+                      if (!isAwait) {
+                 this.history.push(raw.trim());
+                    this.historyIndex = null;
+                  }
+
+                  // When awaiting, treat the whole line as one payload (no splitting on ';')
+                      const commands = isAwait
+                ? [raw] // allow blanks and semicolons verbatim during wizard
+                    : raw.split(';').map(s => s.trim()).filter(Boolean);
         for (const cmd of commands) {
             // client-only clear
             if (['clear','cls'].includes(cmd.toLowerCase())) {
@@ -61,23 +73,28 @@ export default class extends Controller {
                 continue;
             }
 
-            // ---- NEW: alias normalization BEFORE allowlist check ----
-            const firstToken = (cmd.split(/\s+/)[0] || '');
-            const canonical  = ALIASES[firstToken] || firstToken;
-
-            // Role-aware client filter; server still enforces.
-            // BUT: if a wizard is awaiting input, bypass allowlist.
-            if (!this.awaiting && this.allowlistValue && !this.allowlistValue.includes(canonical)) {
-                const wrapper = document.createElement('div');
-                wrapper.innerHTML = this.renderLine(cmd, `${firstToken} is not viable`, false);
-                this.outputTarget.prepend(wrapper.firstElementChild || wrapper);
-                continue;
-            }
+                      // While awaiting a wizard step: bypass aliasing & allowlist entirely
+                          let firstToken = cmd;
+                   let canonical  = cmd;
+                      if (!isAwait) {
+                            // ---- alias normalization BEFORE allowlist check ----
+                                firstToken = (cmd.split(/\s+/)[0] || '');
+                            canonical  = ALIASES[firstToken] || firstToken;
+                            // Role-aware client filter; server still enforces
+                                if (this.allowlistValue && !this.allowlistValue.includes(canonical)) {
+                                  const wrapper = document.createElement('div');
+                                  wrapper.innerHTML = this.renderLine(cmd, `${firstToken} is not viable`, false);
+                                  this.outputTarget.append(wrapper.firstElementChild || wrapper);
+                                  this.scrollToBottom();
+                                  continue;
+                                }
+                          }
 
             // Echo then POST (you can send `cmd` as-is; server also normalizes)
             const pending = document.createElement('div');
             pending.textContent = `> ${cmd}`;
-            this.outputTarget.prepend(pending);
+            this.outputTarget.append(pending);
+            this.scrollToBottom();
 
             try {
                 const form = new FormData();
@@ -92,6 +109,7 @@ export default class extends Controller {
                 wrapper.innerHTML = html;
                 const lineEl = wrapper.firstElementChild || wrapper;
                 pending.replaceWith(lineEl);
+                this.scrollToBottom();
                 // Update awaiting flag for next input (wizard mode)
                 if (lineEl && lineEl.getAttribute) {
                     this.awaiting = lineEl.getAttribute('data-await') === '1';
@@ -272,7 +290,7 @@ export default class extends Controller {
         const hint = document.createElement('div');
         hint.className = 'text-xs text-zinc-500';
         hint.textContent = 'Cleared. Type "help" for commands.';
-        this.outputTarget.prepend(hint);
+        this.outputTarget.append(hint);
     }
 
     renderLine(input, output, success) {

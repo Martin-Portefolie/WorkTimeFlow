@@ -1,28 +1,24 @@
-<div class="space-y-3 text-[13px]">
-    <div class="font-semibold text-zinc-200">Here are the available admin commands</div>
+<div class="space-y-3">
 
-    <div class="font-medium text-zinc-200">Admin commands</div>
-    <ul class="list-disc pl-5 space-y-1">
-        {% for item in aliases %}
-            <li>
-                <span class="term-cmd">{{ item.cmd }}</span>
-                <span class="text-zinc-600"> | </span>
-                <span class="term-alias">{{ item.alias }}</span>
-                {% if item.note %}
-                    <span class="term-note">— {{ item.note }}</span>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-
-
-
-
-    <div class="mt-3 text-[12px] text-zinc-400">
-        Shortcuts:
-        <span class="term-kbd">⌘/Ctrl + \</span> focus,
-        <span class="term-kbd">⌘/Ctrl + .</span> palette,
-        <span class="term-kbd">↑/↓</span> history,
-        <span class="term-kbd">Ctrl/⌘ + L</span> clear.
+    <div class="font-mono text-[13px] text-zinc-100 font-semibold">
+        Here are the available admin commands
     </div>
+
+    <div class="rounded-lg ring-1 ring-zinc-800 overflow-hidden">
+        <div class="bg-zinc-900/40  uppercase tracking-wide text-zinc-400">
+            Admin commands
+        </div>
+
+        <ul class="divide-y divide-zinc-800">
+            {%- for it in aliases -%}
+                <li class="px-3 py-2 text-sm flex items-baseline gap-3">
+                    <code class="text-emerald-400">{{ it.cmd }}</code>
+                    <span class="text-zinc-600 text-xs">|</span>
+                    <code class="text-zinc-400">{{ it.alias }}</code>
+                    <span class="text-zinc-500 text-xs">— {{ it.note }}</span>
+                </li>
+            {%- endfor -%}
+        </ul>
+    </div>
+
 </div>

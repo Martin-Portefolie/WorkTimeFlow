@@ -16,10 +16,24 @@
 
         {# === LEFT (75%) — terminal === #}
         <div class="basis-3/4 min-w-0 border-r border-zinc-800/70 flex flex-col">
+            <!-- output -->
+            <div
+                    class="flex-1 overflow-y-auto px-4 py-3 text-xs space-y-1 bg-[#121418] text-zinc-400 whitespace-normal"
+                    data-terminal--terminal-target="output"
+                    role="log"
+                    aria-live="polite"
+                    aria-relevant="additions"
+                    aria-atomic="false">
+                {# lines injected by Stimulus #}
+            </div>
+
+            <div class="term-divider shrink-0"></div>
+
             <!-- input row -->
             <div class="px-4 py-3 flex items-center gap-2 shrink-0">
         <span class="text-emerald-400">
           ${{ app.user ? app.user.userIdentifier : 'guest' }}
+
         </span>
                 <input
                         type="text"
@@ -37,30 +51,22 @@
 
             <div class="term-divider shrink-0"></div>
 
-            <!-- output -->
-            <div
-                    class="flex-1 overflow-y-auto px-4 py-3 text-xs space-y-1 bg-[#121418] text-zinc-300"
-                    data-terminal--terminal-target="output"
-                    aria-live="polite">
-                {# lines injected by Stimulus #}
-            </div>
 
-            <div class="term-divider shrink-0"></div>
 
             <!-- footer hints -->
             <div class="term-footer">
                 <div>Type <span class="text-emerald-400">help</span> to see available commands.</div>
                 <div class="term-shortcuts">
-    <span class="term-shortcut">
-      <img src="{{ asset('icons/keyboard_icons/ctrl_cmd-key.png') }}" class="keycap-img" alt="Ctrl or Cmd">
-      <span class="text-xl">+</span>
-      <img src="{{ asset('icons/keyboard_icons/forward_slash-key.png') }}" class="keycap-img" alt="/">
-      <span>Open command palette</span>
-    </span>
-                    <span class="term-shortcut">
-      <img src="{{ asset('icons/keyboard_icons/upanddown-key.png') }}" class="keycap-img" alt="Up and Down">
-      <span>Cycle through previous commands</span>
-    </span>
+                <span class="term-shortcut">
+                  <img src="{{ asset('icons/keyboard_icons/ctrl_cmd-key.png') }}" class="keycap-img" alt="Ctrl or Cmd">
+                  <span class="text-xl">+</span>
+                  <img src="{{ asset('icons/keyboard_icons/forward_slash-key.png') }}" class="keycap-img" alt="/">
+                  <span>Open command palette</span>
+                </span>
+                                <span class="term-shortcut">
+                  <img src="{{ asset('icons/keyboard_icons/upanddown-key.png') }}" class="keycap-img" alt="Up and Down">
+                  <span>Cycle through previous commands</span>
+                </span>
                 </div>
             </div>
 

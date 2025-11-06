@@ -6,7 +6,10 @@
     {% endif %}
 
     <div class="flex-1 space-y-1">
-        <div class="text-zinc-200 font-mono text-sm">{{ input }}</div>
-        <div class="text-zinc-400 text-xs">{{ output|raw }}</div>
+        {% if input|length %}
+            <div class="text-zinc-200 font-mono text-sm">{{ input }}</div>
+        {% endif %}
+        <div class="text-zinc-400 text-xs whitespace-normal">{{ output|raw }}</div>
+
     </div>
 </div>

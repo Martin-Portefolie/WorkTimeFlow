@@ -35,57 +35,55 @@ final class TerminalService
      */
     public function execute(string $input): array
     {
+        // keep raw as-trimmed; blank is meaningful for wizard steps
         $raw = trim($input);
-        if ($raw === '') {
-            return ['output' => 'No command.', 'success' => false];
-        }
 
         // Fast path: clear screen handled locally
         if (in_array(strtolower($raw), ['clear', 'cls'], true)) {
             return ['output' => '', 'success' => true];
         }
 
-        // --- 1) Tokenize + resolve aliases FIRST
+        $isAdmin = $this->isAdmin();
+
+        // ── NEW: let any active wizard consume the input (even if it's blank) ──
+        if ($isAdmin) {
+            if ($resp = $this->userModule->handleInteractive($raw))   { return $resp; }
+            if ($resp = $this->clientModule->handleInteractive($raw)) { return $resp; }
+        }
+
+        // At this point we know no wizard is active / interested.
+        if ($raw === '') {
+            return ['output' => 'No command.', 'success' => false];
+        }
+
+        // Tokenize + resolve aliases
         $tokens = preg_split('/\s+/', $raw) ?: [];
         $first  = $tokens[0] ?? '';
-
         if (isset(self::ALIASES[$first])) {
             $tokens[0] = self::ALIASES[$first];
             $raw       = implode(' ', $tokens);
             $first     = $tokens[0];
         }
 
-        $isAdmin = $this->isAdmin();
-
-        // --- 2) Known-commands allowlist
+        // Known-commands allowlist
         $adminCommands = [
             'help','ping',
-            // users
             'users:list','users:show','users:add','users:update','users:forgot-password',
             'users:delete','users:deactivate','users:activate',
-            // clients
             'clients:list','clients:show','clients:add','clients:update','clients:delete',
         ];
         $userCommands  = ['help','ping'];
-
         $known = $isAdmin ? $adminCommands : $userCommands;
 
-        // --- 3) If it's a known command, DISPATCH NOW
+        // Dispatch known commands
         if (in_array($first, $known, true)) {
             return $isAdmin ? $this->handleAdmin($raw) : $this->handleUser($raw);
         }
 
-        // --- 4) Otherwise, give interactive wizard a chance to consume it
-        if ($isAdmin) {
-            if ($resp = $this->clientModule->handleInteractive($raw)) {
-                // response may include 'await'=>true to tell the UI to bypass allowlist next input
-                return $resp;
-            }
-        }
-
-        // --- 5) Fallback
+        // If somehow not known and no wizard, fall back
         return ['output' => sprintf('%s is not viable', htmlspecialchars($first)), 'success' => false];
     }
+
 
     private function handleAdmin(string $input): array
     {
