@@ -9,7 +9,7 @@ namespace App\Service\Terminal;
  *  - named flags (options starting with "--")
  *
  * Example:
- *   input tokens: ["users:add", "--emails=alice@example.com", "--roles=ROLE_ADMIN,ROLE_USER", "123"]
+ *   input tokens: ["users:add", "--emails=HestTest@example.com", "--roles=ROLE_ADMIN,ROLE_USER", "123"]
  *   parse result:
  *     [
  *       'args'  => ["123"],   // plain positional values

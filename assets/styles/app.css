@@ -50,9 +50,11 @@
     .terminal-res   { @apply bg-emerald-50 border border-emerald-200; }
     .terminal-mark  { @apply text-emerald-400 font-mono; }
     .terminal-text  { @apply text-slate-200 font-mono; }
+
     /* --- terminal positioning & shell --- */
     .terminal-sticky { @apply sticky z-40 top-[var(--nav-h)]; }
-    .terminal-shell  { @apply  border border-zinc-800/80 bg-[#0e1116] text-zinc-100 font-mono shadow-md; }
+    .terminal-shell  { @apply  border border-zinc-800/80 bg-[#0e1116] text-zinc-100 font-mono shadow-md rounded-md; }
+
     /* --- Terminal objects --- */
 
     /* Thin divider used above output and above footer */
