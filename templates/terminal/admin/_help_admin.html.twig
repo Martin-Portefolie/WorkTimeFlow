@@ -19,13 +19,15 @@
                         <span class="text-zinc-500 text-xs">— {{ it.desc }}</span>
                     </div>
 
-                    {# Show flags below if any exist #}
                     {% if it.flags is not empty %}
-                        <div class="flex flex-wrap gap-2 mt-1 ml-5">
+                        <div class="flex flex-wrap items-center mt-1 ml-5 text-[10px] text-amber-300">
                             {% for flag in it.flags %}
-                                <code class="text-amber-300 text-[11px] bg-zinc-800/60 px-1.5 py-0.5 rounded leading-4">
+                                <code class="bg-zinc-800/60 px-1 py-0.5 rounded leading-tight tracking-tight">
                                     {{ flag }}
                                 </code>
+                                {% if not loop.last %}
+                                    <span class="text-zinc-600 mx-1">·</span>
+                                {% endif %}
                             {% endfor %}
                         </div>
                     {% endif %}
