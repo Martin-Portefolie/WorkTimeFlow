@@ -11,11 +11,24 @@
 
         <ul class="divide-y divide-zinc-800">
             {%- for it in aliases -%}
-                <li class="px-3 py-2 text-sm flex items-baseline gap-3">
-                    <code class="text-emerald-400">{{ it.cmd }}</code>
-                    <span class="text-zinc-600 text-xs">|</span>
-                    <code class="text-zinc-400">{{ it.alias }}</code>
-                    <span class="text-zinc-500 text-xs">— {{ it.note }}</span>
+                <li class="px-3 py-2 text-sm">
+                    <div class="flex items-baseline flex-wrap gap-2">
+                        <code class="text-emerald-400">{{ it.cmd }} {{ it.usage }}</code>
+                        <span class="text-zinc-600 text-xs">|</span>
+                        <code class="text-zinc-400">{{ it.alias }}</code>
+                        <span class="text-zinc-500 text-xs">— {{ it.desc }}</span>
+                    </div>
+
+                    {# Show flags below if any exist #}
+                    {% if it.flags is not empty %}
+                        <div class="flex flex-wrap gap-2 mt-1 ml-5">
+                            {% for flag in it.flags %}
+                                <code class="text-amber-300 text-[11px] bg-zinc-800/60 px-1.5 py-0.5 rounded leading-4">
+                                    {{ flag }}
+                                </code>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </li>
             {%- endfor -%}
         </ul>

@@ -95,23 +95,107 @@ final class TerminalService
                 'view' => 'terminal/admin/_help_admin.html.twig',
                 'vars' => [
                     'aliases' => [
-                        // users
-                        ['alias'=>'u.l',  'cmd'=>'users:list',            'note'=>'list users (flags: --q= --is-active=active|inactive|all)'],
-                        ['alias'=>'u.s',  'cmd'=>'users:show',            'note'=>'show one by id/email'],
-                        ['alias'=>'u.a',  'cmd'=>'users:add',             'note'=>'create user & email credentials'],
-                        ['alias'=>'u.u',  'cmd'=>'users:update',          'note'=>'update email/username/roles'],
-                        ['alias'=>'u.fp', 'cmd'=>'users:forgot-password', 'note'=>'set temp password & email user'],
-                        ['alias'=>'u.del','cmd'=>'users:delete',          'note'=>'hard delete'],
-                        ['alias'=>'u.off','cmd'=>'users:deactivate',      'note'=>'disable login'],
-                        ['alias'=>'u.on', 'cmd'=>'users:activate',        'note'=>'enable login'],
-                        // clients
-                        ['alias'=>'c.l',  'cmd'=>'clients:list',   'note'=>'list clients (flags: --q=)'],
-                        ['alias'=>'c.s',  'cmd'=>'clients:show',   'note'=>'show one by id/name/email'],
-                        ['alias'=>'c.a',  'cmd'=>'clients:add',    'note'=>'interactive — press Enter to skip, type "cancel" to abort'],
-                        ['alias'=>'c.u',  'cmd'=>'clients:update', 'note'=>'update fields'],
-                        ['alias'=>'c.del','cmd'=>'clients:delete', 'note'=>'hard delete'],
-                    ],
-                ],
+                        // === USERS ===
+                        [
+                            'cmd'   => 'users:list',
+                            'alias' => 'u.l',
+                            'desc'  => 'List users',
+                            'usage' => '',
+                            'flags' => ['--q=<search>', '--is-active=active|inactive|all'],
+                        ],
+                        [
+                            'cmd'   => 'users:show',
+                            'alias' => 'u.s',
+                            'desc'  => 'Show a user',
+                            'usage' => '<id|email|username>',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'users:add',
+                            'alias' => 'u.a',
+                            'desc'  => 'Interactive wizard — create a user (Enter to skip, "cancel" to abort)',
+                            'usage' => '',   // interactive; no positional args
+                            'flags' => [],   // interactive; no flags
+                        ],
+                        [
+                            'cmd'   => 'users:update',
+                            'alias' => 'u.u',
+                            'desc'  => 'Update a user',
+                            'usage' => '<id|email>',
+                            'flags' => ['--email=<new_email>', '--username=<new_username>', '--roles=<ROLE_USER, ROLE_ADMIN>'],
+                        ],
+                        [
+                            'cmd'   => 'users:forgot-password',
+                            'alias' => 'u.fp',
+                            'desc'  => 'Generate + email a temporary password',
+                            'usage' => '<id|email>',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'users:delete',
+                            'alias' => 'u.del',
+                            'desc'  => 'Delete a user',
+                            'usage' => '<id|email>',
+                            'flags' => ['--force'],
+                        ],
+                        [
+                            'cmd'   => 'users:deactivate',
+                            'alias' => 'u.off',
+                            'desc'  => 'Disable login',
+                            'usage' => '<id|email>',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'users:activate',
+                            'alias' => 'u.on',
+                            'desc'  => 'Enable login',
+                            'usage' => '<id|email>',
+                            'flags' => [],
+                        ],
+
+                        // === CLIENTS ===
+                        [
+                            'cmd'   => 'clients:list',
+                            'alias' => 'c.l',
+                            'desc'  => 'List clients',
+                            'usage' => '[limit]',
+                            'flags' => ['--q=<search>'],
+                        ],
+                        [
+                            'cmd'   => 'clients:show',
+                            'alias' => 'c.s',
+                            'desc'  => 'Show a client',
+                            'usage' => '<id|name|email>',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'clients:add',
+                            'alias' => 'c.a',
+                            'desc'  => 'Interactive wizard — add a client (Enter to skip, "cancel" to abort)',
+                            'usage' => '',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'clients:update',
+                            'alias' => 'c.u',
+                            'desc'  => 'Update a client',
+                            'usage' => '<id|name|email>',
+                            'flags' => [
+                                '--name=<new_name>', '--email=<new_email>', '--phone=<new_phone>',
+                                '--contact=<person>', '--address=<street>', '--postal=<code>',
+                                '--city=<city>', '--country=<country>',
+                            ],
+                        ],
+                        [
+                            'cmd'   => 'clients:delete',
+                            'alias' => 'c.del',
+                            'desc'  => 'Delete a client',
+                            'usage' => '<id|name|email>',
+                            'flags' => ['--force'],
+                        ],
+                    ]
+
+        ],
                 'success' => true,
             ],
 
