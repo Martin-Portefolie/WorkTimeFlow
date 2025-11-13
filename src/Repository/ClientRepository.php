@@ -20,25 +20,24 @@ class ClientRepository extends ServiceEntityRepository
     public function fetchListRowsSearched(int $limit, ?string $q): array
     {
         $qb = $this->createQueryBuilder('c')
-            ->select('c.id','c.name','c.contactEmail','c.city','c.country')
-            ->orderBy('c.id','ASC')
+            ->leftJoin('c.projects', 'p')
+            ->addSelect('c.id, c.name, c.city, c.country, c.contactPerson, c.contactEmail, c.contactPhone')
+            ->addSelect('COUNT(DISTINCT p.id) AS projectsCount')
+            ->groupBy('c.id')
+            ->orderBy('c.name', 'DESC')
             ->setMaxResults($limit);
 
         if ($q) {
-            $qb->andWhere('LOWER(c.name) LIKE :q OR LOWER(c.contactEmail) LIKE :q OR LOWER(c.city) LIKE :q OR LOWER(c.country) LIKE :q')
-                ->setParameter('q', '%'.mb_strtolower($q).'%');
+            $qb->andWhere('
+            c.name LIKE :q OR
+            c.city LIKE :q OR
+            c.country LIKE :q OR
+            c.contactPerson LIKE :q OR
+            c.contactEmail LIKE :q
+        ')->setParameter('q', '%'.$q.'%');
         }
 
-        return array_map(
-            static fn ($r) => [
-                'id' => (int)$r['id'],
-                'name' => (string)$r['name'],
-                'contactEmail' => $r['contactEmail'] ?? null,
-                'city' => $r['city'] ?? null,
-                'country' => $r['country'] ?? null,
-            ],
-            $qb->getQuery()->getArrayResult()
-        );
+        return $qb->getQuery()->getArrayResult();
     }
 
     /** @param string $key id (digits) OR exact email OR exact name (case-insensitive) */

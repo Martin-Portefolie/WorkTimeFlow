@@ -286,11 +286,31 @@ export default class extends Controller {
 
     /* ========== Utilities ========== */
     clearOutput() {
+        // Wipe the log
         this.outputTarget.innerHTML = '';
+
+        // Add the temporary hint
         const hint = document.createElement('div');
-        hint.className = 'text-xs text-zinc-500';
+        hint.className = 'term-hint text-xs text-zinc-500 opacity-100 transition-opacity duration-500';
         hint.textContent = 'Cleared. Type "help" for commands.';
         this.outputTarget.append(hint);
+
+        // If a previous timer exists, cancel it
+        if (this.clearHintTimeoutId) {
+            clearTimeout(this.clearHintTimeoutId);
+            this.clearHintTimeoutId = null;
+        }
+
+        // After 5 seconds, fade out
+        this.clearHintTimeoutId = setTimeout(() => {
+            hint.classList.add('opacity-0'); // triggers Tailwind fade-out transition
+
+            // Fully remove after the fade completes (≈ 500ms)
+            setTimeout(() => {
+                if (hint.isConnected) hint.remove();
+                this.clearHintTimeoutId = null;
+            }, 600);
+        }, 5000);
     }
 
     renderLine(input, output, success) {

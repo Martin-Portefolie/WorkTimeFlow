@@ -57,6 +57,15 @@
 
     /* --- Terminal objects --- */
 
+    /* Fadeout after a terminal clear command */
+    .term-hint {
+        transition: opacity 0.5s ease;
+        opacity: 1;
+    }
+    .term-hint.opacity-0 {
+        opacity: 0;
+    }
+
     /* Thin divider used above output and above footer */
     .term-divider { @apply h-px bg-zinc-800/70; }
 

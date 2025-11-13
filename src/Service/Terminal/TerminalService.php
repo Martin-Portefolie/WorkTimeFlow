@@ -92,7 +92,7 @@ final class TerminalService
 
         return match ($cmd) {
             'help' => [
-                'view' => 'terminal/admin/_help_admin.html.twig',
+                'view' => 'terminal/admin/terminal_commands/_help_admin.html.twig',
                 'vars' => [
                     'aliases' => [
                         // === USERS ===

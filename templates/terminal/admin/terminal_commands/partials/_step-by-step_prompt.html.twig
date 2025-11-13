@@ -1,0 +1,29 @@
+{# templates/terminal/admin/terminal_commands/partials/_step-by-step.html.twig #}
+{# TODO: clear should cancel the the questioning #}
+<div class="space-y-1 font-mono text-xs">
+
+    {# Step indicator #}
+    {% if step is defined and total is defined %}
+        <div class="text-zinc-500">
+            Step {{ step }} of {{ total }}
+        </div>
+    {% endif %}
+
+    {# Main question #}
+    <div class="text-zinc-500 text-sm">
+        {{ label }}
+    </div>
+
+    {# Example #}
+    {% if example is defined and example %}
+        <div class="text-zinc-500">
+            e.g. <span class="text-zinc-500">{{ example }}</span>
+        </div>
+    {% endif %}
+
+    {# Footer #}
+    <div class="text-zinc-600">
+        Press Enter to leave empty, or type <span class="term-cmd">cancel</span> to abort.
+    </div>
+
+</div>
