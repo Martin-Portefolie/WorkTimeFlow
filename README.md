@@ -10,19 +10,17 @@ Before setting up the project, ensure you have the following installed:
 
 ## Local Development Setup
 
-
-
 ### Setup With Docker
 ```sh
 # 1. Start Docker and build the containers
 docker compose up -d --build
-docker compose up  -d #(if already installed)
+docker compose up -d  # (if already installed)
 
 # 2. Install dependencies
 docker compose exec app composer install
 
 # 3. Migrate the database
-docker compose exec app bin/console doctrine:migrations:migrate  #(only on install)
+docker compose exec app bin/console doctrine:migrations:migrate  # (only on install)
 
 # 4. Start Tailwind CSS compilation
 docker compose exec app bin/console tailwind:build --watch --poll
@@ -33,20 +31,16 @@ To populate your database with test data, follow these steps:
 
 ### 1. Reset the database
 ```sh
-docker compose exec app php bin/console doctrine:schema:drop --full-database --force
-docker compose exec app php bin/console doctrine:migrations:migrate
+docker compose exec app bin/console doctrine:schema:drop --full-database --force
+docker compose exec app bin/console doctrine:migrations:migrate
 ```
-
 
 ### 2. Load test data
 ```sh
-docker compose exec app php bin/console doctrine:fixtures:load
+docker compose exec app bin/console doctrine:fixtures:load
 ```
 
-
 ## Mailer Setup
-
-To enable email sending in Symfony, follow these steps:
 
 ### 1. Configure the `.env` file
 Open the `.env.local` file and update the `MAILER_DSN` value based on your email provider. Example for Gmail:
@@ -56,23 +50,13 @@ MAILER_DSN=smtp://your_email@gmail.com:your_password@smtp.gmail.com:587?encrypti
 For other mail providers, refer to the [Symfony Mailer documentation](https://symfony.com/doc/current/mailer.html).
 
 ### 2. Clear the cache
-After updating the `.env.local` file, clear the cache to apply the changes:
 ```sh
-docker compose exec app php bin/console cache:clear
-```
-If using Docker:
-```sh
-docker compose exec app php bin/console cache:clear
+docker compose exec app bin/console cache:clear
 ```
 
 ### 3. Start the Mailer Transport
-Run the following command to start consuming mail messages via Symfony Messenger:
 ```sh
-docker compose exec app php bin/console messenger:consume async -vv
-```
-If using Docker:
-```sh
-docker compose exec app php bin/console messenger:consume async -vv
+docker compose exec app bin/console messenger:consume async -vv
 ```
 
 ## Production Setup
@@ -101,13 +85,12 @@ chmod -R 775 var/
 ```
 
 ## Running Tests
-Before making a pull request, ensure the code passes all tests:
 ```sh
 # Lint Twig templates
-docker-compose exec php bin/console lint:twig templates/
+docker compose exec app bin/console lint:twig templates/
 
 # Run PHP-CS-Fixer in dry-run mode
-docker-compose exec php ./vendor/bin/php-cs-fixer fix --dry-run --diff
+docker compose exec app ./vendor/bin/php-cs-fixer fix --dry-run --diff
 ```
 
 ## Helpful Commands
@@ -115,49 +98,49 @@ docker-compose exec php ./vendor/bin/php-cs-fixer fix --dry-run --diff
 ### Database Management
 ```sh
 # Migrate new changes to the database
-docker-compose exec php bin/console doctrine:migrations:migrate
+docker compose exec app bin/console doctrine:migrations:migrate
 
 # Reset and reinitialize the database
-docker-compose exec php bin/console doctrine:schema:drop --full-database --force
-docker-compose exec php bin/console doctrine:migrations:migrate
+docker compose exec app bin/console doctrine:schema:drop --full-database --force
+docker compose exec app bin/console doctrine:migrations:migrate
 
 # Load test data
-docker-compose exec php bin/console doctrine:fixtures:load
+docker compose exec app bin/console doctrine:fixtures:load
 ```
 
 ### User and Project Management
 ```sh
 # Create a new user
-docker-compose exec php bin/console create-user
+docker compose exec app bin/console create-user
 
 # Create a new client
-docker-compose exec php bin/console create-client
+docker compose exec app bin/console create-client
 
 # Create a new project
-docker-compose exec php bin/console create-project
+docker compose exec app bin/console create-project
 
 # Create a team
-docker-compose exec php bin/console create-team "Pegasus Team" a@a.com b@b.com --projectName="Project Pegasus"
+docker compose exec app bin/console create-team "Pegasus Team" a@a.com b@b.com --projectName="Project Pegasus"
 ```
 
 ### Task and Time Log Management
 ```sh
 # Create a new task
-docker-compose exec php bin/console create-todo 1 "Storyboard Development"  "2025-02-20" "2025-02-22"
+docker compose exec app bin/console create-todo 1 "Storyboard Development" "2025-02-20" "2025-02-22"
 
 # Log time entries
-docker-compose exec php bin/console create-timelog "admin" 1 2 30 "2024-11-22" "Completed the storyboard initial draft"
-docker-compose exec php bin/console create-timelog "admin" 1 1 30 "2024-11-20" "Completed the storyboard initial draft 2"
-docker-compose exec php bin/console create-timelog "admin" 1 1 30 "2025-02-20" "Completed the storyboard initial draft 3"
+docker compose exec app bin/console create-timelog "admin" 1 2 30 "2024-11-22" "Completed the storyboard initial draft"
+docker compose exec app bin/console create-timelog "admin" 1 1 30 "2024-11-20" "Completed the storyboard initial draft 2"
+docker compose exec app bin/console create-timelog "admin" 1 1 30 "2025-02-20" "Completed the storyboard initial draft 3"
 ```
 
 ### Running Symfony Messenger
 ```sh
-docker-compose exec php bin/console messenger:consume async -vv
+docker compose exec app bin/console messenger:consume async -vv
 ```
 
 ## Additional Notes
-- Commands inside Docker: `docker-compose exec php bin/console <command>`
-- Install dependencies in Docker: `docker-compose exec php composer <command>`
-- Access the application at: [http://localhost:8080/en/](http://localhost:8080/en/)
+- Commands inside Docker: `docker compose exec app bin/console <command>`
+- Install dependencies in Docker: `docker compose exec app composer <command>`
+- Access the application at: http://localhost:8080/en/
 
