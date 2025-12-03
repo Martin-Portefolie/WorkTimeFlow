@@ -6,15 +6,21 @@
         Here are the available admin commands
     </div>
 
-    {# --- Split aliases into users / clients --- #}
+    {# --- Split aliases into users / clients / company / rates --- #}
     {% set userCommands = [] %}
     {% set clientCommands = [] %}
+    {% set companyCommands = [] %}
+    {% set rateCommands = [] %}
 
     {% for it in aliases %}
         {% if it.cmd starts with 'users:' %}
             {% set userCommands = userCommands|merge([it]) %}
         {% elseif it.cmd starts with 'clients:' %}
             {% set clientCommands = clientCommands|merge([it]) %}
+        {% elseif it.cmd starts with 'company:' %}
+            {% set companyCommands = companyCommands|merge([it]) %}
+        {% elseif it.cmd starts with 'rates:' %}
+            {% set rateCommands = rateCommands|merge([it]) %}
         {% endif %}
     {% endfor %}
 
@@ -96,6 +102,124 @@
 
             <tbody>
             {% for it in clientCommands %}
+                <tr class="text-zinc-300">
+                    <td class="border border-zinc-800 px-2 py-1">
+                        <code class="text-emerald-400">{{ it.cmd }}</code>
+                    </td>
+
+                    <td class="border border-zinc-800 px-2 py-1">
+                        <code class="text-amber-300">{{ it.alias }}</code>
+                    </td>
+
+                    <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
+                        {% if it.usage %}
+                            <code class="text-zinc-400">{{ it.usage }}</code>
+                        {% else %}
+                            <span class="text-zinc-700">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
+                        {{ it.desc }}
+                    </td>
+
+                    <td class="border border-zinc-800 px-2 py-1">
+                        {% if it.flags is not empty %}
+                            <div class="flex flex-col gap-0.5">
+                                {% for flag in it.flags %}
+                                    <code class="text-sky-400 bg-zinc-800/60 px-1 py-0.5 rounded text-[10px]">
+                                        {{ flag }}
+                                    </code>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <span class="text-zinc-700 text-[10px]">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {# ---------- COMPANY COMMANDS TABLE ---------- #}
+    {% if companyCommands is not empty %}
+        <table class="border-collapse border border-zinc-800 w-full text-xs">
+            <caption class="bg-zinc-900/40 text-zinc-400 uppercase tracking-wide p-2 text-left">
+                Company commands
+            </caption>
+
+            <thead>
+            <tr class="bg-zinc-900/40 text-zinc-500">
+                <th class="border border-zinc-800 px-2 py-1 text-left w-[22%]">Command</th>
+                <th class="border border-zinc-800 px-2 py-1 text-left w-[10%]">Alias</th>
+                <th class="border border-zinc-800 px-2 py-1 text-left w-[18%]">Usage</th>
+                <th class="border border-zinc-800 px-2 py-1 text-left w-[30%]">Description</th>
+                <th class="border border-zinc-800 px-2 py-1 text-left w-[20%]">Flags</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for it in companyCommands %}
+                <tr class="text-zinc-300">
+                    <td class="border border-zinc-800 px-2 py-1">
+                        <code class="text-emerald-400">{{ it.cmd }}</code>
+                    </td>
+
+                    <td class="border border-zinc-800 px-2 py-1">
+                        <code class="text-amber-300">{{ it.alias }}</code>
+                    </td>
+
+                    <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
+                        {% if it.usage %}
+                            <code class="text-zinc-400">{{ it.usage }}</code>
+                        {% else %}
+                            <span class="text-zinc-700">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
+                        {{ it.desc }}
+                    </td>
+
+                    <td class="border border-zinc-800 px-2 py-1">
+                        {% if it.flags is not empty %}
+                            <div class="flex flex-col gap-0.5">
+                                {% for flag in it.flags %}
+                                    <code class="text-sky-400 bg-zinc-800/60 px-1 py-0.5 rounded text-[10px]">
+                                        {{ flag }}
+                                    </code>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <span class="text-zinc-700 text-[10px]">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {# ---------- RATE COMMANDS TABLE ---------- #}
+    {% if rateCommands is not empty %}
+        <table class="border-collapse border border-zinc-800 w-full text-xs">
+            <caption class="bg-zinc-900/40 text-zinc-400 uppercase tracking-wide p-2 text-left">
+                Rate commands
+            </caption>
+
+            <thead>
+            <tr class="bg-zinc-900/40 text-zinc-500">
+                <th class="border border-zinc-800 px-2 py-1 text-left w-[22%]">Command</th>
+                <th class="border border-zinc-800 px-2 py-1 text-left w-[10%]">Alias</th>
+                <th class="border border-zinc-800 px-2 py-1 text-left w-[18%]">Usage</th>
+                <th class="border border-zinc-800 px-2 py-1 text-left w-[30%]">Description</th>
+                <th class="border border-zinc-800 px-2 py-1 text-left w-[20%]">Flags</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for it in rateCommands %}
                 <tr class="text-zinc-300">
                     <td class="border border-zinc-800 px-2 py-1">
                         <code class="text-emerald-400">{{ it.cmd }}</code>
