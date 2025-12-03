@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 const ALIASES = {
+    // Users
     'u.l':  'users:list',
     'u.s':  'users:show',
     'u.a':  'users:add',
@@ -9,12 +10,23 @@ const ALIASES = {
     'u.off':'users:deactivate',
     'u.on': 'users:activate',
     'u.del':'users:delete',
-    'c.l':'clients:list',
-    'c.s':'clients:show',
-    'c.a':'clients:add',
-    'c.u':'clients:update',
+
+    // Clients
+    'c.l':  'clients:list',
+    'c.s':  'clients:show',
+    'c.a':  'clients:add',
+    'c.u':  'clients:update',
     'c.del':'clients:delete',
 
+    // Company
+    'co.s':  'company:show',
+    'co.n':  'company:set-name',
+
+    // Rates
+    'r.l':   'rates:list',
+    'r.a':   'rates:add',
+    'r.u':   'rates:update',
+    'r.del': 'rates:delete',
 };
 export default class extends Controller {
     static targets = ['input', 'output', 'suggestions', 'palette', 'paletteInput', 'paletteList'];

@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Service\Terminal;
 
 use App\Service\Terminal\Admin\ClientTerminalService;
+use App\Service\Terminal\Admin\CompanyTerminalService;
 use App\Service\Terminal\Admin\UserTerminalService;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -10,16 +12,38 @@ final class TerminalService
     /** @var array<string,string> */
     private const ALIASES = [
         // Users
-        'u.l'=>'users:list','u.s'=>'users:show','u.a'=>'users:add','u.u'=>'users:update',
-        'u.fp'=>'users:forgot-password','u.off'=>'users:deactivate','u.on'=>'users:activate','u.del'=>'users:delete',
+        'u.l'   => 'users:list',
+        'u.s'   => 'users:show',
+        'u.a'   => 'users:add',
+        'u.u'   => 'users:update',
+        'u.fp'  => 'users:forgot-password',
+        'u.off' => 'users:deactivate',
+        'u.on'  => 'users:activate',
+        'u.del' => 'users:delete',
+
         // Clients
-        'c.l'=>'clients:list','c.s'=>'clients:show','c.a'=>'clients:add','c.u'=>'clients:update','c.del'=>'clients:delete',
+        'c.l'   => 'clients:list',
+        'c.s'   => 'clients:show',
+        'c.a'   => 'clients:add',
+        'c.u'   => 'clients:update',
+        'c.del' => 'clients:delete',
+
+        // Company
+        'co.s'  => 'company:show',
+        'co.n'  => 'company:set-name',
+
+        // Rates
+        'r.l'   => 'rates:list',
+        'r.a'   => 'rates:add',
+        'r.u'   => 'rates:update',
+        'r.del' => 'rates:delete',
     ];
 
     public function __construct(
-        private Security $security,
-        private UserTerminalService $userModule,
+        private Security             $security,
+        private UserTerminalService  $userModule,
         private ClientTerminalService $clientModule,
+        private CompanyTerminalService $companyModule,
     ) {}
 
     private function isAdmin(): bool
@@ -45,10 +69,11 @@ final class TerminalService
 
         $isAdmin = $this->isAdmin();
 
-        // ── NEW: let any active wizard consume the input (even if it's blank) ──
+        // ── Let any active wizard consume the input (even if it's blank) ──
         if ($isAdmin) {
             if ($resp = $this->userModule->handleInteractive($raw))   { return $resp; }
             if ($resp = $this->clientModule->handleInteractive($raw)) { return $resp; }
+            if ($resp = $this->companyModule->handleInteractive($raw)) { return $resp; } // ⬅ NEW
         }
 
         // At this point we know no wizard is active / interested.
@@ -68,9 +93,19 @@ final class TerminalService
         // Known-commands allowlist
         $adminCommands = [
             'help','ping',
+
+            // users
             'users:list','users:show','users:add','users:update','users:forgot-password',
             'users:delete','users:deactivate','users:activate',
+
+            // clients
             'clients:list','clients:show','clients:add','clients:update','clients:delete',
+
+            // company
+            'company:show','company:set-name',
+
+            // rates
+            'rates:list','rates:add','rates:update','rates:delete',
         ];
         $userCommands  = ['help','ping'];
         $known = $isAdmin ? $adminCommands : $userCommands;
@@ -114,8 +149,8 @@ final class TerminalService
                             'cmd'   => 'users:add',
                             'alias' => 'u.a',
                             'desc'  => 'Interactive wizard — create a user (Enter to skip, "cancel" to abort)',
-                            'usage' => '',   // interactive; no positional args
-                            'flags' => [],   // interactive; no flags
+                            'usage' => '',
+                            'flags' => [],
                         ],
                         [
                             'cmd'   => 'users:update',
@@ -193,9 +228,59 @@ final class TerminalService
                             'usage' => '<id|name|email>',
                             'flags' => ['--force'],
                         ],
-                    ]
 
-        ],
+                        // === COMPANY ===
+                        [
+                            'cmd'   => 'company:show',
+                            'alias' => 'co.s',
+                            'desc'  => 'Show our company (name, logo, rates)',
+                            'usage' => '',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'company:set-name',
+                            'alias' => 'co.n',
+                            'desc'  => 'Create/update our company name (wizard or --name)',
+                            'usage' => '[--name=<company_name>]',
+                            'flags' => ['--name=<company_name>'],
+                        ],
+
+                        // === RATES ===
+                        [
+                            'cmd'   => 'rates:list',
+                            'alias' => 'r.l',
+                            'desc'  => 'List all rates for our company',
+                            'usage' => '',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'rates:add',
+                            'alias' => 'r.a',
+                            'desc'  => 'Add a rate (flags or interactive wizard)',
+                            'usage' => '[--name=<name> --value=<decimal>]',
+                            'flags' => ['--name=<name>', '--value=<decimal>'],
+                        ],
+                        [
+                            'cmd'   => 'rates:update',
+                            'alias' => 'r.u',
+                            'desc'  => 'Update a rate',
+                            'usage' => '<id> [--name=<name> --value=<decimal>]',
+                            'flags' => ['--name=<name>', '--value=<decimal>'],
+                        ],
+                        [
+                            'cmd'   => 'rates:delete',
+                            'alias' => 'r.del',
+                            'desc'  => 'Delete a rate',
+                            'usage' => '<id>',
+                            'flags' => [],
+                        ],
+                    ],
+                ],
+                'success' => true,
+            ],
+
+            'ping' => [
+                'output'  => 'pong (admin)',
                 'success' => true,
             ],
 
@@ -212,11 +297,21 @@ final class TerminalService
             // clients
             'clients:list'   => $this->clientModule->listCommand($tokens),
             'clients:show'   => $this->clientModule->showCommand($tokens),
-            'clients:add'    => $this->clientModule->addCommand($tokens),   // starts interactive wizard (returns await=true)
+            'clients:add'    => $this->clientModule->addCommand($tokens),
             'clients:update' => $this->clientModule->updateCommand($tokens),
             'clients:delete' => $this->clientModule->deleteCommand($tokens),
 
-            default => ['output'=>'Unhandled admin command','success'=>false],
+            // company
+            'company:show'     => $this->companyModule->companyShowCommand($tokens),
+            'company:set-name' => $this->companyModule->companySetNameCommand($tokens),
+
+            // rates
+            'rates:list'   => $this->companyModule->ratesListCommand($tokens),
+            'rates:add'    => $this->companyModule->ratesAddCommand($tokens),
+            'rates:update' => $this->companyModule->ratesUpdateCommand($tokens),
+            'rates:delete' => $this->companyModule->ratesDeleteCommand($tokens),
+
+            default => ['output' => 'Unhandled admin command', 'success' => false],
         };
     }
 
