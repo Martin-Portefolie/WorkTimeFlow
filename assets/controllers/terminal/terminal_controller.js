@@ -27,6 +27,16 @@ const ALIASES = {
     'r.a':   'rates:add',
     'r.u':   'rates:update',
     'r.del': 'rates:delete',
+
+
+    // Teams
+    't.l':  'teams:list',
+    't.s':  'teams:show',
+    't.a':  'teams:add',
+    't.u':  'teams:update',
+    't.del':'teams:delete',
+    't.au': 'teams:add-user',
+    't.ru': 'teams:remove-user',
 };
 export default class extends Controller {
     static targets = ['input', 'output', 'suggestions', 'palette', 'paletteInput', 'paletteList'];

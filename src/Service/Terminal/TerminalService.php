@@ -4,6 +4,7 @@ namespace App\Service\Terminal;
 
 use App\Service\Terminal\Admin\ClientTerminalService;
 use App\Service\Terminal\Admin\CompanyTerminalService;
+use App\Service\Terminal\Admin\TeamTerminalService;
 use App\Service\Terminal\Admin\UserTerminalService;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -37,6 +38,15 @@ final class TerminalService
         'r.a'   => 'rates:add',
         'r.u'   => 'rates:update',
         'r.del' => 'rates:delete',
+
+        // Teams
+        't.l'   => 'teams:list',
+        't.s'   => 'teams:show',
+        't.a'   => 'teams:add',
+        't.u'   => 'teams:update',
+        't.del' => 'teams:delete',
+        't.au'  => 'teams:add-user',
+        't.ru'  => 'teams:remove-user',
     ];
 
     public function __construct(
@@ -44,6 +54,7 @@ final class TerminalService
         private UserTerminalService  $userModule,
         private ClientTerminalService $clientModule,
         private CompanyTerminalService $companyModule,
+        private TeamTerminalService $teamModule,
     ) {}
 
     private function isAdmin(): bool
@@ -73,7 +84,8 @@ final class TerminalService
         if ($isAdmin) {
             if ($resp = $this->userModule->handleInteractive($raw))   { return $resp; }
             if ($resp = $this->clientModule->handleInteractive($raw)) { return $resp; }
-            if ($resp = $this->companyModule->handleInteractive($raw)) { return $resp; } // ⬅ NEW
+            if ($resp = $this->companyModule->handleInteractive($raw)) { return $resp; }
+            if ($resp = $this->teamModule->handleInteractive($raw))   { return $resp; }
         }
 
         // At this point we know no wizard is active / interested.
@@ -106,6 +118,10 @@ final class TerminalService
 
             // rates
             'rates:list','rates:add','rates:update','rates:delete',
+
+            // teams
+            'teams:list','teams:show','teams:add','teams:update','teams:delete',
+            'teams:add-user','teams:remove-user',
         ];
         $userCommands  = ['help','ping'];
         $known = $isAdmin ? $adminCommands : $userCommands;
@@ -274,6 +290,57 @@ final class TerminalService
                             'usage' => '<id>',
                             'flags' => [],
                         ],
+
+                        // === TEAMS ===
+                        [
+                            'cmd'   => 'teams:list',
+                            'alias' => 't.l',
+                            'desc'  => 'List all teams grouped by project',
+                            'usage' => '',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'teams:show',
+                            'alias' => 't.s',
+                            'desc'  => 'Show a team, including users and projects',
+                            'usage' => '<id|name>',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'teams:add',
+                            'alias' => 't.a',
+                            'desc'  => 'Create a team (flags or interactive wizard)',
+                            'usage' => '[--name= --project= --users=]',
+                            'flags' => ['--name=<team_name>', '--project=<project_name>', '--users=<email1,email2>'],
+                        ],
+                        [
+                            'cmd'   => 'teams:update',
+                            'alias' => 't.u',
+                            'desc'  => 'Rename a team',
+                            'usage' => '<id> [--name=<new_name>]',
+                            'flags' => ['--name=<new_name>'],
+                        ],
+                        [
+                            'cmd'   => 'teams:delete',
+                            'alias' => 't.del',
+                            'desc'  => 'Delete a team',
+                            'usage' => '<id>',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'teams:add-user',
+                            'alias' => 't.au',
+                            'desc'  => 'Add user to team',
+                            'usage' => '<teamId> <userId|email>',
+                            'flags' => [],
+                        ],
+                        [
+                            'cmd'   => 'teams:remove-user',
+                            'alias' => 't.ru',
+                            'desc'  => 'Remove user from team',
+                            'usage' => '<teamId> <userId|email>',
+                            'flags' => [],
+                        ],
                     ],
                 ],
                 'success' => true,
@@ -310,6 +377,15 @@ final class TerminalService
             'rates:add'    => $this->companyModule->ratesAddCommand($tokens),
             'rates:update' => $this->companyModule->ratesUpdateCommand($tokens),
             'rates:delete' => $this->companyModule->ratesDeleteCommand($tokens),
+
+            // teams
+            'teams:list'        => $this->teamModule->listCommand($tokens),
+            'teams:show'        => $this->teamModule->showCommand($tokens),
+            'teams:add'         => $this->teamModule->addCommand($tokens),
+            'teams:update'      => $this->teamModule->updateCommand($tokens),
+            'teams:delete'      => $this->teamModule->deleteCommand($tokens),
+            'teams:add-user'    => $this->teamModule->addUserCommand($tokens),
+            'teams:remove-user' => $this->teamModule->removeUserCommand($tokens),
 
             default => ['output' => 'Unhandled admin command', 'success' => false],
         };
