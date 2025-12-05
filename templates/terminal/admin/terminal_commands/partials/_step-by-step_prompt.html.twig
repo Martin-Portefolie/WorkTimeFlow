@@ -31,49 +31,43 @@
     {# --- Optional previews --- #}
 
     {# Recent clients #}
-    {% if clientsPreview is defined and clientsPreview %}
-        <div class="mt-1 text-zinc-500">
-            Recent clients (use number, id, or name):
-        </div>
-        <ul class="text-[11px] text-zinc-400 space-y-0.5">
+    {% if clientsPreview is defined and clientsPreview is not empty %}
+        <div class="mt-2 text-[11px] text-zinc-400">
+            Recent clients (type id or exact name):
             {% for c in clientsPreview %}
-                <li>
-                    [{{ c.index }}] #{{ c.id }} — {{ c.name }}
-                </li>
+                <div>
+                    #{{ c.id }} — {{ c.name }}
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% endif %}
 
-    {% if teamsPreview is defined and teamsPreview %}
-        <div class="mt-1 text-zinc-500">
-            Recent teams (use number, id, or name, comma separated):
-        </div>
-        <ul class="text-[11px] text-zinc-400 space-y-0.5">
+    {# Recent Teams #}
+    {% if teamsPreview is defined and teamsPreview is not empty %}
+        <div class="mt-2 text-[11px] text-zinc-400">
+            Recent teams (type ids or exact names, comma separated):
             {% for t in teamsPreview %}
-                <li>
-                    [{{ t.index }}] #{{ t.id }} — {{ t.name }}
-                </li>
+                <div>
+                    #{{ t.id }} — {{ t.name }}
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% endif %}
 
-    {# Rates with numeric shortcuts #}
-    {% if ratesPreview is defined and ratesPreview %}
-        <div class="mt-1 text-zinc-500">
-            Available rates (type number or name):
-        </div>
-        <ul class="text-[11px] text-zinc-400 space-y-0.5">
+    {% if ratesPreview is defined and ratesPreview is not empty %}
+        <div class="mt-2 text-[11px] text-zinc-400">
+            Available rates (type id or exact name):
             {% for r in ratesPreview %}
-                <li>
-                    [{{ r.index }}] #{{ r.id }} — {{ r.name }} ({{ r.value }})
-                </li>
+                <div>
+                    #{{ r.id }} — {{ r.name }} ({{ r.value }})
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% endif %}
 
     {# Footer #}
     <div class="text-zinc-600">
-        Press Enter to leave empty, or type <span class="term-cmd">cancel</span> to abort.
+        Type <span class="term-cmd">cancel</span> to abort.
     </div>
 
 </div>

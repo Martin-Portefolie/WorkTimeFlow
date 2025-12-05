@@ -30,7 +30,7 @@ final class ProjectTerminalService
         [
             'key'     => 'teams',
             'label'   => 'Teams (ids or names, comma separated, Enter to skip)',
-            'example' => 'Eksammens Team, Another Team',
+            'example' => '1, 2 or Eksammens Team, Another Team',
         ],
         [
             'key'     => 'name',
@@ -44,7 +44,7 @@ final class ProjectTerminalService
         ],
         [
             'key'     => 'priority',
-            'label'   => 'Priority [ 1=low, 2=medium, 3=high, 4=critical ] (Enter for low)',
+            'label'   => 'Priority [1=low, 2=medium, 3=high, 4=critical] (Enter for medium)',
             'example' => '2',
         ],
         [
@@ -64,10 +64,11 @@ final class ProjectTerminalService
         ],
         [
             'key'     => 'rate',
-            'label'   => 'Rate (id, name, or number from list below, Enter to skip)',
-            'example' => '0 or Eksammens Rate',
+            'label'   => 'Rate (id or name, Enter to skip)',
+            'example' => '1 or Eksammens Rate',
         ],
     ];
+
 
     public function __construct(
         private ProjectRepository      $projects,
@@ -435,7 +436,7 @@ final class ProjectTerminalService
                 // Empty: treat as "no change" to avoid violating NOT NULL
                 // (if you wanted: you could decide empty = reset to +30 days here)
             } else {
-                $parsed = $this->dateParser->parseFlexibleDate($rawTrimmed, null, null);
+                $parsed = $this->dateInputParser->parseFlexibleDate($rawTrimmed, null, null);
 
                 if (!$parsed) {
                     return ['output' => 'Invalid deadline format.', 'success' => false];
@@ -640,32 +641,42 @@ final class ProjectTerminalService
         switch ($key) {
             case 'client':
                 if ($val === '') {
-                    $error = 'Client is required. Use an id, name, or one of the numbers [0..n] shown.';
+                    $error = 'Client is required. Use an existing id or exact name.';
                     break;
                 }
-                $client = $this->resolveClientFromWizard($val);
+
+                $client = $this->resolveClient($val); // id or name
                 if (!$client) {
-                    $error = 'Client not found. Try a valid id, exact name, or a number from the list.';
+                    $error = 'Client not found. Use an existing id or exact name (e.g. 1 or "Viden Djurs").';
                     break;
                 }
-                // store a stable identifier; easiest is client id
+
+                // store stable id
                 $data['client'] = (string) $client->getId();
                 break;
 
 
+
             case 'teams':
                 if ($val === '') {
+                    // no teams selected
                     $data['teams'] = '';
                     break;
                 }
-                $resolved = $this->resolveTeamsFromWizard($val);
-                if (!$resolved) {
-                    $error = 'No teams matched that input. Use ids, names, or numbers from the list.';
+
+                $resolvedTeams = $this->resolveTeams($val); // ids or names
+                if (!$resolvedTeams) {
+                    $error = 'No teams matched that input. Use existing ids or exact names, comma separated.';
                     break;
                 }
-                // store raw input; createProjectFromData will resolve again
-                $data['teams'] = $val;
+
+                // store a comma-separated list of ids (simplest + stable)
+                $data['teams'] = implode(',', array_map(
+                    static fn(Team $t) => (string) $t->getId(),
+                    $resolvedTeams
+                ));
                 break;
+
 
             case 'name':
                 if ($val === '') {
@@ -682,14 +693,15 @@ final class ProjectTerminalService
 
             case 'priority':
                 if ($val === '') {
-                    // default to Low
-                    $data['priority'] = 'low';
+                    // default to medium in wizard
+                    $data['priority'] = Priority::MEDIUM->value;
                 } else {
-                    if (!$this->parsePriority($val)) {
-                        $error = 'Invalid priority. Use 1=low, 2=medium, 3=high or low|medium|high.';
+                    $priority = $this->parsePriority($val);
+                    if (!$priority) {
+                        $error = 'Invalid priority. Use 1=low, 2=medium, 3=high, 4=critical or low|medium|high|critical.';
                         break;
                     }
-                    $data['priority'] = $val;
+                    $data['priority'] = $priority->value;
                 }
                 break;
 
@@ -732,16 +744,18 @@ final class ProjectTerminalService
             case 'rate':
                 if ($val === '') {
                     $data['rate'] = '';
-                } else {
-                    $rate = $this->resolveRateFromWizard($val);
-                    if (!$rate) {
-                        $error = 'Rate not found. Type a rate name, id, or one of the numbers [0..n] shown above.';
-                        break;
-                    }
-                    // store id (stable) for createProjectFromData
-                    $data['rate'] = (string) $rate->getId();
+                    break;
                 }
+
+                $rate = $this->resolveRate($val); // id or name
+                if (!$rate) {
+                    $error = 'Rate not found. Use an existing id or exact name (e.g. 1 or "Eksammens Rate").';
+                    break;
+                }
+
+                $data['rate'] = (string) $rate->getId();
                 break;
+
 
             default:
                 // Fallback: just store raw
@@ -800,25 +814,33 @@ final class ProjectTerminalService
     /** @return array{success:bool, project?:Project, error?:string} */
     private function createProjectFromData(array $data): array
     {
+        // --- Name (required) ---
         $name = trim((string) ($data['name'] ?? ''));
         if ($name === '') {
             return ['success' => false, 'error' => 'Project name is required.'];
         }
 
+        // --- Client (required, id or name) ---
         $clientKey = trim((string) ($data['client'] ?? ''));
-        $client = $this->resolveClient($clientKey);
+        $client    = $this->resolveClient($clientKey);
         if (!$client) {
             return ['success' => false, 'error' => 'Client is required and must exist.'];
         }
 
+        // --- Priority (optional, defaults to MEDIUM) ---
         $priorityRaw = trim((string) ($data['priority'] ?? ''));
-        $priority = $priorityRaw === '' ? Priority::MEDIUM : $this->parsePriority($priorityRaw);
+
+        $priority = $priorityRaw === ''
+            ? Priority::LOW
+            : $this->parsePriority($priorityRaw);
+
         if (!$priority) {
-            return ['success' => false, 'error' => 'Invalid priority. Use low, medium, high.'];
+            return ['success' => false, 'error' => 'Invalid priority. Use low, medium, high or critical.'];
         }
 
+        // --- Deadline (flexible input, defaults +30 days if empty) ---
         $deadlineInput = $data['deadline'] ?? '';
-        $deadline = $this->dateInputParser->parseFlexibleDate(
+        $deadline      = $this->dateInputParser->parseFlexibleDate(
             $deadlineInput,
             null,   // base = today
             30      // default 30 days if empty (wizard)
@@ -828,7 +850,8 @@ final class ProjectTerminalService
             return ['success' => false, 'error' => 'Invalid deadline format.'];
         }
 
-        $estimatedRaw = trim((string) ($data['estimated'] ?? ''));
+        // --- Estimated time (optional) ---
+        $estimatedRaw     = trim((string) ($data['estimated'] ?? ''));
         $estimatedMinutes = null;
         if ($estimatedRaw !== '') {
             $estimatedMinutes = $this->parseEstimatedTime($estimatedRaw);
@@ -837,11 +860,13 @@ final class ProjectTerminalService
             }
         }
 
+        // --- Budget (optional, decimal) ---
         $budgetRaw = trim((string) ($data['budget'] ?? ''));
-        $budget = $budgetRaw !== '' ? $this->parseBudget($budgetRaw) : null;
+        $budget    = $budgetRaw !== '' ? $this->parseBudget($budgetRaw) : null;
 
+        // --- Rate (optional, id or name) ---
         $rateRaw = trim((string) ($data['rate'] ?? ''));
-        $rate = null;
+        $rate    = null;
         if ($rateRaw !== '') {
             $rate = $this->resolveRate($rateRaw);
             if (!$rate) {
@@ -849,21 +874,22 @@ final class ProjectTerminalService
             }
         }
 
+        // --- Teams (optional, ids or names, comma-separated) ---
         $teamsRaw = trim((string) ($data['teams'] ?? ''));
-        $teams = [];
+        $teams    = [];
         if ($teamsRaw !== '') {
-            // wizard may contain numeric indices; use wizard-aware resolver
-            $teams = $this->resolveTeamsFromWizard($teamsRaw);
+            // Here we now only accept IDs or names (no wizard indices).
+            $teams = $this->resolveTeams($teamsRaw);
         }
 
+        // --- Create project entity ---
         $project = new Project();
         $project->setName($name);
         $project->setDescription(($data['description'] ?? '') !== '' ? $data['description'] : null);
         $project->setClient($client);
         $project->setPriority($priority);
-        if ($deadline) {
-            $project->setDeadline($deadline);
-        }
+        $project->setDeadline($deadline);
+
         if ($estimatedMinutes !== null) {
             $project->setEstimatedTime($estimatedMinutes);
         }
@@ -884,105 +910,15 @@ final class ProjectTerminalService
         return ['success' => true, 'project' => $project];
     }
 
+
     // =====================================================================
     // HELPERS
     // =====================================================================
 
-    private function resolveClientFromWizard(string $input): ?Client
-    {
-        $input = trim($input);
-        if ($input === '') {
-            return null;
-        }
-
-        // numeric index into preview list
-        if (ctype_digit($input)) {
-            $idx    = (int) $input;
-            $list   = $this->getClientPreview();
-            if (isset($list[$idx])) {
-                return $this->clients->find($list[$idx]['id']);
-            }
-        }
-
-        // fallback: id or name
-        return $this->resolveClient($input);
-    }
-
-    /**
-     * Accepts:
-     *  - comma-separated numeric indices (0,1,2)
-     *  - comma-separated ids or names (existing behaviour)
-     *
-     * Returns array<Team>
-     */
-    private function resolveTeamsFromWizard(string $csv): array
-    {
-        $csv = trim($csv);
-        if ($csv === '') {
-            return [];
-        }
-
-        $parts = array_filter(array_map('trim', explode(',', $csv)));
-
-        if (!$parts) {
-            return [];
-        }
-
-        $preview = $this->getTeamPreview();
-        $byIndex = [];
-        foreach ($preview as $row) {
-            $byIndex[(string) $row['index']] = $row['id']; // "0" => teamId
-        }
-
-        $result = [];
-
-        foreach ($parts as $piece) {
-            $team = null;
-
-            // 1) numeric preview index?
-            if (ctype_digit($piece) && isset($byIndex[$piece])) {
-                $team = $this->teams->find($byIndex[$piece]);
-            }
-
-            // 2) numeric id?
-            if (!$team && ctype_digit($piece)) {
-                $team = $this->teams->find((int) $piece);
-            }
-
-            // 3) name?
-            if (!$team) {
-                $team = $this->teams->findOneBy(['name' => $piece]);
-            }
-
-            if ($team) {
-                $result[] = $team;
-            }
-        }
-
-        return $result;
-    }
 
 
-    private function resolveRateFromWizard(string $input): ?Rate
-    {
-        $input = trim($input);
-        if ($input === '') {
-            return null;
-        }
 
-        // 0,1,2,... => index in preview list
-        if (ctype_digit($input)) {
-            $idx   = (int) $input;
-            $list  = $this->getRatePreview();
-            if (isset($list[$idx])) {
-                // we only have id + name + value in preview; refetch full Rate by id
-                return $this->rates->find($list[$idx]['id']);
-            }
-        }
 
-        // Fallback: existing behaviour (id or name)
-        return $this->resolveRate($input);
-    }
 
     private function getClientPreview(): array
     {
@@ -1090,22 +1026,23 @@ final class ProjectTerminalService
         return 'guest';
     }
 
-    private function resolveClient(string $needle): ?Client
+    private function resolveClient(string $raw): ?Client
     {
-        $needle = trim($needle);
-        if ($needle === '') {
+        $raw = trim($raw);
+
+        if ($raw === '') {
             return null;
         }
 
-        if (ctype_digit($needle)) {
-            $client = $this->clients->find((int) $needle);
-            if ($client) {
-                return $client;
-            }
+        // ID
+        if (ctype_digit($raw)) {
+            return $this->clients->find((int)$raw);
         }
 
-        return $this->clients->findOneBy(['name' => $needle]);
+        // Exact name
+        return $this->clients->findOneBy(['name' => $raw]);
     }
+
 
     private function resolveRate(string $needle): ?Rate
     {
