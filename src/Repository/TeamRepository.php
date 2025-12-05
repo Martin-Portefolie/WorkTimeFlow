@@ -16,6 +16,21 @@ class TeamRepository extends ServiceEntityRepository
         parent::__construct($registry, Team::class);
     }
 
+
+    /**
+     * Last created/updated teams for terminal previews.
+     *
+     * @return Team[]
+     */
+    public function findRecentForTerminal(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('t')
+            ->orderBy('t.id', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Team[] Returns an array of Team objects
     //     */

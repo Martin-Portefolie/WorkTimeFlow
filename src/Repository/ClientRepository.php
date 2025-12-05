@@ -58,6 +58,20 @@ class ClientRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    /**
+     * Last updated / created clients for terminal previews.
+     *
+     * @return Client[]
+     */
+    public function findRecentForTerminal(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.id', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
 
     //    /**
     //     * @return ClientFixtures[] Returns an array of ClientFixtures objects

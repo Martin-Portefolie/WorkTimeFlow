@@ -4,6 +4,7 @@ namespace App\Service\Terminal;
 
 use App\Service\Terminal\Admin\ClientTerminalService;
 use App\Service\Terminal\Admin\CompanyTerminalService;
+use App\Service\Terminal\Admin\ProjectTerminalService;
 use App\Service\Terminal\Admin\TeamTerminalService;
 use App\Service\Terminal\Admin\UserTerminalService;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -47,6 +48,13 @@ final class TerminalService
         't.del' => 'teams:delete',
         't.au'  => 'teams:add-user',
         't.ru'  => 'teams:remove-user',
+
+        // Projects
+        'p.l'   => 'projects:list',
+        'p.s'   => 'projects:show',
+        'p.a'   => 'projects:add',
+        'p.u'   => 'projects:update',
+        'p.del' => 'projects:delete',
     ];
 
     public function __construct(
@@ -55,6 +63,7 @@ final class TerminalService
         private ClientTerminalService $clientModule,
         private CompanyTerminalService $companyModule,
         private TeamTerminalService $teamModule,
+        private ProjectTerminalService $projectModule
     ) {}
 
     private function isAdmin(): bool
@@ -86,6 +95,7 @@ final class TerminalService
             if ($resp = $this->clientModule->handleInteractive($raw)) { return $resp; }
             if ($resp = $this->companyModule->handleInteractive($raw)) { return $resp; }
             if ($resp = $this->teamModule->handleInteractive($raw))   { return $resp; }
+            if ($resp = $this->projectModule->handleInteractive($raw))   { return $resp; }
         }
 
         // At this point we know no wizard is active / interested.
@@ -122,6 +132,9 @@ final class TerminalService
             // teams
             'teams:list','teams:show','teams:add','teams:update','teams:delete',
             'teams:add-user','teams:remove-user',
+
+            // Projects
+            'projects:list','projects:show','projects:add','projects:update','projects:delete',
         ];
         $userCommands  = ['help','ping'];
         $known = $isAdmin ? $adminCommands : $userCommands;
@@ -341,6 +354,23 @@ final class TerminalService
                             'usage' => '<teamId> <userId|email>',
                             'flags' => [],
                         ],
+
+                        // === Projects ===
+                        [
+                            'cmd'   => 'projects:list',
+                            'alias' => 'p.l',
+                            'desc'  => 'List projects (overrun first, then newest)',
+                            'usage' => '[filter]',
+                            'flags' => ['--archived=active|archived|all'],
+                        ],
+                        [
+                            'cmd'   => 'projects:show',
+                            'alias' => 'p.s',
+                            'desc'  => 'Show a project and its stats',
+                            'usage' => '<id|name>',
+                            'flags' => [],
+                        ],
+
                     ],
                 ],
                 'success' => true,
@@ -386,6 +416,13 @@ final class TerminalService
             'teams:delete'      => $this->teamModule->deleteCommand($tokens),
             'teams:add-user'    => $this->teamModule->addUserCommand($tokens),
             'teams:remove-user' => $this->teamModule->removeUserCommand($tokens),
+
+            // projects
+            'projects:list'   => $this->projectModule->listCommand($tokens),
+            'projects:show'   => $this->projectModule->showCommand($tokens),
+            'projects:add'    => $this->projectModule->addCommand($tokens),
+            'projects:update' => $this->projectModule->updateCommand($tokens),
+            'projects:delete' => $this->projectModule->deleteCommand($tokens),
 
             default => ['output' => 'Unhandled admin command', 'success' => false],
         };

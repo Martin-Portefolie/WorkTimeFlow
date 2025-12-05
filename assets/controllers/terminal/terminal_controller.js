@@ -28,7 +28,6 @@ const ALIASES = {
     'r.u':   'rates:update',
     'r.del': 'rates:delete',
 
-
     // Teams
     't.l':  'teams:list',
     't.s':  'teams:show',
@@ -37,6 +36,13 @@ const ALIASES = {
     't.del':'teams:delete',
     't.au': 'teams:add-user',
     't.ru': 'teams:remove-user',
+
+    // Projects
+    'p.l':  'projects:list',
+    'p.s':  'projects:show',
+    'p.a':  'projects:add',
+    'p.u':  'projects:update',
+    'p.del':'projects:delete',
 };
 export default class extends Controller {
     static targets = ['input', 'output', 'suggestions', 'palette', 'paletteInput', 'paletteList'];

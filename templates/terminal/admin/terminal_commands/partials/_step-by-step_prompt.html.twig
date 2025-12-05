@@ -1,11 +1,18 @@
-{# templates/terminal/admin/terminal_commands/partials/_step-by-step.html.twig #}
-{# TODO: clear should cancel the the questioning #}
-<div class="space-y-1 font-mono text-xs">
+{# templates/terminal/admin/terminal_commands/partials/_step-by-step_prompt.html.twig #}
+
+<div class="space-y-2 font-mono text-xs">
 
     {# Step indicator #}
     {% if step is defined and total is defined %}
         <div class="text-zinc-500">
             Step {{ step }} of {{ total }}
+        </div>
+    {% endif %}
+
+    {# Error message (if any) #}
+    {% if error is defined and error %}
+        <div class="text-red-400">
+            {{ error }}
         </div>
     {% endif %}
 
@@ -19,6 +26,49 @@
         <div class="text-zinc-500">
             e.g. <span class="text-zinc-500">{{ example }}</span>
         </div>
+    {% endif %}
+
+    {# --- Optional previews --- #}
+
+    {# Recent clients #}
+    {% if clientsPreview is defined and clientsPreview %}
+        <div class="mt-1 text-zinc-500">
+            Recent clients (use number, id, or name):
+        </div>
+        <ul class="text-[11px] text-zinc-400 space-y-0.5">
+            {% for c in clientsPreview %}
+                <li>
+                    [{{ c.index }}] #{{ c.id }} — {{ c.name }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if teamsPreview is defined and teamsPreview %}
+        <div class="mt-1 text-zinc-500">
+            Recent teams (use number, id, or name, comma separated):
+        </div>
+        <ul class="text-[11px] text-zinc-400 space-y-0.5">
+            {% for t in teamsPreview %}
+                <li>
+                    [{{ t.index }}] #{{ t.id }} — {{ t.name }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {# Rates with numeric shortcuts #}
+    {% if ratesPreview is defined and ratesPreview %}
+        <div class="mt-1 text-zinc-500">
+            Available rates (type number or name):
+        </div>
+        <ul class="text-[11px] text-zinc-400 space-y-0.5">
+            {% for r in ratesPreview %}
+                <li>
+                    [{{ r.index }}] #{{ r.id }} — {{ r.name }} ({{ r.value }})
+                </li>
+            {% endfor %}
+        </ul>
     {% endif %}
 
     {# Footer #}
