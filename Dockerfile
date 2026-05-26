@@ -1,7 +1,7 @@
 FROM dunglas/frankenphp:php8.4
 WORKDIR /app
 
-RUN install-php-extensions intl zip pdo_mysql opcache
+RUN install-php-extensions intl zip pdo_mysql opcache gd
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # 1) deps layer
