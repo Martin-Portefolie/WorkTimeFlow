@@ -1,0 +1,21 @@
+footer:
+  contact:
+    title: "Kontakt"
+    project: "WorkTimeFlow open source-projekt"
+    address: "Rasmus Østergaards Have 66, 8700 Horsens, Danmark"
+    email_label: "E-mail:"
+  tech:
+    title: "Teknologier vi bruger"
+  oss:
+    title: "Open source"
+    description: "WorkTimeFlow er gratis open source-software."
+    released_under_prefix: "Udgivet under"
+    mit_license: "MIT-licens"
+    contribute_prefix: "Bidrag eller se kildekoden på"
+    github: "GitHub"
+  contrib:
+    title: "Bidrag"
+    desc: "Støt den fortsatte udvikling af WorkTimeFlow."
+    cta: "Bliv sponsor"
+  legal:
+    copyright: "© %year% %brand%. Alle rettigheder forbeholdes."
