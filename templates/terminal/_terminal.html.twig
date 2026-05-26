@@ -1,0 +1,13 @@
+{# Wrapper that routes to the correct terminal UI by role #}
+<div class="relative mt-4 mb-2 ">
+    <div class="card-soft">
+
+{% if is_granted('ROLE_ADMIN') %}
+    {% include 'terminal/admin/_admin.html.twig' %}
+{% else %}
+    {# TODO: style your user terminal later #}
+    {% include 'terminal/profile/_profile.html.twig' %}
+{% endif %}
+
+    </div>
+</div>

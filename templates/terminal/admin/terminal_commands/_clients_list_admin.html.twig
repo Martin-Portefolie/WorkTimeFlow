@@ -1,0 +1,94 @@
+{# templates/terminal/admin/terminalcommands/_clients_list_admin.html.twig #}
+
+<div class="space-y-2">
+    <div class="text-xs uppercase tracking-wide text-zinc-500">
+        Clients
+    </div>
+
+    <div class="flex items-center justify-between text-[11px] text-zinc-500">
+        <div>
+            <span class="text-zinc-500">Total shown:</span> {{ rows|length }}
+            <span class="mx-2 text-zinc-700">•</span>
+            <span class="text-zinc-500">Limit:</span> {{ limit }}
+            {% if q %}
+                <span class="mx-2 text-zinc-700">•</span>
+                <span class="text-zinc-500">Filter:</span>
+                <code class="term-flag">--q={{ q }}</code>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if rows is empty %}
+        <div class="mt-2 text-[12px] text-zinc-500">
+            No clients found.
+        </div>
+    {% else %}
+        <div class="rounded-md ring-1 ring-zinc-800 overflow-hidden font-mono tabular-nums">
+            <table class="table-auto w-full text-xs text-left border-collapse">
+                <caption class="text-left px-3 py-2 bg-zinc-900/40 text-zinc-500 text-[11px]">
+                    Client list
+                </caption>
+
+                <thead class="text-zinc-500">
+                <tr>
+                    <th class="border border-dotted border-zinc-700 px-3 py-1 w-10 font-normal">
+                        Id
+                    </th>
+                    <th class="border border-dotted border-zinc-700 px-3 py-1 font-normal">
+                        Company name
+                    </th>
+                    <th class="border border-dotted border-zinc-700 px-3 py-1 font-normal">
+                        City
+                    </th>
+                    <th class="border border-dotted border-zinc-700 px-3 py-1 font-normal">
+                        Country
+                    </th>
+                    <th class="border border-dotted border-zinc-700 px-3 py-1 w-16 font-normal">
+                        Projects
+                    </th>
+                    <th class="border border-dotted border-zinc-700 px-3 py-1 font-normal">
+                        Contact person
+                    </th>
+                    <th class="border border-dotted border-zinc-700 px-3 py-1 font-normal">
+                        Contact Email
+                    </th>
+                    <th class="border border-dotted border-zinc-700 px-3 py-1 font-normal">
+                        Contact phone
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody class="text-zinc-500">
+                {% for r in rows %}
+                    <tr>
+                        <td class="border border-dotted border-zinc-700 px-3 py-1">
+                            {{ r.id }}
+                        </td>
+                        <td class="border border-dotted border-zinc-700 px-3 py-1 truncate" title="{{ r.name }}">
+                            {{ r.name ?: '—' }}
+                        </td>
+                        <td class="border border-dotted border-zinc-700 px-3 py-1 truncate" title="{{ r.city }}">
+                            {{ r.city ?: '—' }}
+                        </td>
+                        <td class="border border-dotted border-zinc-700 px-3 py-1 truncate" title="{{ r.country }}">
+                            {{ r.country ?: '—' }}
+                        </td>
+                        <td class="border border-dotted border-zinc-700 px-3 py-1">
+                            {{ r.projectsCount }}
+                        </td>
+                        <td class="border border-dotted border-zinc-700 px-3 py-1 truncate" title="{{ r.contactPerson }}">
+                            {{ r.contactPerson ?: '—' }}
+                        </td>
+                        <td class="border border-dotted border-zinc-700 px-3 py-1 truncate" title="{{ r.email }}">
+                            {{ r.email ?: '—' }}
+                        </td>
+                        <td class="border border-dotted border-zinc-700 px-3 py-1 truncate" title="{{ r.phone }}">
+                            {{ r.phone ?: '—' }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
