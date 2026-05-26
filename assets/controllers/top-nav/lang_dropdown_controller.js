@@ -1,36 +1,51 @@
-
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
     static targets = ["menu", "button"];
 
     connect() {
-        this._outsideClick = this._outsideClick || ((e) => {
-            if (!this.element.contains(e.target)) this.close();
-        });
-        document.addEventListener("click", this._outsideClick);
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") this.close();
-        });
+        this.outsideClick = this.outsideClick.bind(this);
+        this.escapeClose = this.escapeClose.bind(this);
+
+        document.addEventListener("click", this.outsideClick);
+        document.addEventListener("keydown", this.escapeClose);
     }
 
     disconnect() {
-        document.removeEventListener("click", this._outsideClick);
+        document.removeEventListener("click", this.outsideClick);
+        document.removeEventListener("keydown", this.escapeClose);
     }
 
-    toggle(e) {
-        e.preventDefault();
+    toggle(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         this.menuTarget.classList.toggle("hidden");
-        this.buttonTarget.setAttribute(
-            "aria-expanded",
-            this.menuTarget.classList.contains("hidden") ? "false" : "true"
-        );
+        this.buttonTarget.setAttribute("aria-expanded", this.isOpen ? "true" : "false");
     }
 
     close() {
-        if (!this.menuTarget.classList.contains("hidden")) {
-            this.menuTarget.classList.add("hidden");
-            this.buttonTarget.setAttribute("aria-expanded", "false");
+        if (!this.isOpen) {
+            return;
         }
+
+        this.menuTarget.classList.add("hidden");
+        this.buttonTarget.setAttribute("aria-expanded", "false");
+    }
+
+    outsideClick(event) {
+        if (!this.element.contains(event.target)) {
+            this.close();
+        }
+    }
+
+    escapeClose(event) {
+        if (event.key === "Escape") {
+            this.close();
+        }
+    }
+
+    get isOpen() {
+        return !this.menuTarget.classList.contains("hidden");
     }
 }

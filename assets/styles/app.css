@@ -5,6 +5,14 @@
     --font-display: Poppins, ui-sans-serif, system-ui, sans-serif;
 }
 
+html, body {
+    min-height: 100vh;
+}
+
+body {
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+}
+
 /*@tailwind base;*/
 /*@tailwind components;*/
 /*@tailwind utilities;*/
