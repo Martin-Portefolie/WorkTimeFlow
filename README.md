@@ -23,7 +23,7 @@ docker compose exec app composer install
 docker compose exec app bin/console doctrine:migrations:migrate  # (only on install)
 
 # 4. Start Tailwind CSS compilation
-docker compose exec app bin/console tailwind:build --watch --poll
+docker compose exec app bin/console tailwind:build --watch 
 ```
 
 ## Data Fixtures Setup

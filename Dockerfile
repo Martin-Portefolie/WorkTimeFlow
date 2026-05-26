@@ -22,3 +22,8 @@ COPY docker/entrypoint.sh /usr/local/bin/app-entrypoint
 RUN chmod +x /usr/local/bin/app-entrypoint
 ENTRYPOINT ["/usr/local/bin/app-entrypoint"]
 CMD ["frankenphp","run","--config","/etc/frankenphp/Caddyfile"]
+
+# 5) Tailwind and watchman
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends watchman \
+ && rm -rf /var/lib/apt/lists/*
