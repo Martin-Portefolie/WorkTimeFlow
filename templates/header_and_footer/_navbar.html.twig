@@ -7,6 +7,10 @@
 {% set current_route = app.request.attributes.get('_route')|default('home') %}
 {% set route_params = app.request.attributes.get('_route_params')|default({}) %}
 
+{# ========================================================= #}
+{# Todo add correct comments                                 #}
+{# ========================================================= #}
+
 <header
     class="sticky top-0 z-50 border-b border-emerald-200/80 bg-white/90 text-slate-900 shadow-sm backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/90 dark:text-slate-100"
     data-controller="top-nav--layout-nav"
