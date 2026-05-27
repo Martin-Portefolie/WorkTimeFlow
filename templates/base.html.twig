@@ -33,13 +33,13 @@
     </head>
 
     <body>
-        {% include 'components/_navbar.html.twig' %}
+        {% include 'header_and_footer/_navbar.html.twig' %}
 
     {#    <!-- User menu -->#}
-{#    {% include 'components/_navbar_user.html.twig' %}#}
+{#    {% include 'header_and_footer/_navbar_user.html.twig' %}#}
 {#    <!-- Admin menu -->#}
 {#    {% if is_granted('ROLE_ADMIN') %}#}
-{#        {% include 'components/_navbar_admin.html.twig' %}#}
+{#        {% include 'header_and_footer/_navbar_admin.html.twig' %}#}
 {#    {% endif %}#}
 
     <!-- Content Section -->
@@ -48,6 +48,6 @@
     </main>
 
     <!-- Footer Section -->
-    {% include 'components/_footer.html.twig' %}
+    {% include 'header_and_footer/_footer.html.twig' %}
     </body>
 </html>

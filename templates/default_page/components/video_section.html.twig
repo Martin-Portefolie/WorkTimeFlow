@@ -1,0 +1,41 @@
+<section class="bg-white pt-4 pb-16">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div
+            class="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-6 shadow-xl shadow-emerald-900/10"
+            data-controller="default-page--video"
+        >
+            <div class="relative aspect-video overflow-hidden rounded-2xl bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900">
+                <video
+                    data-default-page--video-target="video"
+                    class="absolute inset-0 hidden h-full w-full rounded-2xl object-cover"
+                    preload="metadata"
+                    controls
+                >
+                    <source src="{{ asset('movie/movie.mp4') }}" type="video/mp4">
+                    {{ 'default_page.video.fallback'|trans }}
+                </video>
+
+                <button
+                    type="button"
+                    data-default-page--video-target="overlay"
+                    data-action="click->default-page--video#play"
+                    class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-black/10 px-6 text-center text-white transition hover:bg-black/20"
+                >
+                            <span class="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                                <svg class="ml-1 h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </span>
+
+                    <span class="text-2xl font-bold sm:text-3xl">
+                                {{ 'default_page.video.title'|trans }}
+                            </span>
+
+                    <span class="mt-2 text-base font-medium text-white/80">
+                                {{ 'default_page.video.subtitle'|trans }}
+                            </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>

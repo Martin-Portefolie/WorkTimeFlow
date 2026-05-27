@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'default_page.meta.title'|trans }}{% endblock %}
+
+{% block body %}
+    <main id="main-content">
+
+        {# ========================================================= #}
+        {# Hero section                                              #}
+        {# ========================================================= #}
+        {% include 'default_page/components/hero_section.html.twig' %}
+
+        {# ========================================================= #}
+        {# Video section                                            #}
+        {# ========================================================= #}
+        {% include 'default_page/components/video_section.html.twig' %}
+
+        {# ========================================================= #}
+        {# CTA section                                              #}
+        {# ========================================================= #}
+        {% include 'default_page/components/cta_section.html.twig' %}
+
+        {# ========================================================= #}
+        {# Features section                                         #}
+        {# ========================================================= #}
+        {% include 'default_page/components/features_section.html.twig' %}
+
+        {# ========================================================= #}
+        {# Command examples section                                 #}
+        {# ========================================================= #}
+        {% include 'default_page/components/commands_examples_section.html.twig' %}
+
+    </main>
+{% endblock %}
