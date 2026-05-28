@@ -27,7 +27,7 @@ final class AdminController extends AbstractController
             $output = $this->renderView($result['view'], $result['vars'] ?? []);
         }
 
-        return $this->render('terminal/_line.html.twig', [
+        return $this->render('terminals/_line.html.twig', [
             'input'   => $input,
             'output'  => $output ?? '',
             'success' => (bool)($result['success'] ?? false),

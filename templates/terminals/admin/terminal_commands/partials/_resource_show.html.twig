@@ -1,0 +1,48 @@
+{# ========================================================= #}
+{# Resource show                                             #}
+{# ========================================================= #}
+
+<div class="space-y-3">
+    <div>
+        <h3 class="text-sm font-semibold text-zinc-100">
+            {{ title|default(resource|default('Resource')|title) }}
+        </h3>
+
+        {% if description is defined and description %}
+            <p class="mt-1 text-xs text-zinc-500">
+                {{ description }}
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="overflow-hidden rounded-xl border border-zinc-800 bg-[#0e1116]">
+        <table class="min-w-full border-collapse text-left text-xs">
+            <tbody class="divide-y divide-zinc-800/80">
+            {% for field in fields %}
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-40 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">
+                        {{ field.label }}
+                    </th>
+                    <td class="px-3 py-2 text-zinc-300">
+                        {% if field.value is same as(true) %}
+                            <span class="text-emerald-400">yes</span>
+                        {% elseif field.value is same as(false) %}
+                            <span class="text-red-400">no</span>
+                        {% elseif field.value is empty %}
+                            <span class="text-zinc-600">—</span>
+                        {% else %}
+                            {{ field.value }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td class="px-3 py-6 text-center text-zinc-500">
+                        No fields available.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

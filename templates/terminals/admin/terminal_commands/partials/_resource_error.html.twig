@@ -1,0 +1,15 @@
+{# ========================================================= #}
+{# Resource error                                            #}
+{# ========================================================= #}
+
+<div class="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 font-mono text-xs">
+    <div class="font-semibold text-red-400">
+        {{ title|default('Command error') }}
+    </div>
+
+    {% if message is defined and message %}
+        <div class="mt-1 text-zinc-400">
+            {{ message }}
+        </div>
+    {% endif %}
+</div>

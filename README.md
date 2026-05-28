@@ -19,11 +19,15 @@ docker compose up -d  # (if already installed)
 # 2. Install dependencies
 docker compose exec app composer install
 
-# 3. Migrate the database
+# 3 docker rm assets
+docker compose exec app rm -rf public/assets
+
+# 4. Migrate the database
 docker compose exec app bin/console doctrine:migrations:migrate  # (only on install)
 
-# 4. Start Tailwind CSS compilation
+# 5. Start Tailwind CSS compilation
 docker compose exec app bin/console tailwind:build --watch 
+
 ```
 
 ## Data Fixtures Setup

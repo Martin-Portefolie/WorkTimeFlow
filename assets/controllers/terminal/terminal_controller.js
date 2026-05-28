@@ -44,6 +44,9 @@ const ALIASES = {
     'p.u':  'projects:update',
     'p.del':'projects:delete',
 };
+
+
+
 export default class extends Controller {
     static targets = ['input', 'output', 'suggestions', 'palette', 'paletteInput', 'paletteList'];
     static values = { runUrl: String, allowlist: Array };
@@ -184,9 +187,29 @@ export default class extends Controller {
 
         // --- When input is focused, support history + escape ---
         if (isFocused && !isCmd && !isAlt) {
-            if (event.key === 'ArrowUp')   { event.preventDefault(); this.showHistoryPrev(); return; }
-            if (event.key === 'ArrowDown') { event.preventDefault(); this.showHistoryNext(); return; }
-            if (event.key === 'Escape')    { event.preventDefault(); this.blurTile();        return; }
+
+            // Only history navigation when caret is at start/end
+            const start = this.inputTarget.selectionStart;
+            const end = this.inputTarget.selectionEnd;
+            const len = this.inputTarget.value.length;
+
+            if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                this.showHistoryPrev();
+                return;
+            }
+
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                this.showHistoryNext();
+                return;
+            }
+
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                this.blurTile();
+                return;
+            }
         }
     }
 
@@ -258,6 +281,61 @@ export default class extends Controller {
             this.paletteInputTarget.value = '';
             this.paletteInputTarget.focus();
         }
+
+        this.paletteIndex = 0;
+        this.highlightPaletteItem();
+
+    }
+
+    paletteKeydown(event) {
+        if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            this.movePaletteSelection(1);
+            return;
+        }
+
+        if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            this.movePaletteSelection(-1);
+            return;
+        }
+
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            this.pickSelectedPalette();
+            return;
+        }
+
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            this.closePalette();
+        }
+    }
+
+    movePaletteSelection(delta) {
+        const buttons = [...this.paletteListTarget.querySelectorAll('button[data-cmd]')];
+        if (buttons.length === 0) return;
+
+        this.paletteIndex = (this.paletteIndex + delta + buttons.length) % buttons.length;
+        this.highlightPaletteItem();
+    }
+
+    highlightPaletteItem() {
+        const buttons = [...this.paletteListTarget.querySelectorAll('button[data-cmd]')];
+
+        buttons.forEach((button, index) => {
+            button.classList.toggle('bg-zinc-800', index === this.paletteIndex);
+        });
+    }
+
+    pickSelectedPalette() {
+        const buttons = [...this.paletteListTarget.querySelectorAll('button[data-cmd]')];
+        const selected = buttons[this.paletteIndex];
+
+        if (!selected) return;
+
+        this.insertCommand(selected.dataset.cmd);
+        this.closePalette();
     }
 
     closePalette() {
@@ -381,8 +459,7 @@ class HistoryStore {
         this._save();
     }
     last(n = 10) {
-        const slice = this.arr.slice(-n);     // oldest->newest within the slice
-        return slice.reverse();               // return newest->oldest
+        return this.arr.slice(-n);
     }
     _load() {
         try {

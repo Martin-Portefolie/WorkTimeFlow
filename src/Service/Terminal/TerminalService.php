@@ -6,6 +6,7 @@ use App\Service\Terminal\Admin\ClientTerminalService;
 use App\Service\Terminal\Admin\CompanyTerminalService;
 use App\Service\Terminal\Admin\ProjectTerminalService;
 use App\Service\Terminal\Admin\TeamTerminalService;
+use App\Service\Terminal\Admin\TerminalUserService;
 use App\Service\Terminal\Admin\UserTerminalService;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -59,7 +60,8 @@ final class TerminalService
 
     public function __construct(
         private Security             $security,
-        private UserTerminalService  $userModule,
+//        private UserTerminalService  $userModule,
+        private TerminalUserService $userModule,
         private ClientTerminalService $clientModule,
         private CompanyTerminalService $companyModule,
         private TeamTerminalService $teamModule,
@@ -153,10 +155,14 @@ final class TerminalService
     {
         $tokens = preg_split('/\s+/', trim($input)) ?: [];
         $cmd    = array_shift($tokens) ?? '';
+        $parsed = ArgsParser::parse($tokens);
+
+        $args  = $parsed['args'];
+        $flags = $parsed['flags'];
 
         return match ($cmd) {
             'help' => [
-                'view' => 'terminal/admin/terminal_commands/_help_admin.html.twig',
+                'view' => 'terminals/admin/terminal_commands/_help_admin.html.twig',
                 'vars' => [
                     'aliases' => [
                         // === USERS ===
@@ -382,12 +388,12 @@ final class TerminalService
             ],
 
             // users
-            'users:list'             => $this->userModule->listCommand($tokens),
-            'users:show'             => $this->userModule->showCommand($tokens),
-            'users:add'              => $this->userModule->addCommand($tokens),
-            'users:update'           => $this->userModule->updateCommand($tokens),
+            'users:list'             => $this->userModule->list($flags),
+            'users:show'             => $this->userModule->show($args),
+            'users:add'              => $this->userModule->add($flags),
+            'users:update'           => $this->userModule->update($args, $flags),
             'users:forgot-password'  => $this->userModule->forgotPasswordCommand($tokens),
-            'users:delete'           => $this->userModule->deleteCommand($tokens),
+            'users:delete'           => $this->userModule->delete($args, $flags),
             'users:deactivate'       => $this->userModule->deactivateCommand($tokens),
             'users:activate'         => $this->userModule->activateCommand($tokens),
 

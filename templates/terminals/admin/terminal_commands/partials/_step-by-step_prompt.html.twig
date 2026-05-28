@@ -1,0 +1,73 @@
+{# templates/terminal/admin/terminal_commands/partials/_step-by-step_prompt.html.twig #}
+
+<div class="space-y-2 font-mono text-xs">
+
+    {# Step indicator #}
+    {% if step is defined and total is defined %}
+        <div class="text-zinc-500">
+            Step {{ step }} of {{ total }}
+        </div>
+    {% endif %}
+
+    {# Error message (if any) #}
+    {% if error is defined and error %}
+        <div class="text-red-400">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    {# Main question #}
+    <div class="text-zinc-500 text-sm">
+        {{ label }}
+    </div>
+
+    {# Example #}
+    {% if example is defined and example %}
+        <div class="text-zinc-500">
+            e.g. <span class="text-zinc-500">{{ example }}</span>
+        </div>
+    {% endif %}
+
+    {# --- Optional previews --- #}
+
+    {# Recent clients #}
+    {% if clientsPreview is defined and clientsPreview is not empty %}
+        <div class="mt-2 text-[11px] text-zinc-400">
+            Recent clients (type id or exact name):
+            {% for c in clientsPreview %}
+                <div>
+                    #{{ c.id }} — {{ c.name }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {# Recent Teams #}
+    {% if teamsPreview is defined and teamsPreview is not empty %}
+        <div class="mt-2 text-[11px] text-zinc-400">
+            Recent teams (type ids or exact names, comma separated):
+            {% for t in teamsPreview %}
+                <div>
+                    #{{ t.id }} — {{ t.name }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if ratesPreview is defined and ratesPreview is not empty %}
+        <div class="mt-2 text-[11px] text-zinc-400">
+            Available rates (type id or exact name):
+            {% for r in ratesPreview %}
+                <div>
+                    #{{ r.id }} — {{ r.name }} ({{ r.value }})
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {# Footer #}
+    <div class="text-zinc-600">
+        Type <span class="term-cmd">cancel</span> to abort.
+    </div>
+
+</div>
