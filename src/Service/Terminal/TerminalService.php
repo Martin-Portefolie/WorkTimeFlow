@@ -392,10 +392,10 @@ final class TerminalService
             'users:show'             => $this->userModule->show($args),
             'users:add'              => $this->userModule->add($flags),
             'users:update'           => $this->userModule->update($args, $flags),
-            'users:forgot-password'  => $this->userModule->forgotPasswordCommand($tokens),
+            'users:forgot-password' => $this->userModule->forgotPassword($args, $flags),
             'users:delete'           => $this->userModule->delete($args, $flags),
-            'users:deactivate'       => $this->userModule->deactivateCommand($tokens),
-            'users:activate'         => $this->userModule->activateCommand($tokens),
+            'users:deactivate' =>       $this->userModule->deactivate($args),
+            'users:activate' =>         $this->userModule->activate($args),
 
             // clients
             'clients:list'   => $this->clientModule->listCommand($tokens),

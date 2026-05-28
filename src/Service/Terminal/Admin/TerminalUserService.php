@@ -8,6 +8,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class TerminalUserService
 {
@@ -17,6 +21,8 @@ final class TerminalUserService
         private readonly Security $security,
         private readonly EntityManagerInterface $em,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly MailerInterface $mailer,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -193,10 +199,28 @@ final class TerminalUserService
 
         return $this->prompt(
             step: 1,
-            total: 5,
+            total: 4,
             label: 'Enter user email',
             example: 'test@example.com',
         );
+    }
+
+    // -----------------------------------------------------
+// Activate User
+// -----------------------------------------------------
+
+    public function activate(array $args = []): array
+    {
+        return $this->toggleActive($args, true);
+    }
+
+// -----------------------------------------------------
+// Deactivate User
+// -----------------------------------------------------
+
+    public function deactivate(array $args = []): array
+    {
+        return $this->toggleActive($args, false);
     }
 
     // -----------------------------------------------------
@@ -388,6 +412,103 @@ final class TerminalUserService
         ];
     }
 
+    // -----------------------------------------------------
+// Forgot password
+// -----------------------------------------------------
+
+    public function forgotPassword(array $args = [], array $flags = []): array
+    {
+        $identifier = $args[0] ?? null;
+
+        if (!$identifier) {
+            return [
+                'success' => false,
+                'view' => 'terminals/admin/terminal_commands/users.html.twig',
+                'vars' => [
+                    'view' => 'error',
+                    'title' => 'Missing user identifier',
+                    'message' => 'Usage: users:forgot-password <id|email|username>',
+                ],
+            ];
+        }
+
+        $user = $this->userRepository->findOneByIdEmailOrUsername($identifier);
+
+        if (!$user) {
+            return [
+                'success' => false,
+                'view' => 'terminals/admin/terminal_commands/users.html.twig',
+                'vars' => [
+                    'view' => 'error',
+                    'title' => 'User not found',
+                    'message' => sprintf('No user found for "%s".', $identifier),
+                ],
+            ];
+        }
+
+        // -----------------------------------------------------
+        // Generate temporary password
+        // -----------------------------------------------------
+
+        $plainPassword = bin2hex(random_bytes(4));
+
+        $hashedPassword = $this->passwordHasher->hashPassword(
+            $user,
+            $plainPassword,
+        );
+
+        $user->setPassword($hashedPassword);
+
+        $this->em->flush();
+
+        // -----------------------------------------------------
+        // Send reset email
+        // -----------------------------------------------------
+
+        $email = (new TemplatedEmail())
+            ->from('noreply@worktimeflow.test')
+            ->to($user->getEmail())
+            ->subject('WORKTIMEFLOW Password Reset')
+            ->htmlTemplate('admin/emails/password_reset.html.twig')
+            ->context([
+                'username' => $user->getUsername(),
+                'user_email' => $user->getEmail(),
+                'password' => $plainPassword,
+                'login_url' => $this->router->generate(
+                    'app_login',
+                    [],
+                    UrlGeneratorInterface::ABSOLUTE_URL,
+                ),
+            ]);
+
+        try {
+            $this->mailer->send($email);
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'view' => 'terminals/admin/terminal_commands/users.html.twig',
+                'vars' => [
+                    'view' => 'error',
+                    'title' => 'Mail delivery failed',
+                    'message' => $e->getMessage(),
+                ],
+            ];
+        }
+
+        return [
+            'success' => true,
+            'view' => 'terminals/admin/terminal_commands/users.html.twig',
+            'vars' => [
+                'view' => 'show',
+                'title' => 'Password reset email sent',
+                'fields' => [
+                    ['label' => 'User', 'value' => $user->getUsername()],
+                    ['label' => 'Email', 'value' => $user->getEmail()],
+                ],
+            ],
+        ];
+    }
+
     // =========================================================
     // Handle interactive user wizard input
     // =========================================================
@@ -401,7 +522,10 @@ final class TerminalUserService
             return null;
         }
 
-        if (mb_strtolower(trim($raw)) === 'cancel') {
+        $raw = trim($raw);
+        $lower = mb_strtolower($raw);
+
+        if ($lower === 'cancel') {
             $this->state->clear($userId);
 
             return [
@@ -411,7 +535,15 @@ final class TerminalUserService
             ];
         }
 
-        return $this->handleAddWizard($userId, $state, trim($raw));
+        // If a new users:add command is entered while a stale add wizard exists,
+        // restart the wizard instead of treating "u.a" as email input.
+        if (in_array($lower, ['u.a', 'users:add'], true)) {
+            $this->state->clear($userId);
+
+            return $this->add();
+        }
+
+        return $this->handleAddWizard($userId, $state, $raw);
     }
 
     private function prompt(
@@ -441,8 +573,8 @@ final class TerminalUserService
     }
 
     // -----------------------------------------------------
-// Handle add wizard
-// -----------------------------------------------------
+    // Handle add wizard
+    // -----------------------------------------------------
 
     private function handleAddWizard(
         string $userId,
@@ -460,7 +592,7 @@ final class TerminalUserService
             if (!filter_var($input, FILTER_VALIDATE_EMAIL)) {
                 return $this->prompt(
                     step: 1,
-                    total: 5,
+                    total: 4,
                     label: 'Enter user email',
                     example: 'test@example.com',
                     error: 'Invalid email address.',
@@ -477,7 +609,7 @@ final class TerminalUserService
 
             return $this->prompt(
                 step: 2,
-                total: 5,
+                total: 4,
                 label: 'Enter username',
                 example: 'Martin',
             );
@@ -491,7 +623,7 @@ final class TerminalUserService
             if (mb_strlen(trim($input)) < 2) {
                 return $this->prompt(
                     step: 2,
-                    total: 5,
+                    total: 4,
                     label: 'Enter username',
                     example: 'Martin',
                     error: 'Username must be at least 2 characters.',
@@ -508,82 +640,39 @@ final class TerminalUserService
 
             return $this->prompt(
                 step: 3,
-                total: 5,
-                label: 'Enter password',
-                example: 'SuperSecret123',
+                total: 4,
+                label: 'Enter roles (comma separated). Leave empty for ROLE_USER',
+                example: 'ROLE_USER,ROLE_ADMIN',
             );
         }
 
         // -----------------------------------------------------
-        // Step 3 — Password
+        // Step 3 — Roles
         // -----------------------------------------------------
 
         if ($step === 3) {
-            if (mb_strlen($input) < 6) {
-                return $this->prompt(
-                    step: 3,
-                    total: 5,
-                    label: 'Enter password',
-                    example: 'SuperSecret123',
-                    error: 'Password must be at least 6 characters.',
-                );
-            }
-
-            $data['password'] = $input;
-
-            $this->state->set($userId, [
-                'mode' => 'users:add',
-                'step' => 4,
-                'data' => $data,
-            ]);
-
-            return $this->prompt(
-                step: 4,
-                total: 5,
-                label: 'Enter roles (comma separated)',
-                example: 'ROLE_USER',
-            );
-        }
-
-        // -----------------------------------------------------
-        // Step 4 — Roles
-        // -----------------------------------------------------
-
-        if ($step === 4) {
             $roles = array_filter(array_map(
                 'trim',
                 explode(',', $input)
             ));
 
-            $allowedRoles = [
-                'ROLE_USER',
-                'ROLE_ADMIN',
-            ];
-
-            $invalidRoles = array_diff($roles, $allowedRoles);
-
-            if (!empty($invalidRoles)) {
+            try {
+                $roles = $this->validateRoles($roles);
+            } catch (\InvalidArgumentException $e) {
                 return $this->prompt(
-                    step: 4,
-                    total: 5,
+                    step: 3,
+                    total: 4,
                     label: 'Enter roles (comma separated). Leave empty for ROLE_USER',
                     example: 'ROLE_USER,ROLE_ADMIN',
-                    error: sprintf(
-                        'Invalid role(s): %s',
-                        implode(', ', $invalidRoles),
-                    ),
+                    error: $e->getMessage(),
                 );
-            }
-
-            if (empty($roles)) {
-                $roles = ['ROLE_USER'];
             }
 
             $data['roles'] = $roles;
 
             $this->state->set($userId, [
                 'mode' => 'users:add',
-                'step' => 5,
+                'step' => 4,
                 'data' => $data,
             ]);
 
@@ -605,10 +694,10 @@ final class TerminalUserService
         }
 
         // -----------------------------------------------------
-        // Step 5 — Confirm + Persist
+        // Step 4 — Confirm + Persist
         // -----------------------------------------------------
 
-        if ($step === 5) {
+        if ($step === 4) {
             if (!in_array(mb_strtolower($input), ['yes', 'y'], true)) {
                 $this->state->clear($userId);
 
@@ -625,15 +714,35 @@ final class TerminalUserService
             $user->setRoles($data['roles']);
             $user->setIsActive(true);
 
+            $plainPassword = bin2hex(random_bytes(4));
+
             $hashed = $this->passwordHasher->hashPassword(
                 $user,
-                $data['password'],
+                $plainPassword,
             );
 
             $user->setPassword($hashed);
 
             $this->em->persist($user);
             $this->em->flush();
+
+            $email = (new TemplatedEmail())
+                ->from('noreply@worktimeflow.test')
+                ->to($user->getEmail())
+                ->subject('Welcome to WORKTIMEFLOW')
+                ->htmlTemplate('admin/emails/user_created.html.twig')
+                ->context([
+                    'username' => $user->getUsername(),
+                    'user_email' => $user->getEmail(),
+                    'password' => $plainPassword,
+                    'login_url' => $this->router->generate(
+                        'app_login',
+                        [],
+                        UrlGeneratorInterface::ABSOLUTE_URL,
+                    ),
+                ]);
+
+            $this->mailer->send($email);
 
             $this->state->clear($userId);
 
@@ -643,7 +752,7 @@ final class TerminalUserService
                 'vars' => [
                     'view' => 'show',
                     'title' => 'User created',
-
+                    'description' => 'Welcome email sent successfully.',
                     'fields' => [
                         ['label' => 'ID', 'value' => $user->getId()],
                         ['label' => 'Email', 'value' => $user->getEmail()],
@@ -685,6 +794,70 @@ final class TerminalUserService
         }
 
         return $roles ?: ['ROLE_USER'];
+    }
+
+    // -----------------------------------------------------
+// Toggle user active state
+// -----------------------------------------------------
+
+    private function toggleActive(array $args, bool $active): array
+    {
+        $identifier = $args[0] ?? null;
+
+        if (!$identifier) {
+            return [
+                'success' => false,
+                'view' => 'terminals/admin/terminal_commands/users.html.twig',
+                'vars' => [
+                    'view' => 'error',
+                    'title' => 'Missing user identifier',
+                    'message' => sprintf(
+                        'Usage: users:%s <id|email|username>',
+                        $active ? 'activate' : 'deactivate',
+                    ),
+                ],
+            ];
+        }
+
+        $user = $this->userRepository->findOneByIdEmailOrUsername($identifier);
+
+        if (!$user) {
+            return [
+                'success' => false,
+                'view' => 'terminals/admin/terminal_commands/users.html.twig',
+                'vars' => [
+                    'view' => 'error',
+                    'title' => 'User not found',
+                    'message' => sprintf(
+                        'No user found for "%s".',
+                        $identifier,
+                    ),
+                ],
+            ];
+        }
+
+        $user->setIsActive($active);
+
+        $this->em->flush();
+
+        return [
+            'success' => true,
+            'view' => 'terminals/admin/terminal_commands/users.html.twig',
+            'vars' => [
+                'view' => 'show',
+                'title' => sprintf(
+                    'User %s',
+                    $active ? 'activated' : 'deactivated',
+                ),
+                'fields' => [
+                    ['label' => 'ID', 'value' => $user->getId()],
+                    ['label' => 'Email', 'value' => $user->getEmail()],
+                    ['label' => 'Username', 'value' => $user->getUsername()],
+                    ['label' => 'Roles', 'value' => implode(', ', $user->getRoles())],
+                    ['label' => 'Active', 'value' => $user->isActive() ? 'yes' : 'no'],
+                ],
+            ],
+        ];
     }
 
 }
