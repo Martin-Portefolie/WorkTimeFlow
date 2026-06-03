@@ -21,6 +21,10 @@ final class TerminalClientService
     ) {
     }
 
+    // -----------------------------------------------------
+    // List Clients
+    // -----------------------------------------------------
+
     public function list(array $flags = []): array
     {
         $q = isset($flags['q']) ? trim((string) $flags['q']) : null;
@@ -51,6 +55,14 @@ final class TerminalClientService
         ];
     }
 
+    // -----------------------------------------------------
+    // Show Client
+    // -----------------------------------------------------
+    // TODO:
+    // Projects in client show should become clickable UI actions.
+    // Clicking project should run: projects:show <id> / p.s <id>
+    // Clicking "Projects" header/count should run: projects:list --client=<id>
+    // Terminal output and right-side UI object should both update from same command result.
     public function show(array $args = []): array
     {
         $identifier = $args[0] ?? null;
@@ -74,6 +86,10 @@ final class TerminalClientService
         return $this->clientShowPayload('Client', $client);
     }
 
+    // -----------------------------------------------------
+    // Add Client Wizard
+    // -----------------------------------------------------
+
     public function add(array $flags = []): array
     {
         $userId = $this->currentUserId();
@@ -91,6 +107,10 @@ final class TerminalClientService
             example: 'Acme ApS',
         );
     }
+
+    // -----------------------------------------------------
+    // Update Client
+    // -----------------------------------------------------
 
     public function update(array $args = [], array $flags = []): array
     {
@@ -190,6 +210,10 @@ final class TerminalClientService
         return $this->clientShowPayload('Client updated', $client);
     }
 
+    // -----------------------------------------------------
+    // Delete Client
+    // -----------------------------------------------------
+
     public function delete(array $args = [], array $flags = []): array
     {
         $identifier = $args[0] ?? null;
@@ -240,6 +264,10 @@ final class TerminalClientService
         ];
     }
 
+    // -----------------------------------------------------
+    // Interactive Wizard Handler
+    // -----------------------------------------------------
+
     public function handleInteractive(string $raw): ?array
     {
         $userId = $this->currentUserId();
@@ -270,6 +298,10 @@ final class TerminalClientService
 
         return $this->handleAddWizard($userId, $state, $raw);
     }
+
+    // -----------------------------------------------------
+    // Handle Add Client Wizard
+    // -----------------------------------------------------
 
     private function handleAddWizard(string $userId, array $state, string $input): array
     {
@@ -407,8 +439,41 @@ final class TerminalClientService
         ];
     }
 
+    // -----------------------------------------------------
+    // Client Show Payload
+    // -----------------------------------------------------
+
     private function clientShowPayload(string $title, Client $client): array
     {
+        $projects = $client->getProjects()->toArray();
+
+        $fields = [
+            ['label' => 'ID', 'value' => $client->getId()],
+            ['label' => 'Name', 'value' => $client->getName()],
+            ['label' => 'Contact person', 'value' => $client->getContactPerson()],
+            ['label' => 'Email', 'value' => $client->getContactEmail()],
+            ['label' => 'Phone', 'value' => $client->getContactPhone()],
+            ['label' => 'Address', 'value' => $client->getAdress()],
+            ['label' => 'Postal code', 'value' => $client->getPostalCode()],
+            ['label' => 'City', 'value' => $client->getCity()],
+            ['label' => 'Country', 'value' => $client->getCountry()],
+            ['label' => 'Projects', 'value' => sprintf('(%d)', count($projects))],
+        ];
+
+        if (count($projects) > 0) {
+            foreach ($projects as $project) {
+                $fields[] = [
+                    'label' => sprintf('project: %s', $project->getId()),
+                    'value' => $project->getName() ?: '—',
+                ];
+            }
+        } else {
+            $fields[] = [
+                'label' => '',
+                'value' => 'none',
+            ];
+        }
+
         return [
             'success' => true,
             'view' => self::VIEW,
@@ -416,21 +481,14 @@ final class TerminalClientService
                 'view' => 'show',
                 'resource' => 'clients',
                 'title' => $title,
-                'fields' => [
-                    ['label' => 'ID', 'value' => $client->getId()],
-                    ['label' => 'Name', 'value' => $client->getName()],
-                    ['label' => 'Contact person', 'value' => $client->getContactPerson()],
-                    ['label' => 'Email', 'value' => $client->getContactEmail()],
-                    ['label' => 'Phone', 'value' => $client->getContactPhone()],
-                    ['label' => 'Address', 'value' => $client->getAdress()],
-                    ['label' => 'Postal code', 'value' => $client->getPostalCode()],
-                    ['label' => 'City', 'value' => $client->getCity()],
-                    ['label' => 'Country', 'value' => $client->getCountry()],
-                    ['label' => 'Projects', 'value' => $client->getProjects()->count()],
-                ],
+                'fields' => $fields,
             ],
         ];
     }
+
+    // -----------------------------------------------------
+    // Prompt Helper
+    // -----------------------------------------------------
 
     private function prompt(
         int $step,
@@ -453,6 +511,10 @@ final class TerminalClientService
         ];
     }
 
+    // -----------------------------------------------------
+    // Error Helper
+    // -----------------------------------------------------
+
     private function error(string $title, string $message): array
     {
         return [
@@ -466,6 +528,10 @@ final class TerminalClientService
         ];
     }
 
+    // -----------------------------------------------------
+    // Save Wizard Step
+    // -----------------------------------------------------
+
     private function saveWizardStep(string $userId, int $step, array $data): void
     {
         $this->state->set($userId, [
@@ -475,10 +541,18 @@ final class TerminalClientService
         ]);
     }
 
+    // -----------------------------------------------------
+    // Current User ID
+    // -----------------------------------------------------
+
     private function currentUserId(): string
     {
         return $this->security->getUser()?->getUserIdentifier() ?? 'guest';
     }
+
+    // -----------------------------------------------------
+    // Nullable String Helper
+    // -----------------------------------------------------
 
     private function nullableString(mixed $value): ?string
     {
