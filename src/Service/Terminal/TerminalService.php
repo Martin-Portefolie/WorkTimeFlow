@@ -7,7 +7,7 @@ use App\Service\Terminal\Admin\CompanyTerminalService;
 use App\Service\Terminal\Admin\ProjectTerminalService;
 use App\Service\Terminal\Admin\TeamTerminalService;
 use App\Service\Terminal\Admin\TerminalUserService;
-use App\Service\Terminal\Admin\UserTerminalService;
+use App\Service\Terminal\Admin\TerminalClientService;
 use Symfony\Bundle\SecurityBundle\Security;
 
 final class TerminalService
@@ -62,7 +62,7 @@ final class TerminalService
         private Security             $security,
 //        private UserTerminalService  $userModule,
         private TerminalUserService $userModule,
-        private ClientTerminalService $clientModule,
+        private TerminalClientService $clientModule,
         private CompanyTerminalService $companyModule,
         private TeamTerminalService $teamModule,
         private ProjectTerminalService $projectModule
@@ -398,11 +398,11 @@ final class TerminalService
             'users:activate' =>         $this->userModule->activate($args),
 
             // clients
-            'clients:list'   => $this->clientModule->listCommand($tokens),
-            'clients:show'   => $this->clientModule->showCommand($tokens),
-            'clients:add'    => $this->clientModule->addCommand($tokens),
-            'clients:update' => $this->clientModule->updateCommand($tokens),
-            'clients:delete' => $this->clientModule->deleteCommand($tokens),
+            'clients:list'   => $this->clientModule->list($flags),
+            'clients:show'   => $this->clientModule->show($args),
+            'clients:add'    => $this->clientModule->add($flags),
+            'clients:update' => $this->clientModule->update($args, $flags),
+            'clients:delete' => $this->clientModule->delete($args, $flags),
 
             // company
             'company:show'     => $this->companyModule->companyShowCommand($tokens),
