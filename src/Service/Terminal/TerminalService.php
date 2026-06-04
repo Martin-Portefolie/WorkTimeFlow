@@ -2,12 +2,12 @@
 
 namespace App\Service\Terminal;
 
-use App\Service\Terminal\Admin\ClientTerminalService;
+
 use App\Service\Terminal\Admin\CompanyTerminalService;
-use App\Service\Terminal\Admin\ProjectTerminalService;
 use App\Service\Terminal\Admin\TeamTerminalService;
 use App\Service\Terminal\Admin\TerminalUserService;
 use App\Service\Terminal\Admin\TerminalClientService;
+use App\Service\Terminal\Admin\TerminalProjectService;
 use Symfony\Bundle\SecurityBundle\Security;
 
 final class TerminalService
@@ -65,7 +65,7 @@ final class TerminalService
         private TerminalClientService $clientModule,
         private CompanyTerminalService $companyModule,
         private TeamTerminalService $teamModule,
-        private ProjectTerminalService $projectModule
+        private TerminalProjectService $projectModule,
     ) {}
 
     private function isAdmin(): bool
@@ -424,11 +424,11 @@ final class TerminalService
             'teams:remove-user' => $this->teamModule->removeUserCommand($tokens),
 
             // projects
-            'projects:list'   => $this->projectModule->listCommand($tokens),
-            'projects:show'   => $this->projectModule->showCommand($tokens),
-            'projects:add'    => $this->projectModule->addCommand($tokens),
-            'projects:update' => $this->projectModule->updateCommand($tokens),
-            'projects:delete' => $this->projectModule->deleteCommand($tokens),
+            'projects:list' => $this->projectModule->list($flags),
+            'projects:show' => $this->projectModule->show($args),
+            'projects:add' => $this->projectModule->add($flags),
+            'projects:update' => $this->projectModule->update($args, $flags),
+            'projects:delete' => $this->projectModule->delete($args, $flags),
 
             default => ['output' => 'Unhandled admin command', 'success' => false],
         };
