@@ -1,0 +1,12 @@
+<section class="grid min-h-[40vh] border border-zinc-800 bg-black font-mono text-sm text-zinc-300 lg:grid-cols-[280px_1fr]">
+    {% include 'gui/admin/_sidebar.html.twig' with {
+        active: active|default('dashboard')
+    } %}
+
+    <section class="min-w-0 border-l border-zinc-800 bg-black">
+        {% include 'gui/admin/_topbar.html.twig' %}
+        {% include 'gui/admin/_content.html.twig' with {
+            active: active|default('dashboard')
+        } %}
+    </section>
+</section>

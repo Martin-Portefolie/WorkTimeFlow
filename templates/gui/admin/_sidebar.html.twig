@@ -1,0 +1,37 @@
+<aside class="bg-black">
+    <div class="border-b border-zinc-800 p-4">
+        <div class="text-emerald-400">WORKTIMEFLOW GUI</div>
+        <div class="mt-1 text-xs text-zinc-500">Admin interface</div>
+    </div>
+
+    <nav class="space-y-1 p-4">
+        {% set items = [
+            { key: 'dashboard', label: 'Dashboard', command: 'dashboard' },
+            { key: 'clients', label: 'Clients', command: 'c.l' },
+            { key: 'projects', label: 'Projects', command: 'p.l' },
+            { key: 'teams', label: 'Teams', command: 't.l' },
+            { key: 'users', label: 'Users', command: 'u.l' },
+            { key: 'todos', label: 'Todos', command: 'todo.l' }
+        ] %}
+
+        {% for item in items %}
+            <button
+                type="button"
+                data-command="{{ item.command }}"
+                class="grid w-full grid-cols-[1fr_auto] border border-transparent px-3 py-2 text-left transition
+                    {{ active == item.key
+                ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
+                : 'text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-100'
+                }}"
+            >
+                <span>&gt; {{ item.label }}</span>
+                <span class="text-xs text-zinc-500">{{ item.command }}</span>
+            </button>
+        {% endfor %}
+    </nav>
+
+    <div class="border-t border-zinc-800 p-4 text-xs text-zinc-500">
+        scope: admin<br>
+        gui: ready
+    </div>
+</aside>

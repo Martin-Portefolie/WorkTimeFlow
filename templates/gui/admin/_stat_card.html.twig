@@ -1,0 +1,12 @@
+<button
+    type="button"
+    data-command="{{ command }}"
+    class="border border-zinc-800 bg-zinc-950 p-4 text-left transition hover:border-emerald-500/40 hover:bg-black"
+>
+    <div class="text-xs uppercase tracking-[0.25em] text-zinc-500">{{ label }}</div>
+
+    <div class="mt-6 grid grid-cols-[1fr_auto] items-end">
+        <span class="text-xl font-bold text-zinc-100">{{ value }}</span>
+        <span class="text-xs text-emerald-400">{{ command }}</span>
+    </div>
+</button>

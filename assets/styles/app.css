@@ -16,3 +16,12 @@ body {
     @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
 }
 
+.wtf-gui-bg {
+    background:
+        linear-gradient(
+            to bottom,
+            rgb(3 7 18),
+            rgb(9 9 11)
+        );
+}
+
