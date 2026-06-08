@@ -1,5 +1,12 @@
 .idea
 ###> symfony/framework-bundle ###
+# MacOS
+.DS_Store
+**/.DS_Store
+
+# PhpStorm
+.idea/
+
 /src/.DS_Store
 /.env.local
 /.env.local.php
