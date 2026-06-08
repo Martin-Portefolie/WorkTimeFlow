@@ -1,0 +1,17 @@
+{% set currentView = view|default('list') %}
+
+{% if currentView == 'list' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_list.html.twig' %}
+{% elseif currentView == 'confirm' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_show.html.twig' %}
+{% elseif currentView == 'show' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_show.html.twig' %}
+{% elseif currentView == 'add' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_add.html.twig' %}
+{% elseif currentView == 'edit' or currentView == 'update' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_edit.html.twig' %}
+{% elseif currentView == 'delete' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_delete.html.twig' %}
+{% else %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_error.html.twig' %}
+{% endif %}

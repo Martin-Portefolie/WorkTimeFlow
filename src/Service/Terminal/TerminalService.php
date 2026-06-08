@@ -4,7 +4,7 @@ namespace App\Service\Terminal;
 
 
 use App\Service\Terminal\Admin\CompanyTerminalService;
-use App\Service\Terminal\Admin\TeamTerminalService;
+use App\Service\Terminal\Admin\TerminalTeamService;
 use App\Service\Terminal\Admin\TerminalUserService;
 use App\Service\Terminal\Admin\TerminalClientService;
 use App\Service\Terminal\Admin\TerminalProjectService;
@@ -64,7 +64,7 @@ final class TerminalService
         private TerminalUserService $userModule,
         private TerminalClientService $clientModule,
         private CompanyTerminalService $companyModule,
-        private TeamTerminalService $teamModule,
+        private TerminalTeamService $teamModule,
         private TerminalProjectService $projectModule,
     ) {}
 
@@ -415,13 +415,13 @@ final class TerminalService
             'rates:delete' => $this->companyModule->ratesDeleteCommand($tokens),
 
             // teams
-            'teams:list'        => $this->teamModule->listCommand($tokens),
-            'teams:show'        => $this->teamModule->showCommand($tokens),
-            'teams:add'         => $this->teamModule->addCommand($tokens),
-            'teams:update'      => $this->teamModule->updateCommand($tokens),
-            'teams:delete'      => $this->teamModule->deleteCommand($tokens),
-            'teams:add-user'    => $this->teamModule->addUserCommand($tokens),
-            'teams:remove-user' => $this->teamModule->removeUserCommand($tokens),
+            'teams:list' => $this->teamModule->list($flags),
+            'teams:show' => $this->teamModule->show($args),
+            'teams:add' => $this->teamModule->add($flags),
+            'teams:update' => $this->teamModule->update($args, $flags),
+            'teams:delete' => $this->teamModule->delete($args, $flags),
+            'teams:add-user' => $this->teamModule->addUser($args, $flags),
+            'teams:remove-user' => $this->teamModule->removeUser($args, $flags),
 
             // projects
             'projects:list' => $this->projectModule->list($flags),
