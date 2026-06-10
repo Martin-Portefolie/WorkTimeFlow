@@ -13,7 +13,7 @@ html, body {
 }
 
 body {
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+    @apply  text-slate-900 dark:bg-slate-950 dark:text-slate-100  bg-zinc-950
 }
 
 .wtf-gui-bg {

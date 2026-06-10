@@ -20,7 +20,7 @@ docker compose up -d  # (if already installed)
 docker compose exec app composer install
 
 # 3 docker rm assets
-docker compose exec app rm -rf public/assets
+docker compose exec app sh -lc 'rm -rf public/assets/*'
 
 # 4. Migrate the database
 docker compose exec app bin/console doctrine:migrations:migrate  # (only on install)

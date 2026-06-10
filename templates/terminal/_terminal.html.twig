@@ -1,6 +1,6 @@
 {# Wrapper that routes to the correct terminal UI by role #}
 <div class="relative mt-4 mb-2">
-    <div class="overflow-hidden rounded-2xl border border-zinc-800/80 bg-[#0e1116] text-zinc-100 shadow-2xl">
+    <div class="overflow-hidden  border-zinc-800/80 bg-[#0e1116] text-zinc-100 shadow-2xl">
         {% if is_granted('ROLE_ADMIN') %}
             {% include 'terminal/admin/_admin.html.twig' %}
         {% else %}
