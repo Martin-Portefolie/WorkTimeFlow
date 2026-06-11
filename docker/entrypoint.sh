@@ -6,6 +6,28 @@ APP_ENV="${APP_ENV:-prod}"
 echo "Entrypoint starting (APP_ENV=$APP_ENV)"
 
 # ------------------------------------------------------------------------------
+# Check for missing files
+# ------------------------------------------------------------------------------
+echo "Checking Symfony installation..."
+
+test -f /app/public/index.php || {
+    echo "ERROR: public/index.php missing"
+    exit 1
+}
+
+test -f /app/bin/console || {
+    echo "ERROR: bin/console missing"
+    exit 1
+}
+
+test -f /app/composer.json || {
+    echo "ERROR: composer.json missing"
+    exit 1
+}
+
+echo "Symfony installation looks valid"
+
+# ------------------------------------------------------------------------------
 # Writable dirs & permissions
 # ------------------------------------------------------------------------------
 mkdir -p var/cache var/log var/sessions public/bundles

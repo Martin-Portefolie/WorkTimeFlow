@@ -731,4 +731,4 @@ Long-term goals:
 - reduced duplicated Twig templates
 - one command template per resource
 - universal CRUD partials
-- optional Symfony FormFlow for non-terminal multi-step forms
+- optional Symfony FormFlow for non-terminal multi-step forms_

@@ -1,150 +1,108 @@
-# Work Time Flow
+# WorkTimeFlow
 
-A free Symfony-based time-registration project designed to simplify tracking time logs and project management.
+WorkTimeFlow is a free and open-source time registration and project management platform released under the MIT License.
 
-## Prerequisites
-Before setting up the project, ensure you have the following installed:
-- Check [Symfony requirements](https://symfony.com/doc/current/setup.html)
-- Install and start [Docker Desktop](https://www.docker.com/products/docker-desktop/) if using Docker
-- PHP, Composer, and Symfony CLI (if running without Docker)
+The project is designed with simplicity, fast deployment, speed, and maintainability as its primary goals. It is intentionally built to be easy to run on a VPS using Docker with minimal setup and configuration.
 
-## Local Development Setup
+WorkTimeFlow is built around a terminal-first workflow with a complementary GUI.
 
-### Setup With Docker
-```sh
-# 1. Start Docker and build the containers
-docker compose up -d --build
-docker compose up -d  # (if already installed)
+The long-term vision is to create a lightweight workspace experience where users can work through either:
 
-# 2. Install dependencies
-docker compose exec app composer install
+- Terminal
+- GUI
 
-# 3 docker rm assets
-docker compose exec app sh -lc 'rm -rf public/assets/*'
+without duplicating logic or maintaining separate workflows.
 
-# 4. Migrate the database
-docker compose exec app bin/console doctrine:migrations:migrate  # (only on install)
+The documentation follows a developer-first approach. The goal is to make it easy for developers to understand the codebase, perform maintenance, and apply hotfixes quickly.
 
-# 5. Start Tailwind CSS compilation
-docker compose exec app bin/console tailwind:build --watch 
+---
 
-```
+# Requirements
 
-## Data Fixtures Setup
-To populate your database with test data, follow these steps:
+WorkTimeFlow can be run either locally or on a server.
 
-### 1. Reset the database
-```sh
-docker compose exec app bin/console doctrine:schema:drop --full-database --force
-docker compose exec app bin/console doctrine:migrations:migrate
-```
+## Local Development
 
-### 2. Load test data
-```sh
-docker compose exec app bin/console doctrine:fixtures:load
-```
+The recommended setup is [Docker Desktop](https://www.docker.com/products/docker-desktop/) together with Docker Compose.
 
-## Mailer Setup
+Optional tools that can make development easier:
 
-### 1. Configure the `.env` file
-Open the `.env.local` file and update the `MAILER_DSN` value based on your email provider. Example for Gmail:
-```env
-MAILER_DSN=smtp://your_email@gmail.com:your_password@smtp.gmail.com:587?encryption=tls&auth_mode=login
-```
-For other mail providers, refer to the [Symfony Mailer documentation](https://symfony.com/doc/current/mailer.html).
+- [Git](https://git-scm.com/downloads)
+- [Symfony CLI](https://symfony.com/download)
+- [Composer](https://getcomposer.org/download/)
+- [PHP](https://www.php.net/downloads.php)
+- [TablePlus](https://tableplus.com/)
+- [DBeaver](https://dbeaver.io/)
 
-### 2. Clear the cache
-```sh
-docker compose exec app bin/console cache:clear
-```
+See:
 
-### 3. Start the Mailer Transport
-```sh
-docker compose exec app bin/console messenger:consume async -vv
-```
+- [Local Setup](documentation/setup/local-setup.md)
 
-## Production Setup
+---
 
-### Deploying to a Production Server
-```sh
-# 1. Clone the repository
-git clone https://github.com/Martin-Portefolie/WorkTimeFlow.git
-cd WorkTimeFlow
+## Server Deployment
 
-# 2. Install dependencies in production mode
-composer install --no-dev --optimize-autoloader
+The recommended server setup is a Linux VPS running Docker Engine and Docker Compose.
 
-# 3. Set environment variables
-cp .env .env.local
-# Modify DB connection, APP_ENV=prod
+See:
 
-# 4. Clear cache
-php bin/console cache:clear --env=prod --no-debug
+- [Server Setup](documentation/setup/server.md)
 
-# 5. Migrate database
-php bin/console doctrine:migrations:migrate --no-interaction
+---
 
-# 6. Set proper file permissions
-chmod -R 775 var/
-```
+## Symfony Requirements
 
-## Running Tests
-```sh
-# Lint Twig templates
-docker compose exec app bin/console lint:twig templates/
+If you plan to run WorkTimeFlow without Docker, verify that your environment meets the Symfony requirements:
 
-# Run PHP-CS-Fixer in dry-run mode
-docker compose exec app ./vendor/bin/php-cs-fixer fix --dry-run --diff
-```
+- https://symfony.com/doc/current/setup.html
 
-## Helpful Commands
+---
 
-### Database Management
-```sh
-# Migrate new changes to the database
-docker compose exec app bin/console doctrine:migrations:migrate
+# Documentation
 
-# Reset and reinitialize the database
-docker compose exec app bin/console doctrine:schema:drop --full-database --force
-docker compose exec app bin/console doctrine:migrations:migrate
+## New Developer
 
-# Load test data
-docker compose exec app bin/console doctrine:fixtures:load
-```
+Start here:
 
-### User and Project Management
-```sh
-# Create a new user
-docker compose exec app bin/console create-user
+- [Local Setup](documentation/setup/local-setup.md)
+- [Server Setup](documentation/setup/server.md)
 
-# Create a new client
-docker compose exec app bin/console create-client
+---
 
-# Create a new project
-docker compose exec app bin/console create-project
+## Troubleshooting
 
-# Create a team
-docker compose exec app bin/console create-team "Pegasus Team" a@a.com b@b.com --projectName="Project Pegasus"
-```
+Something broken?
 
-### Task and Time Log Management
-```sh
-# Create a new task
-docker compose exec app bin/console create-todo 1 "Storyboard Development" "2025-02-20" "2025-02-22"
+- [Quick Hotfix](documentation/quick-hotfix/README.md)
 
-# Log time entries
-docker compose exec app bin/console create-timelog "admin" 1 2 30 "2024-11-22" "Completed the storyboard initial draft"
-docker compose exec app bin/console create-timelog "admin" 1 1 30 "2024-11-20" "Completed the storyboard initial draft 2"
-docker compose exec app bin/console create-timelog "admin" 1 1 30 "2025-02-20" "Completed the storyboard initial draft 3"
-```
+---
 
-### Running Symfony Messenger
-```sh
-docker compose exec app bin/console messenger:consume async -vv
-```
+## Application Areas
 
-## Additional Notes
-- Commands inside Docker: `docker compose exec app bin/console <command>`
-- Install dependencies in Docker: `docker compose exec app composer <command>`
-- Access the application at: http://localhost:8080/en/
+### Admin
 
+Administrative workspace.
+
+- [Admin Documentation](documentation/admin/README.md)
+
+### Profile
+
+User workspace.
+
+- [Profile Documentation](documentation/profile/README.md)
+
+---
+
+## Shared Symfony Logic
+
+Controllers, Services, Forms, Entities and Repositories.
+
+- [Backend Documentation](documentation/backend/README.md)
+
+---
+
+## Project Direction
+
+Project vision, architecture, design decisions and long-term roadmap.
+
+- [Architecture Documentation](documentation/architecture/README.md)
