@@ -1,13 +1,32 @@
-<div class="min-h-[40vh] p-4">
-    {% if active|default('dashboard') == 'dashboard' %}
+<div class="h-full overflow-auto bg-white text-zinc-900 dark:bg-black dark:text-zinc-300">
+    {% set view = view|default('overview') %}
+
+    {% if view == 'overview' %}
         {% include 'gui/admin/_overview.html.twig' %}
+
+    {% elseif view == 'clients/list' %}
+        <div class="p-6">
+            <h2 class="mb-4 text-lg text-emerald-500 dark:text-emerald-400">
+                Clients
+            </h2>
+
+            <div class="border border-zinc-300 p-4 dark:border-zinc-800">
+                Client list placeholder
+            </div>
+        </div>
+
+    {% elseif view == 'projects/list' %}
+        <div class="p-6">
+            <h2 class="mb-4 text-lg text-emerald-500 dark:text-emerald-400">
+                Projects
+            </h2>
+
+            <div class="border border-zinc-300 p-4 dark:border-zinc-800">
+                Project list placeholder
+            </div>
+        </div>
+
     {% else %}
-        <section class="border border-zinc-800 bg-zinc-950 p-4">
-            <div class="text-xs uppercase tracking-[0.3em] text-emerald-400">GUI CONTENT</div>
-            <h2 class="mt-3 text-xl font-bold uppercase text-zinc-100">{{ active }}</h2>
-            <p class="mt-2 text-zinc-500">
-                Waiting for terminal sync.
-            </p>
-        </section>
+        {% include 'gui/admin/_overview.html.twig' %}
     {% endif %}
 </div>

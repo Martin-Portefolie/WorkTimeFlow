@@ -1,3 +1,5 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
 @import "tailwindcss";
 
 @source "../../templates/**/*.twig";
@@ -13,15 +15,7 @@ html, body {
 }
 
 body {
-    @apply  text-slate-900 dark:bg-slate-950 dark:text-slate-100  bg-zinc-950
+    @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100;
 }
 
-.wtf-gui-bg {
-    background:
-        linear-gradient(
-            to bottom,
-            rgb(3 7 18),
-            rgb(9 9 11)
-        );
-}
 
