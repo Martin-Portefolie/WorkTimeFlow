@@ -82,7 +82,7 @@ export default class extends Controller {
   async submit() {
               // Don't trim yet; blank lines are meaningful during wizard (Enter = null)
                   const raw = (this.inputTarget.value || '');
-           const isAwait = this.awaiting === true;
+                  const isAwait = this.awaiting === true;
 
                   // If not awaiting and empty after trim, ignore
                       if (!isAwait && raw.trim() === '') return;
@@ -144,9 +144,31 @@ export default class extends Controller {
                 // Update awaiting flag for next input (wizard mode)
                 if (lineEl && lineEl.getAttribute) {
                     this.awaiting = lineEl.getAttribute('data-await') === '1';
+
+                    const active = lineEl.getAttribute('data-gui-active');
+                    const view = lineEl.getAttribute('data-gui-view');
+
+                    const guiTemplate = lineEl.querySelector(
+                        'template[data-gui-html]'
+                    );
+
+                    if (active && view) {
+                        document.dispatchEvent(
+                            new CustomEvent('wtf:gui:update', {
+                                detail: {
+                                    active,
+                                    view,
+                                    html: guiTemplate
+                                        ? guiTemplate.innerHTML
+                                        : null,
+                                },
+                            }),
+                        );
+                    }
                 } else {
                     this.awaiting = false;
-                                    }
+                }
+
             } catch (e) {
                 pending.textContent = `Error: ${e.message}`;
             }

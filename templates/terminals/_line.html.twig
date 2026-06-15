@@ -5,6 +5,10 @@
     : 'border-red-500/20 bg-red-500/5'
     }}"
     data-await="{{ await ? '1' : '0' }}"
+    {% if gui %}
+        data-gui-active="{{ gui.active }}"
+        data-gui-view="{{ gui.view }}"
+    {% endif %}
 >
     <div class="flex items-start gap-3">
         <span class="{{ success ? 'text-emerald-400' : 'text-red-400' }} select-none">&gt;</span>
@@ -21,4 +25,9 @@
             </div>
         </div>
     </div>
+    {% if guiHtml is defined and guiHtml %}
+        <template data-gui-html>
+            {{ guiHtml|raw }}
+        </template>
+    {% endif %}
 </div>

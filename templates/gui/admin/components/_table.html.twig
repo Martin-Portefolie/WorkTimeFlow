@@ -1,0 +1,39 @@
+<div class="overflow-auto border border-zinc-300 dark:border-zinc-800">
+    <table class="w-full min-w-[760px] text-left text-xs">
+        <thead class="border-b border-zinc-300 text-zinc-500 dark:border-zinc-800">
+        <tr>
+            {% for column in data.columns|default([]) %}
+                <th class="p-2 font-normal uppercase">
+                    {{ column.label }}
+                </th>
+            {% endfor %}
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for row in data.rows|default([])|slice(0, 10) %}
+            <tr class="border-b border-zinc-200 dark:border-zinc-800">
+                {% for column in data.columns|default([]) %}
+                    <td class="p-2">
+                        {% set value = row[column.key]|default('—') %}
+
+                        {% if column.key == 'active' %}
+                            {{ value ? 'yes' : 'no' }}
+                        {% elseif value is iterable %}
+                            {{ value|join(', ') }}
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="{{ data.columns|default([])|length ?: 1 }}" class="p-4 text-zinc-500">
+                    {{ emptyLabel|default('No rows found.') }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

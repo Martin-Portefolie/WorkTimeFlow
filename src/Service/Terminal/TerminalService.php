@@ -388,7 +388,11 @@ final class TerminalService
             ],
 
             // users
-            'users:list'             => $this->userModule->list($flags),
+            'users:list'             => $this->withGui(
+                $this->userModule->list($flags),
+                'users',
+                'users/list'
+            ),
             'users:show'             => $this->userModule->show($args),
             'users:add'              => $this->userModule->add($flags),
             'users:update'           => $this->userModule->update($args, $flags),
@@ -398,7 +402,11 @@ final class TerminalService
             'users:activate' =>         $this->userModule->activate($args),
 
             // clients
-            'clients:list'   => $this->clientModule->list($flags),
+            'clients:list'   => $this->withGui(
+                $this->clientModule->list($flags),
+                'clients',
+                'clients/list'
+            ),
             'clients:show'   => $this->clientModule->show($args),
             'clients:add'    => $this->clientModule->add($flags),
             'clients:update' => $this->clientModule->update($args, $flags),
@@ -415,7 +423,11 @@ final class TerminalService
             'rates:delete' => $this->companyModule->ratesDeleteCommand($tokens),
 
             // teams
-            'teams:list' => $this->teamModule->list($flags),
+            'teams:list' => $this->withGui(
+                $this->teamModule->list($flags),
+                'teams',
+                'teams/list'
+            ),
             'teams:show' => $this->teamModule->show($args),
             'teams:add' => $this->teamModule->add($flags),
             'teams:update' => $this->teamModule->update($args, $flags),
@@ -424,7 +436,11 @@ final class TerminalService
             'teams:remove-user' => $this->teamModule->removeUser($args, $flags),
 
             // projects
-            'projects:list' => $this->projectModule->list($flags),
+            'projects:list' => $this->withGui(
+                $this->projectModule->list($flags),
+                'projects',
+                'projects/list'
+            ),
             'projects:show' => $this->projectModule->show($args),
             'projects:add' => $this->projectModule->add($flags),
             'projects:update' => $this->projectModule->update($args, $flags),
@@ -432,6 +448,17 @@ final class TerminalService
 
             default => ['output' => 'Unhandled admin command', 'success' => false],
         };
+    }
+
+    private function withGui(array $response, string $active, string $view): array
+    {
+        $response['gui'] = [
+            'active' => $active,
+            'view' => $view,
+            'data' => $response['vars'] ?? [],
+        ];
+
+        return $response;
     }
 
     /** @return array{output:string, success:bool} */

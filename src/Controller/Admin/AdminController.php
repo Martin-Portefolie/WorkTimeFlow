@@ -25,16 +25,34 @@ final class AdminController extends AbstractController
         $result = $terminal->execute($input);
 
         $output = $result['output'] ?? null;
+
         if (!$output && isset($result['view'])) {
-            $output = $this->renderView($result['view'], $result['vars'] ?? []);
+            $output = $this->renderView(
+                $result['view'],
+                $result['vars'] ?? []
+            );
+        }
+
+        $guiHtml = null;
+
+        if (isset($result['gui']['view'])) {
+            $guiHtml = $this->renderView(
+                'gui/admin/_content_inner.html.twig',
+                [
+                    'view' => $result['gui']['view'] ?? 'overview',
+                    'data' => $result['gui']['data'] ?? [],
+                ]
+            );
         }
 
         return $this->render('terminals/_line.html.twig', [
-            'input'   => $input,
-            'output'  => $output ?? '',
-            'success' => (bool)($result['success'] ?? false),
-            'await'   => (bool)($result['await'] ?? false),
-            'user'    => $this->getUser()?->getUserIdentifier() ?? 'guest',
+            'input'    => $input,
+            'output'   => $output ?? '',
+            'success'  => (bool)($result['success'] ?? false),
+            'await'    => (bool)($result['await'] ?? false),
+            'user'     => $this->getUser()?->getUserIdentifier() ?? 'guest',
+            'gui'      => $result['gui'] ?? null,
+            'guiHtml'  => $guiHtml,
         ]);
     }
 

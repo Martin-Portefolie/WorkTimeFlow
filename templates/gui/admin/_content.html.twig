@@ -1,32 +1,8 @@
-<div class="h-full overflow-auto bg-white text-zinc-900 dark:bg-black dark:text-zinc-300">
-    {% set view = view|default('overview') %}
-
-    {% if view == 'overview' %}
-        {% include 'gui/admin/_overview.html.twig' %}
-
-    {% elseif view == 'clients/list' %}
-        <div class="p-6">
-            <h2 class="mb-4 text-lg text-emerald-500 dark:text-emerald-400">
-                Clients
-            </h2>
-
-            <div class="border border-zinc-300 p-4 dark:border-zinc-800">
-                Client list placeholder
-            </div>
-        </div>
-
-    {% elseif view == 'projects/list' %}
-        <div class="p-6">
-            <h2 class="mb-4 text-lg text-emerald-500 dark:text-emerald-400">
-                Projects
-            </h2>
-
-            <div class="border border-zinc-300 p-4 dark:border-zinc-800">
-                Project list placeholder
-            </div>
-        </div>
-
-    {% else %}
-        {% include 'gui/admin/_overview.html.twig' %}
-    {% endif %}
+<div
+    data-gui--admin-gui-target="content"
+    class="h-full overflow-auto bg-white text-zinc-900 dark:bg-black dark:text-zinc-300"
+>
+    {% include 'gui/admin/_content_inner.html.twig' with {
+        view: view|default('overview')
+    } %}
 </div>
