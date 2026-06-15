@@ -1,0 +1,42 @@
+<aside class="flex flex-col bg-zinc-100 dark:bg-black">
+    <div class="border-b border-zinc-300 p-4 dark:border-zinc-800">
+        <div class="text-emerald-500 dark:text-emerald-400">
+            WORKTIMEFLOW GUI
+        </div>
+
+        <div class="mt-1 text-xs text-zinc-600 dark:text-zinc-500">
+            Admin interface
+        </div>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto space-y-1 p-4">
+        {% set items = [
+            { key: 'dashboard', label: 'Dashboard', command: 'dashboard' },
+            { key: 'clients', label: 'Clients', command: 'c.l' },
+            { key: 'projects', label: 'Projects', command: 'p.l' },
+            { key: 'teams', label: 'Teams', command: 't.l' },
+            { key: 'users', label: 'Users', command: 'u.l' },
+            { key: 'todos', label: 'Todos', command: 'todo.l' }
+        ] %}
+
+        {% for item in items %}
+            <button
+                type="button"
+                data-command="{{ item.command }}"
+                class="grid w-full grid-cols-[1fr_auto] border px-3 py-2 text-left transition
+                    {{ active == item.key
+                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500 dark:border-emerald-500/40 dark:text-emerald-400'
+                : 'border-transparent text-zinc-600 hover:border-zinc-300 hover:bg-white hover:text-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:bg-zinc-900 dark:hover:text-zinc-100'
+                }}"
+            >
+                <span>&gt; {{ item.label }}</span>
+                <span class="text-xs text-zinc-500">{{ item.command }}</span>
+            </button>
+        {% endfor %}
+    </nav>
+
+    <div class="border-t border-zinc-300 p-4 text-xs text-zinc-600 dark:border-zinc-800 dark:text-zinc-500">
+        scope: admin<br>
+        gui: ready
+    </div>
+</aside>

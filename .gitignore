@@ -1,5 +1,13 @@
-.idea
+
 ###> symfony/framework-bundle ###
+# MacOS
+.DS_Store
+**/.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
 /src/.DS_Store
 /.env.local
 /.env.local.php

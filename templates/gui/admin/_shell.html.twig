@@ -1,0 +1,15 @@
+<section class="grid h-[40vh] overflow-hidden border border-zinc-300 bg-white font-mono text-sm text-zinc-900 dark:border-zinc-800 dark:bg-black dark:text-zinc-300 lg:grid-cols-[280px_1fr]">
+    {% include 'gui/admin/_sidebar.html.twig' with {
+        active: active|default('dashboard')
+    } %}
+
+    <section class="min-w-0 border-l border-zinc-300 bg-white dark:border-zinc-800 dark:bg-black">
+        {% include 'gui/admin/_topbar.html.twig' with {
+            active: active|default('dashboard')
+        } %}
+
+        {% include 'gui/admin/_content.html.twig' with {
+            view: view|default('overview')
+        } %}
+    </section>
+</section>

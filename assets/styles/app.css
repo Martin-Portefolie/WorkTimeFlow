@@ -1,3 +1,5 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
 @import "tailwindcss";
 
 @source "../../templates/**/*.twig";
@@ -13,6 +15,7 @@ html, body {
 }
 
 body {
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+    @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100;
 }
+
 

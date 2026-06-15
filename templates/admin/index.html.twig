@@ -2,16 +2,14 @@
 {% block title %}Admin — WorkTimeFlow{% endblock %}
 
 {% block body %}
-    <!-- Sticky terminal under navbar -->
-    <div class="terminal-sticky">
-        <div class="container-admin">
-            {% include 'terminals/_terminal.html.twig' %}
-        </div>
-    </div>
 
     <main class="container-landing py-8 space-y-10">
 
+        {% include 'terminals/admin/_admin.html.twig' %}
 
+        {% include 'gui/admin/_shell.html.twig' with {
+            active: 'dashboard'
+        } %}
 
 {#        #}{# --- Clients --- #}
 {#        {% include 'admin/sections/_clients.html.twig' %}#}

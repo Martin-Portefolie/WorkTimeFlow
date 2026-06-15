@@ -33,7 +33,9 @@
     </head>
 
     <body>
+    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
         {% include 'header_and_footer/_navbar.html.twig' %}
+    {% endif %}
 
     {#    <!-- User menu -->#}
 {#    {% include 'header_and_footer/_navbar_user.html.twig' %}#}
