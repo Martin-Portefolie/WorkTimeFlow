@@ -1,0 +1,109 @@
+{% set detailFields = [] %}
+{% set relatedProjects = [] %}
+{% set relatedTeams = [] %}
+{% set relatedUsers = [] %}
+
+{% for field in data.fields|default([]) %}
+
+    {% if field.label starts with 'project:' %}
+        {% set relatedProjects = relatedProjects|merge([field]) %}
+
+    {% elseif field.label starts with 'team:' %}
+        {% set relatedTeams = relatedTeams|merge([field]) %}
+
+    {% elseif field.label starts with 'user:' %}
+        {% set relatedUsers = relatedUsers|merge([field]) %}
+
+    {% else %}
+        {% set detailFields = detailFields|merge([field]) %}
+    {% endif %}
+
+{% endfor %}
+
+<div class="space-y-6">
+
+    <section class="border border-zinc-300 dark:border-zinc-800">
+        <dl class="divide-y divide-zinc-200 text-xs dark:divide-zinc-800">
+
+            {% for field in detailFields %}
+                <div class="grid grid-cols-[220px_1fr] items-start">
+                    <dt class="bg-zinc-100 p-3 text-zinc-500 dark:bg-zinc-950">
+                        {{ field.label }}
+                    </dt>
+
+                    <dd class="p-3 text-zinc-900 dark:text-zinc-100">
+                        {{ field.value }}
+                    </dd>
+                </div>
+            {% endfor %}
+
+        </dl>
+    </section>
+
+    {% if relatedProjects|length %}
+        <section class="border border-zinc-300 dark:border-zinc-800">
+            <header class="border-b border-zinc-300 px-4 py-3 dark:border-zinc-800">
+                <h3 class="uppercase tracking-wider text-emerald-500">
+                    Projects
+                </h3>
+            </header>
+
+            <div class="divide-y divide-zinc-200 dark:divide-zinc-800">
+
+                {% for project in relatedProjects %}
+                    <button
+                        type="button"
+                        class="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-zinc-100 dark:hover:bg-zinc-950"
+                    >
+                        <span>{{ project.value }}</span>
+                        <span class="text-xs text-zinc-500">
+                            {{ project.label }}
+                        </span>
+                    </button>
+                {% endfor %}
+
+            </div>
+        </section>
+    {% endif %}
+
+    {% if relatedTeams|length %}
+        <section class="border border-zinc-300 dark:border-zinc-800">
+            <header class="border-b border-zinc-300 px-4 py-3 dark:border-zinc-800">
+                <h3 class="uppercase tracking-wider text-emerald-500">
+                    Teams
+                </h3>
+            </header>
+
+            <div class="divide-y divide-zinc-200 dark:divide-zinc-800">
+
+                {% for team in relatedTeams %}
+                    <div class="px-4 py-3">
+                        {{ team.value }}
+                    </div>
+                {% endfor %}
+
+            </div>
+        </section>
+    {% endif %}
+
+    {% if relatedUsers|length %}
+        <section class="border border-zinc-300 dark:border-zinc-800">
+            <header class="border-b border-zinc-300 px-4 py-3 dark:border-zinc-800">
+                <h3 class="uppercase tracking-wider text-emerald-500">
+                    Users
+                </h3>
+            </header>
+
+            <div class="divide-y divide-zinc-200 dark:divide-zinc-800">
+
+                {% for user in relatedUsers %}
+                    <div class="px-4 py-3">
+                        {{ user.value }}
+                    </div>
+                {% endfor %}
+
+            </div>
+        </section>
+    {% endif %}
+
+</div>

@@ -393,7 +393,11 @@ final class TerminalService
                 'users',
                 'users/list'
             ),
-            'users:show'             => $this->userModule->show($args),
+            'users:show' => $this->withGui(
+                $this->userModule->show($args),
+                'users',
+                'users/show'
+            ),
             'users:add'              => $this->userModule->add($flags),
             'users:update'           => $this->userModule->update($args, $flags),
             'users:forgot-password' => $this->userModule->forgotPassword($args, $flags),
@@ -407,7 +411,11 @@ final class TerminalService
                 'clients',
                 'clients/list'
             ),
-            'clients:show'   => $this->clientModule->show($args),
+            'clients:show' => $this->withGui(
+                $this->clientModule->show($args),
+                'clients',
+                'clients/show'
+            ),
             'clients:add'    => $this->clientModule->add($flags),
             'clients:update' => $this->clientModule->update($args, $flags),
             'clients:delete' => $this->clientModule->delete($args, $flags),
@@ -428,7 +436,11 @@ final class TerminalService
                 'teams',
                 'teams/list'
             ),
-            'teams:show' => $this->teamModule->show($args),
+            'teams:show' => $this->withGui(
+                $this->teamModule->show($args),
+                'teams',
+                'teams/show'
+            ),
             'teams:add' => $this->teamModule->add($flags),
             'teams:update' => $this->teamModule->update($args, $flags),
             'teams:delete' => $this->teamModule->delete($args, $flags),
@@ -441,7 +453,11 @@ final class TerminalService
                 'projects',
                 'projects/list'
             ),
-            'projects:show' => $this->projectModule->show($args),
+            'projects:show' => $this->withGui(
+                $this->projectModule->show($args),
+                'projects',
+                'projects/show'
+            ),
             'projects:add' => $this->projectModule->add($flags),
             'projects:update' => $this->projectModule->update($args, $flags),
             'projects:delete' => $this->projectModule->delete($args, $flags),
