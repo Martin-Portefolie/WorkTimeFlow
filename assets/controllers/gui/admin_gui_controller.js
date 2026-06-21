@@ -55,4 +55,18 @@ export default class extends Controller {
                 }
             });
     }
+
+    runCommand(event) {
+        const command = event.currentTarget.dataset.command;
+
+        if (!command) {
+            return;
+        }
+
+        document.dispatchEvent(
+            new CustomEvent('wtf:terminal:run', {
+                detail: { command },
+            }),
+        );
+    }
 }

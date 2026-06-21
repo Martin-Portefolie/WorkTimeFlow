@@ -61,6 +61,13 @@ export default class extends Controller {
         // Per-user + per-scope history
         this.history = new HistoryStore(`wtf:terminal:history:${this.userId}:${scope}`, 50);
         this.historyIndex = null; // null => not navigating
+
+        this.onExternalRun = this.externalRun.bind(this);
+
+        document.addEventListener(
+            'wtf:terminal:run',
+            this.onExternalRun
+        );
     }
 
     scrollToBottom() {
@@ -177,6 +184,19 @@ export default class extends Controller {
         this.inputTarget.value = '';
         this.inputTarget.focus();
     }
+
+    externalRun(event) {
+        const command = event.detail?.command;
+
+        if (!command) {
+            return;
+        }
+
+        this.inputTarget.value = command;
+
+        this.submit();
+    }
+
     /* ========== Keyboard (window) ========== */
     hotkeys(event) {
         const key = event.key.toLowerCase();
@@ -439,6 +459,13 @@ export default class extends Controller {
                 this.clearHintTimeoutId = null;
             }, 600);
         }, 5000);
+    }
+
+    disconnect() {
+        document.removeEventListener(
+            'wtf:terminal:run',
+            this.onExternalRun
+        );
     }
 
     renderLine(input, output, success) {
