@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Required CI checks for changelog updates, database migrations and site smoke tests before merging.
+- Admin Todo list and detail commands with terminal and GUI integration.
 - Translations en and da
 - Clients in general was updated
 - Pagination on client sites
