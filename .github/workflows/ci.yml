@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [alpha-1, main]
+  pull_request:
+    branches: [alpha-1, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Symfony and tests (PHP 8.4)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      APP_ENV: test
+      APP_DEBUG: '1'
+      APP_SECRET: ci-only-test-secret
+      DATABASE_URL: 'mysql://ci:ci_password@127.0.0.1:3306/worktimeflow?serverVersion=11.4.0-MariaDB&charset=utf8mb4'
+      MAILER_DSN: 'null://null'
+      MESSENGER_TRANSPORT_DSN: 'in-memory://'
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: ci_root_password
+          MARIADB_DATABASE: worktimeflow_test
+          MARIADB_USER: ci
+          MARIADB_PASSWORD: ci_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, dom, gd, iconv, intl, mbstring, pdo_mysql, xml, xmlwriter, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate Composer files
+        run: composer validate --strict --no-check-publish
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Check PHP syntax
+        run: find src tests migrations -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Validate Symfony configuration and templates
+        run: |
+          php bin/console lint:yaml config .github --parse-tags
+          php bin/console lint:container
+          php bin/console lint:twig templates
+
+      - name: Migrate the isolated test database
+        run: php bin/console doctrine:migrations:migrate --no-interaction
+
+      - name: Run tests
+        run: php bin/phpunit --fail-on-empty-test-suite
