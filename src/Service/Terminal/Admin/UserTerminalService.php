@@ -119,7 +119,7 @@ final class UserTerminalService
         }, $rows ?? []);
 
         return [
-            'view'    => 'terminal/admin/terminal_commands/_users_list_admin.html.twig',
+            'view'    => 'terminals/admin/terminal_commands/_users_list_admin.html.twig',
             'vars'    => [
                 'rows'         => $rows,
                 'limit'        => $limit,
@@ -156,7 +156,7 @@ final class UserTerminalService
         }
 
         return [
-            'view'    => 'terminal/admin/terminal_commands/_users_show_admin.html.twig',
+            'view'    => 'terminals/admin/terminal_commands/_users_show_admin.html.twig',
             'vars'    => ['user' => $u],
             'success' => true,
         ];
@@ -194,7 +194,7 @@ final class UserTerminalService
         $total = count(self::ADD_STEPS);
 
         return [
-            'view'    => 'terminal/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
+            'view'    => 'terminals/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
             'vars'    => [
                 'label'   => $s['label'],
                 'example' => $s['example'] ?? null,
@@ -314,7 +314,7 @@ final class UserTerminalService
             $total = count(self::ADD_STEPS);
 
             return [
-                'view'    => 'terminal/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
+                'view'    => 'terminals/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
                 'vars'    => [
                     'label'   => $s['label'],
                     'example' => $s['example'] ?? null,
@@ -361,7 +361,7 @@ final class UserTerminalService
                     $total = count($steps);
 
                     return [
-                        'view'    => 'terminal/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
+                        'view'    => 'terminals/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
                         'vars'    => [
                             'label'   => "Please enter a valid email (e.g., alice@example.com).",
                             'example' => $s['example'] ?? null,
@@ -377,7 +377,7 @@ final class UserTerminalService
                     $total = count($steps);
 
                     return [
-                        'view'    => 'terminal/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
+                        'view'    => 'terminals/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
                         'vars'    => [
                             'label'   => "Email already exists. Enter a different email.",
                             'example' => $s['example'] ?? null,
@@ -403,7 +403,7 @@ final class UserTerminalService
             $total = count($steps);
 
             return [
-                'view'    => 'terminal/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
+                'view'    => 'terminals/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
                 'vars'    => [
                     'label'   => $s['label'],
                     'example' => $s['example'] ?? null,
@@ -482,7 +482,7 @@ final class UserTerminalService
 
         // Render summary via Twig (no plaintext password)
         return [
-            'view'    => 'terminal/admin/terminal_commands/_users_created_summary.html.twig',
+            'view'    => 'terminals/admin/terminal_commands/_users_created_summary.html.twig',
             'vars'    => [
                 'id'            => $user->getId(),
                 'username'      => $user->getUsername(),

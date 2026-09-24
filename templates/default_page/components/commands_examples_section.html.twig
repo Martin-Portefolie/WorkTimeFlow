@@ -1,0 +1,190 @@
+<section
+    class="bg-white py-16"
+    aria-labelledby="commands-title"
+>
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        {# Section heading #}
+        <div class="mx-auto mb-10 max-w-3xl text-center">
+            <h2
+                id="commands-title"
+                class="text-3xl font-black tracking-[-0.03em] text-slate-900 sm:text-4xl"
+            >
+                {{ 'default_page.commands.title'|trans }}
+            </h2>
+
+            <p class="mt-4 text-lg leading-8 text-slate-600">
+                {{ 'default_page.commands.subtitle'|trans }}
+            </p>
+        </div>
+
+        {# Commands wrapper #}
+        {# Commands wrapper #}
+        <div class="mx-auto max-w-5xl rounded-2xl border border-emerald-200 bg-emerald-50/30 p-6 shadow-xl shadow-emerald-900/5">
+
+            <div class="space-y-5">
+
+                {# ========================================================= #}
+                {# Example 1                                                  #}
+                {# ========================================================= #}
+
+                <div class="overflow-hidden rounded-2xl border border-slate-800 bg-[#071226] shadow-lg">
+
+                    {# Terminal command #}
+                    <div class="flex items-center gap-3 border-b border-slate-800 px-5 py-4 font-mono text-sm text-slate-100">
+
+                <span class="font-bold text-emerald-400">
+                    &gt;_
+                </span>
+
+                        <span class="font-bold text-emerald-400">
+                    $
+                </span>
+
+                        <span>
+                    add client "Hest Test Calendar APS"
+                </span>
+
+                    </div>
+
+                    {# Success response #}
+                    <div class="flex items-center gap-3 bg-slate-900/40 px-5 py-3 text-sm font-medium text-emerald-300">
+
+                <span>
+                    ✓
+                </span>
+
+                        <span>
+                    {{ 'default_page.commands.responses.client_created'|trans({
+                        '%client%': 'Hest Test Calendar APS'
+                    }) }}
+                </span>
+
+                    </div>
+
+                </div>
+
+                {# ========================================================= #}
+                {# Example 2                                                  #}
+                {# ========================================================= #}
+
+                <div class="overflow-hidden rounded-2xl border border-slate-800 bg-[#071226] shadow-lg">
+
+                    <div class="flex items-center gap-3 border-b border-slate-800 px-5 py-4 font-mono text-sm text-slate-100">
+
+                <span class="font-bold text-emerald-400">
+                    &gt;_
+                </span>
+
+                        <span class="font-bold text-emerald-400">
+                    $
+                </span>
+
+                        <span>
+                    add project "Redesign Website" for client "Hest Test Calendar APS"
+                </span>
+
+                    </div>
+
+                    <div class="flex items-center gap-3 bg-slate-900/40 px-5 py-3 text-sm font-medium text-emerald-300">
+
+                <span>
+                    ✓
+                </span>
+
+                        <span>
+                    {{ 'default_page.commands.responses.project_added'|trans({
+                        '%project%': 'Redesign Website',
+                        '%client%': 'Hest Test Calendar APS'
+                    }) }}
+                </span>
+
+                    </div>
+
+                </div>
+
+                {# ========================================================= #}
+                {# Example 3                                                  #}
+                {# ========================================================= #}
+
+                <div class="overflow-hidden rounded-2xl border border-slate-800 bg-[#071226] shadow-lg">
+
+                    <div class="flex items-center gap-3 border-b border-slate-800 px-5 py-4 font-mono text-sm text-slate-100">
+
+                <span class="font-bold text-emerald-400">
+                    &gt;_
+                </span>
+
+                        <span class="font-bold text-emerald-400">
+                    $
+                </span>
+
+                        <span>
+                    add todo "Find a new name" for website to Redesign Website
+                </span>
+
+                    </div>
+
+                    <div class="flex items-center gap-3 bg-slate-900/40 px-5 py-3 text-sm font-medium text-emerald-300">
+
+                <span>
+                    ✓
+                </span>
+
+                        <span>
+                    {{ 'default_page.commands.responses.todo_added'|trans({
+                        '%todo%': 'Find a new name',
+                        '%project%': 'Redesign Website'
+                    }) }}
+                </span>
+
+                    </div>
+
+                </div>
+
+                {# ========================================================= #}
+                {# Example 4                                                  #}
+                {# ========================================================= #}
+
+                <div class="overflow-hidden rounded-2xl border border-slate-800 bg-[#071226] shadow-lg">
+
+                    <div class="flex items-center gap-3 border-b border-slate-800 px-5 py-4 font-mono text-sm text-slate-100">
+
+                <span class="font-bold text-emerald-400">
+                    &gt;_
+                </span>
+
+                        <span class="font-bold text-emerald-400">
+                    $
+                </span>
+
+                        <span>
+                    add time 2h to todo "Find a new name" 26/08
+                </span>
+
+                    </div>
+
+                    <div class="flex items-center gap-3 bg-slate-900/40 px-5 py-3 text-sm font-medium text-emerald-300">
+
+                <span>
+                    ✓
+                </span>
+
+                        <span>
+                    {{ 'default_page.commands.responses.time_logged'|trans({
+                        '%hours%': '2',
+                        '%todo%': 'Find a new name',
+                        '%date%': '26/08'
+                    }) }}
+                </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>

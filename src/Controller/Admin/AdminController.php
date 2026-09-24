@@ -13,7 +13,9 @@ final class AdminController extends AbstractController
     #[Route('/admin/', name: 'app_admin', methods: ['GET'])]
     public function index(): Response
     {
+
         return $this->render('admin/index.html.twig');
+
     }
 
     #[Route('/admin/terminal/run', name: 'admin_terminal_run', methods: ['POST'])]
@@ -23,16 +25,34 @@ final class AdminController extends AbstractController
         $result = $terminal->execute($input);
 
         $output = $result['output'] ?? null;
+
         if (!$output && isset($result['view'])) {
-            $output = $this->renderView($result['view'], $result['vars'] ?? []);
+            $output = $this->renderView(
+                $result['view'],
+                $result['vars'] ?? []
+            );
         }
 
-        return $this->render('terminal/_line.html.twig', [
-            'input'   => $input,
-            'output'  => $output ?? '',
-            'success' => (bool)($result['success'] ?? false),
-            'await'   => (bool)($result['await'] ?? false),
-            'user'    => $this->getUser()?->getUserIdentifier() ?? 'guest',
+        $guiHtml = null;
+
+        if (isset($result['gui']['view'])) {
+            $guiHtml = $this->renderView(
+                'gui/admin/_content_inner.html.twig',
+                [
+                    'view' => $result['gui']['view'] ?? 'overview',
+                    'data' => $result['gui']['data'] ?? [],
+                ]
+            );
+        }
+
+        return $this->render('terminals/_line.html.twig', [
+            'input'    => $input,
+            'output'   => $output ?? '',
+            'success'  => (bool)($result['success'] ?? false),
+            'await'    => (bool)($result['await'] ?? false),
+            'user'     => $this->getUser()?->getUserIdentifier() ?? 'guest',
+            'gui'      => $result['gui'] ?? null,
+            'guiHtml'  => $guiHtml,
         ]);
     }
 

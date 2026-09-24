@@ -1,4 +1,6 @@
-# config/packages/symfonycasts_tailwind.yaml
 symfonycasts_tailwind:
-  input_css: '%kernel.project_dir%/assets/styles/app.css'
-  config_file: '%kernel.project_dir%/tailwind.config.js'
+    # Specify the EXACT version of Tailwind CSS you want to use
+    binary_version: 'v4.1.11'
+
+    # Alternatively, you can specify the path to the binary that you manage yourself
+    #binary: 'node_modules/.bin/tailwindcss'

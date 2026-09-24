@@ -1,7 +1,14 @@
-/.idea
-.DS_Store
-/node_modules
+
 ###> symfony/framework-bundle ###
+# MacOS
+.DS_Store
+**/.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+/src/.DS_Store
 /.env.local
 /.env.local.php
 /.env.*.local
@@ -9,19 +16,15 @@
 /public/bundles/
 /var/
 /vendor/
+migrations
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
 /phpunit.xml
-.phpunit.result.cache
+/.phpunit.cache/
 ###< phpunit/phpunit ###
 
 ###> symfony/asset-mapper ###
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
-
-###> friendsofphp/php-cs-fixer ###
-/.php-cs-fixer.php
-/.php-cs-fixer.cache
-###< friendsofphp/php-cs-fixer ###

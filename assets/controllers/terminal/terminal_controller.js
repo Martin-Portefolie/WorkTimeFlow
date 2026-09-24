@@ -43,7 +43,14 @@ const ALIASES = {
     'p.a':  'projects:add',
     'p.u':  'projects:update',
     'p.del':'projects:delete',
+
+    // Todos
+    'todo.l': 'todos:list',
+    'todo.s': 'todos:show',
 };
+
+
+
 export default class extends Controller {
     static targets = ['input', 'output', 'suggestions', 'palette', 'paletteInput', 'paletteList'];
     static values = { runUrl: String, allowlist: Array };
@@ -58,6 +65,13 @@ export default class extends Controller {
         // Per-user + per-scope history
         this.history = new HistoryStore(`wtf:terminal:history:${this.userId}:${scope}`, 50);
         this.historyIndex = null; // null => not navigating
+
+        this.onExternalRun = this.externalRun.bind(this);
+
+        document.addEventListener(
+            'wtf:terminal:run',
+            this.onExternalRun
+        );
     }
 
     scrollToBottom() {
@@ -79,7 +93,7 @@ export default class extends Controller {
   async submit() {
               // Don't trim yet; blank lines are meaningful during wizard (Enter = null)
                   const raw = (this.inputTarget.value || '');
-           const isAwait = this.awaiting === true;
+                  const isAwait = this.awaiting === true;
 
                   // If not awaiting and empty after trim, ignore
                       if (!isAwait && raw.trim() === '') return;
@@ -141,9 +155,31 @@ export default class extends Controller {
                 // Update awaiting flag for next input (wizard mode)
                 if (lineEl && lineEl.getAttribute) {
                     this.awaiting = lineEl.getAttribute('data-await') === '1';
+
+                    const active = lineEl.getAttribute('data-gui-active');
+                    const view = lineEl.getAttribute('data-gui-view');
+
+                    const guiTemplate = lineEl.querySelector(
+                        'template[data-gui-html]'
+                    );
+
+                    if (active && view) {
+                        document.dispatchEvent(
+                            new CustomEvent('wtf:gui:update', {
+                                detail: {
+                                    active,
+                                    view,
+                                    html: guiTemplate
+                                        ? guiTemplate.innerHTML
+                                        : null,
+                                },
+                            }),
+                        );
+                    }
                 } else {
                     this.awaiting = false;
-                                    }
+                }
+
             } catch (e) {
                 pending.textContent = `Error: ${e.message}`;
             }
@@ -152,6 +188,19 @@ export default class extends Controller {
         this.inputTarget.value = '';
         this.inputTarget.focus();
     }
+
+    externalRun(event) {
+        const command = event.detail?.command;
+
+        if (!command) {
+            return;
+        }
+
+        this.inputTarget.value = command;
+
+        this.submit();
+    }
+
     /* ========== Keyboard (window) ========== */
     hotkeys(event) {
         const key = event.key.toLowerCase();
@@ -184,9 +233,29 @@ export default class extends Controller {
 
         // --- When input is focused, support history + escape ---
         if (isFocused && !isCmd && !isAlt) {
-            if (event.key === 'ArrowUp')   { event.preventDefault(); this.showHistoryPrev(); return; }
-            if (event.key === 'ArrowDown') { event.preventDefault(); this.showHistoryNext(); return; }
-            if (event.key === 'Escape')    { event.preventDefault(); this.blurTile();        return; }
+
+            // Only history navigation when caret is at start/end
+            const start = this.inputTarget.selectionStart;
+            const end = this.inputTarget.selectionEnd;
+            const len = this.inputTarget.value.length;
+
+            if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                this.showHistoryPrev();
+                return;
+            }
+
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                this.showHistoryNext();
+                return;
+            }
+
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                this.blurTile();
+                return;
+            }
         }
     }
 
@@ -258,6 +327,61 @@ export default class extends Controller {
             this.paletteInputTarget.value = '';
             this.paletteInputTarget.focus();
         }
+
+        this.paletteIndex = 0;
+        this.highlightPaletteItem();
+
+    }
+
+    paletteKeydown(event) {
+        if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            this.movePaletteSelection(1);
+            return;
+        }
+
+        if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            this.movePaletteSelection(-1);
+            return;
+        }
+
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            this.pickSelectedPalette();
+            return;
+        }
+
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            this.closePalette();
+        }
+    }
+
+    movePaletteSelection(delta) {
+        const buttons = [...this.paletteListTarget.querySelectorAll('button[data-cmd]')];
+        if (buttons.length === 0) return;
+
+        this.paletteIndex = (this.paletteIndex + delta + buttons.length) % buttons.length;
+        this.highlightPaletteItem();
+    }
+
+    highlightPaletteItem() {
+        const buttons = [...this.paletteListTarget.querySelectorAll('button[data-cmd]')];
+
+        buttons.forEach((button, index) => {
+            button.classList.toggle('bg-zinc-800', index === this.paletteIndex);
+        });
+    }
+
+    pickSelectedPalette() {
+        const buttons = [...this.paletteListTarget.querySelectorAll('button[data-cmd]')];
+        const selected = buttons[this.paletteIndex];
+
+        if (!selected) return;
+
+        this.insertCommand(selected.dataset.cmd);
+        this.closePalette();
     }
 
     closePalette() {
@@ -341,6 +465,13 @@ export default class extends Controller {
         }, 5000);
     }
 
+    disconnect() {
+        document.removeEventListener(
+            'wtf:terminal:run',
+            this.onExternalRun
+        );
+    }
+
     renderLine(input, output, success) {
         // Fallback renderer used by client-side "not viable" message
         const color = success ? 'text-green-400' : 'text-red-400';
@@ -381,8 +512,7 @@ class HistoryStore {
         this._save();
     }
     last(n = 10) {
-        const slice = this.arr.slice(-n);     // oldest->newest within the slice
-        return slice.reverse();               // return newest->oldest
+        return this.arr.slice(-n);
     }
     _load() {
         try {

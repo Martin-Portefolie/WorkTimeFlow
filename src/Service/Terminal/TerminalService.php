@@ -2,11 +2,13 @@
 
 namespace App\Service\Terminal;
 
-use App\Service\Terminal\Admin\ClientTerminalService;
+
 use App\Service\Terminal\Admin\CompanyTerminalService;
-use App\Service\Terminal\Admin\ProjectTerminalService;
-use App\Service\Terminal\Admin\TeamTerminalService;
-use App\Service\Terminal\Admin\UserTerminalService;
+use App\Service\Terminal\Admin\TerminalTeamService;
+use App\Service\Terminal\Admin\TerminalUserService;
+use App\Service\Terminal\Admin\TerminalClientService;
+use App\Service\Terminal\Admin\TerminalProjectService;
+use App\Service\Terminal\Admin\TerminalTodoService;
 use Symfony\Bundle\SecurityBundle\Security;
 
 final class TerminalService
@@ -55,15 +57,21 @@ final class TerminalService
         'p.a'   => 'projects:add',
         'p.u'   => 'projects:update',
         'p.del' => 'projects:delete',
+
+        // Todos
+        'todo.l' => 'todos:list',
+        'todo.s' => 'todos:show',
     ];
 
     public function __construct(
         private Security             $security,
-        private UserTerminalService  $userModule,
-        private ClientTerminalService $clientModule,
+//        private UserTerminalService  $userModule,
+        private TerminalUserService $userModule,
+        private TerminalClientService $clientModule,
         private CompanyTerminalService $companyModule,
-        private TeamTerminalService $teamModule,
-        private ProjectTerminalService $projectModule
+        private TerminalTeamService $teamModule,
+        private TerminalProjectService $projectModule,
+        private TerminalTodoService $todoModule,
     ) {}
 
     private function isAdmin(): bool
@@ -135,6 +143,9 @@ final class TerminalService
 
             // Projects
             'projects:list','projects:show','projects:add','projects:update','projects:delete',
+
+            // todos
+            'todos:list','todos:show',
         ];
         $userCommands  = ['help','ping'];
         $known = $isAdmin ? $adminCommands : $userCommands;
@@ -153,10 +164,14 @@ final class TerminalService
     {
         $tokens = preg_split('/\s+/', trim($input)) ?: [];
         $cmd    = array_shift($tokens) ?? '';
+        $parsed = ArgsParser::parse($tokens);
+
+        $args  = $parsed['args'];
+        $flags = $parsed['flags'];
 
         return match ($cmd) {
             'help' => [
-                'view' => 'terminal/admin/terminal_commands/_help_admin.html.twig',
+                'view' => 'terminals/admin/terminal_commands/_help_admin.html.twig',
                 'vars' => [
                     'aliases' => [
                         // === USERS ===
@@ -371,6 +386,21 @@ final class TerminalService
                             'flags' => [],
                         ],
 
+                        // === TODOS ===
+                        [
+                            'cmd'   => 'todos:list',
+                            'alias' => 'todo.l',
+                            'desc'  => 'List todos',
+                            'usage' => '',
+                            'flags' => ['--q=<search>', '--project=<id|name>', '--limit=<number>'],
+                        ],
+                        [
+                            'cmd'   => 'todos:show',
+                            'alias' => 'todo.s',
+                            'desc'  => 'Show a todo and its project',
+                            'usage' => '<id|name>',
+                            'flags' => [],
+                        ],
                     ],
                 ],
                 'success' => true,
@@ -382,21 +412,37 @@ final class TerminalService
             ],
 
             // users
-            'users:list'             => $this->userModule->listCommand($tokens),
-            'users:show'             => $this->userModule->showCommand($tokens),
-            'users:add'              => $this->userModule->addCommand($tokens),
-            'users:update'           => $this->userModule->updateCommand($tokens),
-            'users:forgot-password'  => $this->userModule->forgotPasswordCommand($tokens),
-            'users:delete'           => $this->userModule->deleteCommand($tokens),
-            'users:deactivate'       => $this->userModule->deactivateCommand($tokens),
-            'users:activate'         => $this->userModule->activateCommand($tokens),
+            'users:list'             => $this->withGui(
+                $this->userModule->list($flags),
+                'users',
+                'users/list'
+            ),
+            'users:show' => $this->withGui(
+                $this->userModule->show($args),
+                'users',
+                'users/show'
+            ),
+            'users:add'              => $this->userModule->add($flags),
+            'users:update'           => $this->userModule->update($args, $flags),
+            'users:forgot-password' => $this->userModule->forgotPassword($args, $flags),
+            'users:delete'           => $this->userModule->delete($args, $flags),
+            'users:deactivate' =>       $this->userModule->deactivate($args),
+            'users:activate' =>         $this->userModule->activate($args),
 
             // clients
-            'clients:list'   => $this->clientModule->listCommand($tokens),
-            'clients:show'   => $this->clientModule->showCommand($tokens),
-            'clients:add'    => $this->clientModule->addCommand($tokens),
-            'clients:update' => $this->clientModule->updateCommand($tokens),
-            'clients:delete' => $this->clientModule->deleteCommand($tokens),
+            'clients:list'   => $this->withGui(
+                $this->clientModule->list($flags),
+                'clients',
+                'clients/list'
+            ),
+            'clients:show' => $this->withGui(
+                $this->clientModule->show($args),
+                'clients',
+                'clients/show'
+            ),
+            'clients:add'    => $this->clientModule->add($flags),
+            'clients:update' => $this->clientModule->update($args, $flags),
+            'clients:delete' => $this->clientModule->delete($args, $flags),
 
             // company
             'company:show'     => $this->companyModule->companyShowCommand($tokens),
@@ -409,23 +455,62 @@ final class TerminalService
             'rates:delete' => $this->companyModule->ratesDeleteCommand($tokens),
 
             // teams
-            'teams:list'        => $this->teamModule->listCommand($tokens),
-            'teams:show'        => $this->teamModule->showCommand($tokens),
-            'teams:add'         => $this->teamModule->addCommand($tokens),
-            'teams:update'      => $this->teamModule->updateCommand($tokens),
-            'teams:delete'      => $this->teamModule->deleteCommand($tokens),
-            'teams:add-user'    => $this->teamModule->addUserCommand($tokens),
-            'teams:remove-user' => $this->teamModule->removeUserCommand($tokens),
+            'teams:list' => $this->withGui(
+                $this->teamModule->list($flags),
+                'teams',
+                'teams/list'
+            ),
+            'teams:show' => $this->withGui(
+                $this->teamModule->show($args),
+                'teams',
+                'teams/show'
+            ),
+            'teams:add' => $this->teamModule->add($flags),
+            'teams:update' => $this->teamModule->update($args, $flags),
+            'teams:delete' => $this->teamModule->delete($args, $flags),
+            'teams:add-user' => $this->teamModule->addUser($args, $flags),
+            'teams:remove-user' => $this->teamModule->removeUser($args, $flags),
 
             // projects
-            'projects:list'   => $this->projectModule->listCommand($tokens),
-            'projects:show'   => $this->projectModule->showCommand($tokens),
-            'projects:add'    => $this->projectModule->addCommand($tokens),
-            'projects:update' => $this->projectModule->updateCommand($tokens),
-            'projects:delete' => $this->projectModule->deleteCommand($tokens),
+            'projects:list' => $this->withGui(
+                $this->projectModule->list($flags),
+                'projects',
+                'projects/list'
+            ),
+            'projects:show' => $this->withGui(
+                $this->projectModule->show($args),
+                'projects',
+                'projects/show'
+            ),
+            'projects:add' => $this->projectModule->add($flags),
+            'projects:update' => $this->projectModule->update($args, $flags),
+            'projects:delete' => $this->projectModule->delete($args, $flags),
+
+            // todos
+            'todos:list' => $this->withGui(
+                $this->todoModule->list($flags),
+                'todos',
+                'todos/list'
+            ),
+            'todos:show' => $this->withGui(
+                $this->todoModule->show($args),
+                'todos',
+                'todos/show'
+            ),
 
             default => ['output' => 'Unhandled admin command', 'success' => false],
         };
+    }
+
+    private function withGui(array $response, string $active, string $view): array
+    {
+        $response['gui'] = [
+            'active' => $active,
+            'view' => $view,
+            'data' => $response['vars'] ?? [],
+        ];
+
+        return $response;
     }
 
     /** @return array{output:string, success:bool} */
