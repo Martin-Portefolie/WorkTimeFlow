@@ -8,6 +8,7 @@ use App\Service\Terminal\Admin\TerminalTeamService;
 use App\Service\Terminal\Admin\TerminalUserService;
 use App\Service\Terminal\Admin\TerminalClientService;
 use App\Service\Terminal\Admin\TerminalProjectService;
+use App\Service\Terminal\Admin\TerminalTodoService;
 use Symfony\Bundle\SecurityBundle\Security;
 
 final class TerminalService
@@ -56,6 +57,10 @@ final class TerminalService
         'p.a'   => 'projects:add',
         'p.u'   => 'projects:update',
         'p.del' => 'projects:delete',
+
+        // Todos
+        'todo.l' => 'todos:list',
+        'todo.s' => 'todos:show',
     ];
 
     public function __construct(
@@ -66,6 +71,7 @@ final class TerminalService
         private CompanyTerminalService $companyModule,
         private TerminalTeamService $teamModule,
         private TerminalProjectService $projectModule,
+        private TerminalTodoService $todoModule,
     ) {}
 
     private function isAdmin(): bool
@@ -137,6 +143,9 @@ final class TerminalService
 
             // Projects
             'projects:list','projects:show','projects:add','projects:update','projects:delete',
+
+            // todos
+            'todos:list','todos:show',
         ];
         $userCommands  = ['help','ping'];
         $known = $isAdmin ? $adminCommands : $userCommands;
@@ -377,6 +386,21 @@ final class TerminalService
                             'flags' => [],
                         ],
 
+                        // === TODOS ===
+                        [
+                            'cmd'   => 'todos:list',
+                            'alias' => 'todo.l',
+                            'desc'  => 'List todos',
+                            'usage' => '',
+                            'flags' => ['--q=<search>', '--project=<id|name>', '--limit=<number>'],
+                        ],
+                        [
+                            'cmd'   => 'todos:show',
+                            'alias' => 'todo.s',
+                            'desc'  => 'Show a todo and its project',
+                            'usage' => '<id|name>',
+                            'flags' => [],
+                        ],
                     ],
                 ],
                 'success' => true,
@@ -461,6 +485,18 @@ final class TerminalService
             'projects:add' => $this->projectModule->add($flags),
             'projects:update' => $this->projectModule->update($args, $flags),
             'projects:delete' => $this->projectModule->delete($args, $flags),
+
+            // todos
+            'todos:list' => $this->withGui(
+                $this->todoModule->list($flags),
+                'todos',
+                'todos/list'
+            ),
+            'todos:show' => $this->withGui(
+                $this->todoModule->show($args),
+                'todos',
+                'todos/show'
+            ),
 
             default => ['output' => 'Unhandled admin command', 'success' => false],
         };

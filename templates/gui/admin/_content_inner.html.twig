@@ -104,6 +104,31 @@
         } %}
     </div>
 
+{% elseif view == 'todos/list' or view == 'todos/show' %}
+
+    <div class="p-6">
+        <h2 class="mb-4 text-lg text-emerald-500 dark:text-emerald-400">
+            {{ data.title|default('Todos') }}
+        </h2>
+
+        {% if data.view|default('') == 'error' %}
+            <p class="text-sm text-red-500 dark:text-red-400">{{ data.message }}</p>
+        {% elseif view == 'todos/list' %}
+            <p class="mb-4 text-xs text-zinc-500">
+                {{ data.rows|default([])|slice(0, 10)|length }} shown (max 10).
+            </p>
+
+            {% include 'gui/admin/components/_table.html.twig' with {
+                data: data,
+                emptyLabel: 'No todos found.'
+            } %}
+        {% else %}
+            {% include 'gui/admin/components/_details.html.twig' with {
+                data: data
+            } %}
+        {% endif %}
+    </div>
+
 {% elseif view == 'clients/show' %}
 
     <div class="border border-zinc-300 dark:border-zinc-800">

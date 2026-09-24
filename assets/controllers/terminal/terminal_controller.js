@@ -43,6 +43,10 @@ const ALIASES = {
     'p.a':  'projects:add',
     'p.u':  'projects:update',
     'p.del':'projects:delete',
+
+    // Todos
+    'todo.l': 'todos:list',
+    'todo.s': 'todos:show',
 };
 
 
