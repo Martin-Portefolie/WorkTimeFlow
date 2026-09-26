@@ -24,6 +24,24 @@ class UserProjectService
         return $user->getTeams()->toArray();
     }
 
+    public function canUserAccessProject(User $user, Project $project): bool
+    {
+        foreach ($user->getTeams() as $team) {
+            if ($project->getTeams()->contains($team)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function canUserAccessTodo(User $user, Todo $todo): bool
+    {
+        $project = $todo->getProject();
+
+        return $project !== null && $this->canUserAccessProject($user, $project);
+    }
+
     /**
      * Fetch projects for user.
      */

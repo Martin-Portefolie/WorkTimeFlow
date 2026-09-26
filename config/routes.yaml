@@ -1,17 +1,16 @@
 root_to_da:
-  path: /
-  controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
-  defaults:
-    route: home     # the route name from DefaultController
-    _locale: da     # your preferred default locale
-    permanent: true # 301 for SEO; use false while testing if
+    path: /
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
+    defaults:
+        route: home
+        _locale: da
+        permanent: false
 
-# All controller routes live under /{_locale}
 controllers:
-  resource: '../src/Controller/'
-  type: attribute
-  prefix: '/{_locale}'
-  defaults:
-    _locale: en
-  requirements:
-    _locale: 'en|da'
+    resource: '../src/Controller/'
+    type: attribute
+    prefix: '/{_locale}'
+    defaults:
+        _locale: da
+    requirements:
+        _locale: 'da|en'

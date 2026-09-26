@@ -16,6 +16,20 @@ class RateRepository extends ServiceEntityRepository
         parent::__construct($registry, Rate::class);
     }
 
+    /**
+     * Rates for selection in the terminal wizard.
+     *
+     * @return Rate[]
+     */
+    public function findPreviewForTerminal(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('r')
+            ->orderBy('r.id', 'ASC')  // stable order for numeric [0],[1],[2]
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Rate[] Returns an array of Rate objects
     //     */

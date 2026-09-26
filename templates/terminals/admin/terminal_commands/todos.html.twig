@@ -1,0 +1,9 @@
+{% set currentView = view|default('list') %}
+
+{% if currentView == 'list' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_list.html.twig' %}
+{% elseif currentView == 'show' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_show.html.twig' %}
+{% else %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_error.html.twig' %}
+{% endif %}

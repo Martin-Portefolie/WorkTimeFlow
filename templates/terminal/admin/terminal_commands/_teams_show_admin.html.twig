@@ -1,0 +1,92 @@
+{# expects: team, users (Collection<User>), projects (Collection<Project>) #}
+
+<div class="space-y-3 font-mono text-xs">
+    <div class="text-[13px] text-zinc-300 font-semibold">
+        Team details
+    </div>
+
+    <div class="rounded-md ring-1 ring-zinc-800 overflow-hidden">
+        <table class="table-auto w-full text-left border-collapse text-xs">
+            <tbody class="text-zinc-300">
+            <tr>
+                <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500 w-32">
+                    Team ID
+                </td>
+                <td class="border border-dotted border-zinc-700 px-3 py-1">
+                    {{ team.id }}
+                </td>
+            </tr>
+            <tr>
+                <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500">
+                    Name
+                </td>
+                <td class="border border-dotted border-zinc-700 px-3 py-1 truncate"
+                    title="{{ team.name }}">
+                    {{ team.name }}
+                </td>
+            </tr>
+            <tr>
+                <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500 align-top">
+                    Projects
+                </td>
+                <td class="border border-dotted border-zinc-700 px-3 py-1">
+                    {% if projects is empty %}
+                        <span class="text-zinc-600 text-[11px]">
+                            No projects associated.
+                        </span>
+                    {% else %}
+                        <ul class="list-disc list-inside space-y-0.5 text-[11px] text-zinc-300">
+                            {% for p in projects %}
+                                <li title="{{ p.name }}">
+                                    {{ p.name ?: '—' }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500 align-top">
+                    Users
+                </td>
+                <td class="border border-dotted border-zinc-700 px-3 py-1">
+                    {% if users is empty %}
+                        <span class="text-zinc-600 text-[11px]">
+                            No users in this team. Use
+                            <span class="term-cmd">teams:add-user {{ team.id }} &lt;userId|email&gt;</span>
+                            to add one.
+                        </span>
+                    {% else %}
+                        <table class="w-full border-collapse text-[11px]">
+                            <thead class="bg-zinc-900/40 text-zinc-500">
+                            <tr>
+                                <th class="border border-dotted border-zinc-700 px-2 py-1 w-12">ID</th>
+                                <th class="border border-dotted border-zinc-700 px-2 py-1">Identifier</th>
+                                <th class="border border-dotted border-zinc-700 px-2 py-1">Email</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for u in users %}
+                                <tr class="hover:bg-zinc-900/40">
+                                    <td class="border border-dotted border-zinc-700 px-2 py-1 text-zinc-400">
+                                        {{ u.id }}
+                                    </td>
+                                    <td class="border border-dotted border-zinc-700 px-2 py-1 truncate"
+                                        title="{{ u.userIdentifier }}">
+                                        {{ u.userIdentifier }}
+                                    </td>
+                                    <td class="border border-dotted border-zinc-700 px-2 py-1 truncate"
+                                        title="{{ u.email }}">
+                                        {{ u.email }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

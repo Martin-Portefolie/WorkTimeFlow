@@ -1,0 +1,219 @@
+{% set view = view|default('overview') %}
+
+{% if view == 'overview' %}
+
+    {% include 'gui/admin/_overview.html.twig' %}
+
+{% elseif view == 'clients/list' %}
+
+    <div class="p-6">
+        <div class="mb-4 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg text-emerald-500 dark:text-emerald-400">
+                    {{ data.title|default('Clients') }}
+                </h2>
+
+                <p class="mt-1 text-xs text-zinc-500">
+                    Showing max 10 rows. Pagination comes next.
+                </p>
+            </div>
+
+            <span class="text-xs text-zinc-500">
+                {{ data.rows|default([])|length }} shown
+            </span>
+        </div>
+
+        {% include 'gui/admin/components/_table.html.twig' with {
+            data: data,
+            emptyLabel: 'No clients found.'
+        } %}
+    </div>
+
+{% elseif view == 'users/list' %}
+
+    <div class="p-6">
+        <div class="mb-4 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg text-emerald-500 dark:text-emerald-400">
+                    {{ data.title|default('Users') }}
+                </h2>
+
+                <p class="mt-1 text-xs text-zinc-500">
+                    Showing max 10 rows. Pagination comes next.
+                </p>
+            </div>
+
+            <span class="text-xs text-zinc-500">
+                {{ data.rows|default([])|length }} shown
+            </span>
+        </div>
+
+        {% include 'gui/admin/components/_table.html.twig' with {
+            data: data,
+            emptyLabel: 'No users found.'
+        } %}
+    </div>
+
+{% elseif view == 'projects/list' %}
+
+    <div class="p-6">
+        <div class="mb-4 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg text-emerald-500 dark:text-emerald-400">
+                    {{ data.title|default('Projects') }}
+                </h2>
+
+                <p class="mt-1 text-xs text-zinc-500">
+                    Showing max 10 rows. Pagination comes next.
+                </p>
+            </div>
+
+            <span class="text-xs text-zinc-500">
+                {{ data.rows|default([])|length }} shown
+            </span>
+        </div>
+
+        {% include 'gui/admin/components/_table.html.twig' with {
+            data: data,
+            emptyLabel: 'No projects found.'
+        } %}
+    </div>
+
+{% elseif view == 'teams/list' %}
+
+    <div class="p-6">
+        <div class="mb-4 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg text-emerald-500 dark:text-emerald-400">
+                    {{ data.title|default('Teams') }}
+                </h2>
+
+                <p class="mt-1 text-xs text-zinc-500">
+                    Showing max 10 rows. Pagination comes next.
+                </p>
+            </div>
+
+            <span class="text-xs text-zinc-500">
+                {{ data.rows|default([])|length }} shown
+            </span>
+        </div>
+
+        {% include 'gui/admin/components/_table.html.twig' with {
+            data: data,
+            emptyLabel: 'No teams found.'
+        } %}
+    </div>
+
+{% elseif view == 'todos/list' or view == 'todos/show' %}
+
+    <div class="p-6">
+        <h2 class="mb-4 text-lg text-emerald-500 dark:text-emerald-400">
+            {{ data.title|default('Todos') }}
+        </h2>
+
+        {% if data.view|default('') == 'error' %}
+            <p class="text-sm text-red-500 dark:text-red-400">{{ data.message }}</p>
+        {% elseif view == 'todos/list' %}
+            <p class="mb-4 text-xs text-zinc-500">
+                {{ data.rows|default([])|slice(0, 10)|length }} shown (max 10).
+            </p>
+
+            {% include 'gui/admin/components/_table.html.twig' with {
+                data: data,
+                emptyLabel: 'No todos found.'
+            } %}
+        {% else %}
+            {% include 'gui/admin/components/_details.html.twig' with {
+                data: data
+            } %}
+        {% endif %}
+    </div>
+
+{% elseif view == 'timelogs/list' or view == 'timelogs/show' %}
+
+    <div class="p-6">
+        <h2 class="mb-4 text-lg text-emerald-500 dark:text-emerald-400">
+            {{ data.title|default('Timelogs') }}
+        </h2>
+
+        {% if data.view|default('') == 'error' %}
+            <p class="text-sm text-red-500 dark:text-red-400">{{ data.message }}</p>
+        {% elseif view == 'timelogs/list' %}
+            <p class="mb-4 text-xs text-zinc-500">
+                {{ data.rows|default([])|slice(0, 10)|length }} shown (max 10).
+            </p>
+
+            {% include 'gui/admin/components/_table.html.twig' with {
+                data: data,
+                emptyLabel: 'No timelogs found.'
+            } %}
+        {% else %}
+            {% include 'gui/admin/components/_details.html.twig' with {
+                data: data
+            } %}
+        {% endif %}
+    </div>
+
+{% elseif view == 'clients/show' %}
+
+    <div class="border border-zinc-300 dark:border-zinc-800">
+        <dl class="divide-y divide-zinc-200 text-xs dark:divide-zinc-800">
+            {% for field in data.fields|default([]) %}
+                <div class="grid grid-cols-[180px_1fr] items-start">
+                    <dt class="bg-zinc-100 p-3 text-zinc-500 dark:bg-zinc-950">
+                        {{ field.label }}
+                    </dt>
+
+                    <dd class="p-3 text-zinc-900 dark:text-zinc-100">
+                        {{ field.value }}
+                    </dd>
+                </div>
+            {% else %}
+                <div class="p-4 text-zinc-500">
+                    No details found.
+                </div>
+            {% endfor %}
+        </dl>
+    </div>
+
+{% elseif view == 'projects/show' %}
+
+    <div class="p-6">
+        <h2 class="mb-4 text-lg text-emerald-500 dark:text-emerald-400">
+            {{ data.title|default('Project') }}
+        </h2>
+
+        {% include 'gui/admin/components/_details.html.twig' with {
+            data: data
+        } %}
+    </div>
+
+{% elseif view == 'teams/show' %}
+
+    <div class="p-6">
+        <h2 class="mb-4 text-lg text-emerald-500 dark:text-emerald-400">
+            {{ data.title|default('Team') }}
+        </h2>
+
+        {% include 'gui/admin/components/_details.html.twig' with {
+            data: data
+        } %}
+    </div>
+
+{% elseif view == 'users/show' %}
+
+    <div class="p-6">
+        <h2 class="mb-4 text-lg text-emerald-500 dark:text-emerald-400">
+            {{ data.title|default('User') }}
+        </h2>
+
+        {% include 'gui/admin/components/_details.html.twig' with {
+            data: data
+        } %}
+    </div>
+
+{% else %}
+
+    {% include 'gui/admin/_overview.html.twig' %}
+
+{% endif %}

@@ -1,0 +1,201 @@
+{% set currentView = view|default('list') %}
+{% set project = project|default(null) %}
+{% set summary = summary|default({}) %}
+{% set teams = teams|default([]) %}
+{% set todos = todos|default([]) %}
+
+{% if currentView == 'list' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_list.html.twig' %}
+
+{% elseif currentView == 'confirm' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_show.html.twig' %}
+
+{% elseif currentView == 'show' %}
+
+    {# ----------------------------------------------------- #}
+    {# Show Project                                          #}
+    {# ----------------------------------------------------- #}
+
+    <div class="space-y-3 font-mono">
+        <div>
+            <h3 class="text-sm font-semibold text-zinc-100">
+                {{ title|default('Project') }}
+            </h3>
+
+            <p class="mt-1 text-xs text-zinc-500">
+                Project details for
+                <span class="font-semibold text-zinc-300">{{ project.name ?? '—' }}</span>
+                with id:
+                <span class="font-semibold text-zinc-300">{{ project.id ?? '—' }}</span>
+            </p>
+        </div>
+
+        {# ----------------------------------------------------- #}
+        {# Main Project Info                                    #}
+        {# ----------------------------------------------------- #}
+
+        <div class="overflow-hidden rounded-xl border border-zinc-800 bg-[#0e1116]">
+            <table class="min-w-full border-collapse text-left text-xs">
+                <tbody class="divide-y divide-zinc-800/80">
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">ID</th>
+                    <td class="px-3 py-2 text-zinc-300">{{ project.id }}</td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Name</th>
+                    <td class="px-3 py-2 text-zinc-300">{{ project.name ?? '—' }}</td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400 align-top">Description</th>
+                    <td class="px-3 py-2 text-zinc-300 whitespace-pre-wrap">{{ project.description ?: '—' }}</td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Client</th>
+                    <td class="px-3 py-2 text-zinc-300">
+                        {% if summary.clientId %}
+                            #{{ summary.clientId }} — {{ summary.clientName }}
+                        {% else %}
+                            <span class="text-zinc-600">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400 align-top">Teams</th>
+                    <td class="px-3 py-2 text-zinc-300">
+                        {% if teams|length > 0 %}
+                            <div class="space-y-1">
+                                {% for team in teams %}
+                                    <div>#{{ team.id }} — {{ team.name }}</div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <span class="text-zinc-600">none</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {# ----------------------------------------------------- #}
+        {# Planning / Economy                                   #}
+        {# ----------------------------------------------------- #}
+
+        <div class="overflow-hidden rounded-xl border border-zinc-800 bg-[#0e1116]">
+            <table class="min-w-full border-collapse text-left text-xs">
+                <tbody class="divide-y divide-zinc-800/80">
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Priority</th>
+                    <td class="px-3 py-2 text-zinc-300">{{ summary.priorityLabel ?? summary.priority ?? '—' }}</td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">
+                        Rate
+                    </th>
+                    <td class="px-3 py-2 text-zinc-300">
+                        {% if summary.rateName %}
+                            {{ summary.rateName }} ({{ summary.rateValue ?? '0.00' }})
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Deadline</th>
+                    <td class="px-3 py-2 {% if summary.deadlineExpired %}text-red-400{% else %}text-zinc-300{% endif %}">
+                        {{ summary.deadlineLabel ?? summary.deadlineFormatted ?? '—' }}
+                        {% if summary.deadlineExpired %}
+                            <span class="ml-2 text-[10px] uppercase tracking-wide">expired</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Estimated time</th>
+                    <td class="px-3 py-2 text-zinc-300">{{ summary.estimatedLabel ?: '—' }}</td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Estimated budget</th>
+                    <td class="px-3 py-2 text-zinc-300">{{ summary.estimatedBudgetLabel ?? '0,00' }}</td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Total time used</th>
+                    <td class="px-3 py-2 text-zinc-300">{{ summary.totalUsedLabel ?? '0h 0m' }}</td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Remaining time</th>
+                    <td class="px-3 py-2 {% if summary.isOverrun %}text-red-400{% else %}text-zinc-300{% endif %}">
+                        {{ summary.remainingLabel ?: '—' }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {# ----------------------------------------------------- #}
+        {# Status / Meta                                        #}
+        {# ----------------------------------------------------- #}
+
+        <div class="overflow-hidden rounded-xl border border-zinc-800 bg-[#0e1116]">
+            <table class="min-w-full border-collapse text-left text-xs">
+                <tbody class="divide-y divide-zinc-800/80">
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Paid</th>
+                    <td class="px-3 py-2 text-zinc-300">{{ summary.isPaid ? 'yes' : 'no' }}</td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Archived</th>
+                    <td class="px-3 py-2 text-zinc-300">{{ summary.isArchived ? 'yes' : 'no' }}</td>
+                </tr>
+                <tr class="transition hover:bg-zinc-900/70">
+                    <th class="w-44 whitespace-nowrap bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400">Last updated</th>
+                    <td class="px-3 py-2 text-zinc-300">{{ summary.lastUpdatedFormatted ?: '—' }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {# ----------------------------------------------------- #}
+        {# Todos                                                #}
+        {# ----------------------------------------------------- #}
+
+        <div class="overflow-hidden rounded-xl border border-zinc-800 bg-[#0e1116]">
+            <table class="min-w-full border-collapse text-left text-xs">
+                <caption class="bg-zinc-950/60 px-3 py-2 text-left text-zinc-400">
+                    Todos <span class="text-zinc-500">({{ todos|length }})</span>
+                </caption>
+                <tbody class="divide-y divide-zinc-800/80">
+                {% if todos|length > 0 %}
+                    {% for todo in todos %}
+                        <tr class="transition hover:bg-zinc-900/70">
+                            <th class="w-44 bg-zinc-950/60 px-3 py-2 font-medium text-zinc-400 align-top">
+                                todo #{{ todo.id }}
+                            </th>
+                            <td class="px-3 py-2 text-zinc-300">
+                                <div class="font-semibold text-zinc-200">{{ todo.name }}</div>
+                                <div class="mt-1 text-[11px] text-zinc-500">
+                                    {{ todo.status }} · {{ todo.totalLabel }} logged
+                                    {% if todo.timelogsCount > 0 %}
+                                        · {{ todo.timelogsCount }} logs
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td class="px-3 py-4 text-zinc-600">none</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% elseif currentView == 'add' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_add.html.twig' %}
+{% elseif currentView == 'edit' or currentView == 'update' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_edit.html.twig' %}
+{% elseif currentView == 'delete' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_delete.html.twig' %}
+{% else %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_error.html.twig' %}
+{% endif %}

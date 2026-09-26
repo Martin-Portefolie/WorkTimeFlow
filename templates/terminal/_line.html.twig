@@ -1,0 +1,24 @@
+<div
+    class="group rounded-xl border px-4 py-3 font-mono text-sm shadow-sm
+        {{ success
+    ? 'border-emerald-500/20 bg-emerald-500/5'
+    : 'border-red-500/20 bg-red-500/5'
+    }}"
+    data-await="{{ await ? '1' : '0' }}"
+>
+    <div class="flex items-start gap-3">
+        <span class="{{ success ? 'text-emerald-400' : 'text-red-400' }} select-none">&gt;</span>
+
+        <div class="min-w-0 flex-1 space-y-1">
+            {% if input|length %}
+                <div class="break-words text-zinc-100">
+                    {{ input }}
+                </div>
+            {% endif %}
+
+            <div class="prose prose-invert max-w-none text-xs leading-relaxed text-zinc-400 prose-a:text-emerald-300 prose-code:text-emerald-300">
+                {{ output|raw }}
+            </div>
+        </div>
+    </div>
+</div>

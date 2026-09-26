@@ -1,124 +1,21 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@custom-variant dark (&:where(.dark, .dark *));
 
+@import "tailwindcss";
+
+@source "../../templates/**/*.twig";
+@source "../../assets/**/*.js";
+
+@theme {
+    --shadow-card: 0 8px 24px rgba(0,0,0,0.08);
+    --font-display: Poppins, ui-sans-serif, system-ui, sans-serif;
+}
 
 html, body {
-    min-height: 100vh; /* Full viewport height */
-    display: flex;
-    flex-direction: column;
-
+    min-height: 100vh;
 }
 
-main {
-    flex: 1; /* Makes the content area expand and push footer down */
-}
-
-/* Button Variants */
-.btn {
-    @apply font-bold px-6 py-3 rounded-lg shadow-md transition;
-}
-
-.btn-primary {
-    @apply bg-primary text-white hover:bg-secondary;
-}
-
-.btn-secondary {
-    @apply bg-neutral-100 text-primary hover:bg-neutral-500;
-}
-
-/* Input Fields */
-.input-field {
-    @apply p-3 rounded-lg w-full sm:w-auto text-neutral-900 border border-neutral-300;
-}
-
-/* Section Containers */
-.section {
-    @apply max-w-5xl mx-auto py-10 px-6;
+body {
+    @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100;
 }
 
 
-/* Global Text Styles */
-.text-heading {
-    @apply text-3xl font-bold font-display text-neutral-900;
-}
-
-.text-subheading {
-    @apply text-xl font-semibold text-neutral-900;
-}
-
-.text-body {
-    @apply text-lg text-neutral-700 leading-relaxed;
-}
-
-.text-small {
-    @apply text-sm text-neutral-600;
-}
-
-/* calender dropdown */
-/* General Dropdown Styling */
-.dropdown {
-    position: relative;
-    width: 100%;
-    border: 1px solid #D1D5DB; /* Tailwind: border-gray-300 */
-    border-radius: 0.5rem;
-    background: #fff;
-    cursor: pointer;
-}
-
-/* Selected Item */
-.dropdown-select {
-    padding: 0.75rem;
-    font-size: 1rem;
-    color: #374151; /* Tailwind: text-gray-700 */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Dropdown Menu #TODO DELETE ME IF NOT USED */
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: white;
-    border-radius: 0.5rem;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-    max-height: 200px;
-    overflow-y: auto;
-    display: none;
-}
-
-/* Show dropdown when active */
-/* Apply these styles inside your Tailwind file (app.css) */
-@layer components {
-    .dropdown {
-        @apply relative w-full border border-gray-300 rounded-lg bg-white cursor-pointer shadow-sm;
-    }
-
-    .dropdown-select {
-        @apply px-4 py-3 text-gray-700 flex justify-between items-center rounded-lg;
-    }
-
-    .dropdown-menu {
-        @apply absolute top-full left-0 w-full bg-white rounded-lg shadow-md z-50 max-h-48 overflow-y-auto hidden;
-    }
-
-    .dropdown-menu:not(.hidden) {
-        @apply block;
-    }
-
-    .dropdown-menu-search {
-        @apply w-full p-2 text-sm border-b border-gray-200 outline-none;
-    }
-
-    .dropdown-menu-inner {
-        @apply max-h-40 overflow-y-auto;
-    }
-
-    .dropdown-menu-item {
-        @apply p-2 text-sm text-gray-600 cursor-pointer transition-all duration-150 hover:bg-gray-100;
-    }
-}

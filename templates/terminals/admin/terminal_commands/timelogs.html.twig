@@ -1,0 +1,8 @@
+{% if view == 'list' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_list.html.twig' %}
+{% elseif view == 'show' or view == 'confirm' %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_show.html.twig' %}
+    {% if message|default(null) %}<p>{{ message }}</p>{% endif %}
+{% else %}
+    {% include 'terminals/admin/terminal_commands/partials/_resource_error.html.twig' %}
+{% endif %}

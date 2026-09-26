@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block title %}Admin — WorkTimeFlow{% endblock %}
+
+{% block body %}
+
+    <main class="container-landing py-8 space-y-10">
+
+        {% include 'terminals/admin/_admin.html.twig' %}
+
+        {% include 'gui/admin/_shell.html.twig' with {
+            active: 'dashboard'
+        } %}
+
+{#        #}{# --- Clients --- #}
+{#        {% include 'admin/sections/_clients.html.twig' %}#}
+
+{#        #}{# --- Projects --- #}
+{#        {% include 'admin/sections/_projects.html.twig' %}#}
+
+{#        #}{# --- Todos --- #}
+{#        {% include 'admin/sections/_todos.html.twig' %}#}
+
+{#        #}{# --- Users (with Time Overview modal trigger) --- #}
+{#        {% include 'admin/sections/_users.html.twig' %}#}
+
+
+    </main>
+{% endblock %}
