@@ -1,0 +1,84 @@
+{# templates/terminal/admin/terminal_commands/_clients_created_summary.html.twig #}
+
+<table class="table-auto w-full text-xs text-left font-mono border-collapse">
+    <caption class="text-emerald-300 text-sm px-3 py-2">
+        Client created (#{{ id }})
+    </caption>
+
+    <tbody class="text-zinc-300">
+
+    <tr>
+        <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500 w-32">
+          Client name:
+        </td>
+        <td class="border border-dotted border-zinc-700 px-3 py-1">
+            {{ name ?: '—' }}
+        </td>
+    </tr>
+
+    <tr>
+        <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500">
+            Client address:
+        </td>
+        <td class="border border-dotted border-zinc-700 px-3 py-1">
+            {{ address ?: '—' }}
+        </td>
+    </tr>
+
+
+    <tr>
+        <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500">
+          Client postal:
+        </td>
+        <td class="border border-dotted border-zinc-700 px-3 py-1">
+            {{ postal ?: '—' }}
+        </td>
+    </tr>
+
+    <tr>
+        <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500">
+            Client city:
+        </td>
+        <td class="border border-dotted border-zinc-700 px-3 py-1">
+            {{ city ?: '—' }}
+        </td>
+    </tr>
+
+    <tr>
+        <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500">
+            Client country:
+        </td>
+        <td class="border border-dotted border-zinc-700 px-3 py-1">
+            {{ country ?: '—' }}
+        </td>
+    </tr>
+
+    <tr>
+        <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500">
+            Client contact person
+        </td>
+        <td class="border border-dotted border-zinc-700 px-3 py-1">
+            {{ contact ?: '—' }}
+        </td>
+    </tr>
+
+    <tr>
+        <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500">
+            Client contact email
+        </td>
+        <td class="border border-dotted border-zinc-700 px-3 py-1 break-words">
+            {{ email ?: '—' }}
+        </td>
+    </tr>
+
+    <tr>
+        <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-500">
+            Client contact phone
+        </td>
+        <td class="border border-dotted border-zinc-700 px-3 py-1">
+            {{ phone ?: '—' }}
+        </td>
+    </tr>
+
+    </tbody>
+</table>

@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -25,6 +26,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Assert\All([new Assert\Choice(choices: ['ROLE_USER', 'ROLE_ADMIN']),])]
     private array $roles = [];
 
     /**
@@ -47,6 +49,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: Timelog::class, mappedBy: 'user')]
     private Collection $timelogs;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    private ?bool $isActive = true;
 
     public function __construct()
     {
@@ -192,6 +197,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+    public function setIsActive(bool $active): self
+    {
+        $this->isActive = $active;
         return $this;
     }
 }

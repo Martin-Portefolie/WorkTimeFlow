@@ -1,7 +1,7 @@
-FROM dunglas/frankenphp:latest
+FROM dunglas/frankenphp:php8.4
 WORKDIR /app
 
-RUN install-php-extensions intl zip pdo_mysql opcache
+RUN install-php-extensions intl zip pdo_mysql opcache gd
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # 1) deps layer
@@ -22,3 +22,8 @@ COPY docker/entrypoint.sh /usr/local/bin/app-entrypoint
 RUN chmod +x /usr/local/bin/app-entrypoint
 ENTRYPOINT ["/usr/local/bin/app-entrypoint"]
 CMD ["frankenphp","run","--config","/etc/frankenphp/Caddyfile"]
+
+# 5) Tailwind and watchman
+#RUN apt-get update \
+# && apt-get install -y --no-install-recommends watchman \
+# && rm -rf /var/lib/apt/lists/*

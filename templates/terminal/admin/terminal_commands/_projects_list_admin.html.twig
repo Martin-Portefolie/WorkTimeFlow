@@ -1,0 +1,151 @@
+{# templates/terminal/admin/terminal_commands/_projects_list_admin.html.twig #}
+
+<div class="space-y-2 font-mono text-xs">
+    <div class="text-xs uppercase tracking-wide text-zinc-500">
+        Projects
+    </div>
+
+    <div class="flex items-center justify-between text-[11px] text-zinc-500">
+        <div class="space-x-1">
+            <span class="text-zinc-500">Total shown:</span>
+            <span class="text-zinc-300">{{ shownCount }}</span>
+
+            <span class="mx-2 text-zinc-700">•</span>
+
+            <span class="text-zinc-500">Limit:</span>
+            <span class="text-zinc-300">{{ limit }}</span>
+
+            {% if search %}
+                <span class="mx-2 text-zinc-700">•</span>
+                <span class="text-zinc-500">Filter:</span>
+                <code class="term-flag">{{ search }}</code>
+            {% endif %}
+
+            <span class="mx-2 text-zinc-700">•</span>
+            <span class="text-zinc-500">Archived:</span>
+            <code class="term-flag">
+                {{ archivedFlag }}
+            </code>
+        </div>
+    </div>
+
+    {% if projects is empty %}
+        <div class="text-[11px] text-zinc-600">
+            No projects found. Try a different search or remove filters.
+        </div>
+    {% else %}
+        <div class="rounded-md ring-1 ring-zinc-800 overflow-hidden">
+            <table class="table-auto w-full text-left border-collapse text-xs">
+                <thead>
+                <tr class="bg-zinc-900/40 text-zinc-500">
+                    <th class="border border-dotted border-zinc-700 px-2 py-1 w-14">ID</th>
+                    <th class="border border-dotted border-zinc-700 px-2 py-1">Project</th>
+                    <th class="border border-dotted border-zinc-700 px-2 py-1">Client</th>
+                    <th class="border border-dotted border-zinc-700 px-2 py-1 w-20">Priority</th>
+                    <th class="border border-dotted border-zinc-700 px-2 py-1 w-28">Deadline</th>
+                    <th class="border border-dotted border-zinc-700 px-2 py-1 w-24 text-right">Est.</th>
+                    <th class="border border-dotted border-zinc-700 px-2 py-1 w-24 text-right">Used</th>
+                    <th class="border border-dotted border-zinc-700 px-2 py-1 w-28 text-right">Remaining</th>
+                    <th class="border border-dotted border-zinc-700 px-2 py-1 w-16 text-right">Teams</th>
+                    <th class="border border-dotted border-zinc-700 px-2 py-1 w-32">Rate</th>
+                    <th class="border border-dotted border-zinc-700 px-2 py-1 w-24">Flags</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for p in projects %}
+                    <tr class="text-zinc-300 hover:bg-zinc-900/40">
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 text-zinc-400">
+                            {{ p.id }}
+                        </td>
+
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 truncate"
+                            title="{{ p.name }}">
+                            {{ p.name }}
+                        </td>
+
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 truncate"
+                            title="{{ p.clientName }}">
+                            {{ p.clientName }}
+                        </td>
+
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 text-zinc-400">
+                            {{ p.priority|capitalize }}
+                        </td>
+
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 text-[11px]
+                                   {% if p.deadlineExpired %}text-red-400{% else %}text-zinc-400{% endif %}"
+                            title="{{ p.deadlineFormatted ?: '—' }}">
+                            {% if p.deadlineFormatted %}
+                                {{ p.deadlineFormatted }}
+                                {% if p.deadlineExpired %}
+                                    <span class="ml-1 text-[10px] uppercase tracking-wide">expired</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-zinc-700">—</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 text-right text-zinc-400"
+                            title="{{ p.estimatedMinutes is not null ? p.estimatedMinutes ~ ' min' : '' }}">
+                            {% if p.estimatedLabel %}
+                                {{ p.estimatedLabel }}
+                            {% else %}
+                                <span class="text-zinc-700">—</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 text-right text-zinc-400"
+                            title="{{ p.totalMinutesUsed ~ ' min' }}">
+                            {{ p.totalUsedLabel }}
+                        </td>
+
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 text-right
+                                   {% if p.isOverrun %}text-red-400{% else %}text-zinc-400{% endif %}">
+                            {% if p.remainingLabel is not null %}
+                                {{ p.remainingLabel }}
+                                {% if p.isOverrun %}
+                                    <span class="ml-1 text-[10px] uppercase tracking-wide">over</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-zinc-700">—</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 text-right text-zinc-400">
+                            {{ p.teamsCount }}
+                        </td>
+
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 truncate text-zinc-400"
+                            title="{{ p.rateName ?: '' }}">
+                            {% if p.rateName %}
+                                {{ p.rateName }}
+                            {% else %}
+                                <span class="text-zinc-700">—</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="border border-dotted border-zinc-700 px-2 py-1 text-[10px] text-zinc-400">
+                            <div class="flex flex-wrap gap-1">
+                                {% if p.isArchived %}
+                                    <span class="px-1 py-0.5 rounded bg-zinc-800/80 text-amber-300 uppercase">
+                                        archived
+                                    </span>
+                                {% endif %}
+                                {% if p.isPaid %}
+                                    <span class="px-1 py-0.5 rounded bg-zinc-800/80 text-emerald-300 uppercase">
+                                        paid
+                                    </span>
+                                {% endif %}
+                                {% if not p.isArchived and not p.isPaid %}
+                                    <span class="text-zinc-700">—</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
