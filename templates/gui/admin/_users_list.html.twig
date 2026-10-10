@@ -1,0 +1,31 @@
+<section class="p-4" data-controller="user-list" data-testid="users-panel">
+    <div class="mb-3 flex items-center justify-between">
+        <h2 class="uppercase tracking-wider text-emerald-500">{{ 'user.title'|trans }}</h2>
+        <button type="button" data-action="click->user-list#add" data-testid="user-create" class="border border-emerald-500 px-3 py-1 text-xs text-emerald-500">{{ 'user.create'|trans }}</button>
+    </div>
+    <p class="mb-3 text-xs text-zinc-500">{{ 'user.list_help'|trans }}</p>
+    <p class="mb-3 text-xs text-zinc-500">{{ 'user.password_help'|trans }}</p>
+    <div class="overflow-auto border border-zinc-300 dark:border-zinc-800">
+        <table class="w-full text-left text-xs">
+            <thead class="border-b border-zinc-300 text-zinc-500 dark:border-zinc-800">
+                <tr>
+                    {% for field in ['username', 'email', 'roles', 'active'] %}
+                        <th class="p-2 font-normal">{{ ('user.fields.' ~ field)|trans }}</th>
+                    {% endfor %}
+                    <th class="p-2 font-normal">{{ 'client.actions'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody data-user-list-target="rows" data-testid="user-rows">
+                {% for row in data.rows|default([]) %}
+                    {% include 'gui/admin/_user_row.html.twig' with {user: row} %}
+                {% endfor %}
+                <tr data-user-list-target="empty" data-testid="users-empty" {% if data.rows|default([])|length %}hidden{% endif %}>
+                    <td colspan="5" class="p-3 text-zinc-500">{{ 'user.empty'|trans }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <template data-user-list-target="newRow">
+        {% include 'gui/admin/_user_row.html.twig' with {user: {id: null, roles: ['ROLE_USER'], active: true}} %}
+    </template>
+</section>

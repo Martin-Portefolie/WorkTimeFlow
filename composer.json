@@ -92,7 +92,8 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "test:browser": "@php bin/phpunit -c phpunit.panther.xml --fail-on-empty-test-suite"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -104,12 +105,14 @@
         }
     },
     "require-dev": {
+        "dbrekelmans/bdi": "^1.4",
         "doctrine/doctrine-fixtures-bundle": "^4.3",
         "phpunit/phpunit": "^13.1.12",
         "symfony/browser-kit": "8.0.*",
         "symfony/css-selector": "8.0.*",
         "symfony/debug-bundle": "8.0.*",
         "symfony/maker-bundle": "^1.67",
+        "symfony/panther": "^2.4",
         "symfony/phpunit-bridge": "^8.0.8",
         "symfony/stopwatch": "8.0.*",
         "symfony/web-profiler-bundle": "8.0.*"

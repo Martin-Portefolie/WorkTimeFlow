@@ -1,7 +1,17 @@
 <aside class="flex flex-col bg-zinc-100 dark:bg-black">
-    <div class="border-b border-zinc-300 p-4 dark:border-zinc-800">
-        <div class="text-emerald-500 dark:text-emerald-400">
-            WORKTIMEFLOW GUI
+    {% set company = get_company() %}
+    {% set companyName = company.name|default('WorkTimeFlow') %}
+    <div class="border-b border-zinc-300 p-4 dark:border-zinc-800" data-controller="company-form">
+        <div class="flex items-center gap-3">
+            <img
+                src="{{ asset(company_logo(company)) }}"
+                alt="{{ companyName }}"
+                data-company-form-target="brandLogo" data-testid="company-brand-logo"
+                class="h-8 w-auto"
+            >
+            <div class="text-emerald-500 dark:text-emerald-400" data-company-form-target="brandName" data-testid="company-brand-name">
+                {{ companyName }}
+            </div>
         </div>
 
         <div class="mt-1 text-xs text-zinc-600 dark:text-zinc-500">
@@ -24,7 +34,25 @@
             <button
                 type="button"
                 data-command="{{ item.command }}"
-                data-key="{{ item.key }}"
+                data-key="{{ item.key }}" data-testid="nav-{{ item.key }}"
+                {% if item.key == 'dashboard' %}
+                    data-action="click->gui--admin-gui#loadPanel"
+                    data-url="{{ path('admin_dashboard_panel') }}"
+                    data-error="{{ 'dashboard.load_failed'|trans }}"
+                {% elseif item.key == 'clients' %}
+                    data-action="click->gui--admin-gui#loadClient"
+                    data-url="{{ path('admin_clients_panel') }}"
+                    data-error="{{ 'client.load_failed'|trans }}"
+                {% elseif item.key == 'projects' %}
+                    data-action="click->gui--admin-gui#loadPanel"
+                    data-url="{{ path('admin_projects_panel') }}"
+                    data-error="{{ 'project.load_failed'|trans }}"
+                {% elseif item.key == 'users' %}
+                    data-action="click->gui--admin-gui#loadPanel"
+                    data-url="{{ path('admin_users_panel') }}"
+                    data-error="{{ 'user.load_failed'|trans }}"
+                {% endif %}
+                {% if active == item.key %}aria-current="page"{% endif %}
                 class="grid w-full grid-cols-[1fr_auto] border px-3 py-2 text-left transition
                     {{ active == item.key
                 ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500 dark:border-emerald-500/40 dark:text-emerald-400'

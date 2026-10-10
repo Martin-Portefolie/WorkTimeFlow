@@ -90,7 +90,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: ctype, dom, gd, iconv, intl, mbstring, pdo_mysql, xml, xmlwriter, zip
+          extensions: ctype, curl, dom, gd, iconv, intl, mbstring, pdo_mysql, pdo_sqlite, xml, xmlwriter, zip
           coverage: none
           tools: composer:v2
 
@@ -121,3 +121,19 @@ jobs:
 
       - name: Run tests
         run: php bin/phpunit --fail-on-empty-test-suite
+
+      - name: Install browser driver
+        run: vendor/bin/bdi detect drivers
+
+      - name: Test Company, Clients and Users in Chrome
+        env:
+          PANTHER_NO_SANDBOX: '1'
+        run: composer test:browser
+
+      - name: Upload browser failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: panther-screenshots
+          path: var/panther-screenshots/
+          if-no-files-found: ignore

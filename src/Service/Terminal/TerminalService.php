@@ -456,7 +456,7 @@ final class TerminalService
                 'clients/show'
             ),
             'clients:add'    => $this->clientModule->add($flags),
-            'clients:update' => $this->clientModule->update($args, $flags),
+            'clients:update' => $this->withGui($this->clientModule->update($args, $flags), 'clients', 'clients/show'),
             'clients:delete' => $this->clientModule->delete($args, $flags),
 
             // company

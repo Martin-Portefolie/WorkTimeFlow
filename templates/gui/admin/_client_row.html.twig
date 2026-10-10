@@ -1,0 +1,39 @@
+{% set isNew = client.id is null %}
+{% set formId = 'client_row_' ~ (client.id ?? 'new') %}
+<tr data-testid="client-row" data-controller="client-form" data-client-row="{{ isNew ? 'new' : client.id }}"
+    data-saving="{{ 'company.saving'|trans }}" data-error="{{ 'client.save_failed'|trans }}" data-expired="{{ 'client.expired'|trans }}"
+    class="border-b border-zinc-200 dark:border-zinc-800 {{ isNew ? 'bg-emerald-500/5 outline outline-1 -outline-offset-1 outline-emerald-500/30' : '' }}">
+    {% for field in ['name', 'contactPerson', 'contactEmail', 'contactPhone', 'adress', 'postalCode', 'city', 'country'] %}
+        <td class="p-2">
+            <input id="{{ formId }}_{{ field }}" data-testid="client-field-{{ field }}" form="{{ formId }}" name="{{ field }}" value="{{ attribute(client, field)|default('') }}"
+                   aria-label="{{ ('client.fields.' ~ field)|trans }}" placeholder="{{ isNew ? ('client.fields.' ~ field)|trans : '—' }}"
+                   type="{{ field == 'contactEmail' ? 'email' : (field == 'contactPhone' ? 'tel' : 'text') }}"
+                   maxlength="{{ field == 'contactPhone' ? 20 : 255 }}"
+                   {% if field in ['name', 'contactPerson', 'contactEmail', 'contactPhone'] %}required{% endif %}
+                   class="w-full min-w-28 border border-transparent bg-transparent px-2 py-1 text-zinc-900 hover:border-zinc-300 focus:border-emerald-500 focus:bg-white focus:outline-none dark:text-zinc-100 dark:hover:border-zinc-700 dark:focus:bg-black">
+        </td>
+    {% endfor %}
+    <td class="p-2">
+        {% set projects = client.projects|default([]) %}
+        {% if not isNew %}
+            <button type="button" data-action="click->client-form#openProjects" aria-haspopup="dialog" aria-controls="client_projects_{{ client.id }}" data-testid="client-projects-open"
+                    aria-label="{{ 'client.view_projects'|trans({'%name%': client.name, '%count%': projects|length}) }}"
+                    class="border border-emerald-500/30 px-3 py-1 text-emerald-500 hover:bg-emerald-500/10">{{ projects|length }}</button>
+            {% include 'gui/admin/_client_projects_dialog.html.twig' %}
+        {% else %}
+            <span class="text-zinc-500">0</span>
+        {% endif %}
+    </td>
+    <td class="p-2">
+        <form data-testid="client-form" id="{{ formId }}" method="post" action="{{ isNew ? path('admin_client_create_panel') : path('admin_client_panel', {id: client.id}) }}"
+              data-turbo="false" data-action="submit->client-form#save:prevent">
+            <input type="hidden" name="_token" value="{{ csrf_token('client_' ~ (client.id ?? 'new')) }}">
+            <input type="hidden" name="_view" value="row">
+            <button type="submit" data-testid="client-save" class="border border-emerald-500 px-3 py-1 text-emerald-500">{{ 'company.save'|trans }}</button>
+            {% if isNew %}
+                <button type="button" data-action="click->client-list#cancel" data-testid="client-cancel" class="mt-1 text-zinc-500 underline">{{ 'client.cancel'|trans }}</button>
+            {% endif %}
+        </form>
+        <p data-client-form-target="status" data-testid="save-status" role="status" aria-atomic="true" data-state="success" class="form-status">{{ saved|default(false) ? 'company.saved'|trans : '' }}</p>
+    </td>
+</tr>

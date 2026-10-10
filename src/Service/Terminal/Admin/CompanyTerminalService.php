@@ -73,10 +73,15 @@ final class CompanyTerminalService
     public function companySetNameCommand(array $tokens): array
     {
         ['args' => $args, 'flags' => $flags] = ArgsParser::parse($tokens);
-        $name = isset($flags['name']) ? trim((string)$flags['name']) : null;
-
-        // Non-interactive (flags-based)
-        if ($name !== null && $name !== '') {
+        if ($tokens !== []) {
+            if (!isset($flags['name']) || !is_string($flags['name']) || count($flags) !== 1) {
+                return ['output' => 'Usage: company:set-name --name="Company name"', 'success' => false];
+            }
+            // This command has no positional arguments: remaining words belong to the name.
+            $name = trim(implode(' ', [$flags['name'], ...$args]));
+            if (strlen($name) >= 2 && in_array($name[0], ['"', "'"], true) && $name[-1] === $name[0]) {
+                $name = substr($name, 1, -1);
+            }
             return $this->companySetNameNonInteractive($name);
         }
 
@@ -232,7 +237,7 @@ final class CompanyTerminalService
 
         $this->em->flush();
 
-        return ['output' => 'Updated: ' . implode(', ', $changed), 'success' => true];
+        return ['output' => 'Updated: ' . implode(', ', $changed), 'success' => true, 'ratesChanged' => true];
     }
 
     /**
@@ -268,6 +273,7 @@ final class CompanyTerminalService
 
         return [
             'output'  => sprintf('Rate id=%d (%s) deleted.', $rid, (string) $name),
+            'ratesChanged' => true,
             'success' => true,
         ];
     }
@@ -384,18 +390,24 @@ final class CompanyTerminalService
             ];
         }
 
-        // All answers collected → create Rate
-        $data = $state['data'] ?? [];
-        $name = (string) ($data['name'] ?? '');
-        $value = (string) ($data['value'] ?? '');
+        $response = $this->ratesAddNonInteractive($state['data'] ?? []);
+        $this->wiz->clear($userId);
+        return $response;
+    }
 
-        if ($name === '' || $value === '' || !is_numeric($value)) {
-            $this->wiz->clear($userId);
-            return [
-                'output'  => 'Invalid rate data. Name and numeric value are required.',
-                'success' => false,
-            ];
+    private function ratesAddNonInteractive(array $flags): array
+    {
+        $name = $flags['name'] ?? null;
+        $value = $flags['value'] ?? null;
+        if (!is_string($name) || !is_string($value) || array_diff(array_keys($flags), ['name', 'value'])) {
+            return ['output' => 'Usage: rates:add --name=Normal --value=500', 'success' => false];
         }
+        $name = trim($name);
+        $value = str_replace(',', '.', trim($value));
+        if ($name === '' || mb_strlen($name) > 255 || !preg_match('/^([0-9]{1,8})(?:\.([0-9]{1,2}))?$/D', $value, $parts)) {
+            return ['output' => 'A name (1–255 characters) and value from 0 to 99999999.99 with at most two decimals are required.', 'success' => false];
+        }
+        $value = (ltrim($parts[1], '0') ?: '0') . '.' . str_pad($parts[2] ?? '', 2, '0');
 
         $company = $this->getOrCreateCompany();
 
@@ -407,11 +419,9 @@ final class CompanyTerminalService
         $this->em->persist($rate);
         $this->em->flush();
 
-        // Clear wizard
-        $this->wiz->clear($userId);
-
         return [
             'view'    => 'terminal/admin/terminal_commands/_rate_created_summary.html.twig',
+            'ratesChanged' => true,
             'vars'    => [
                 'id'          => $rate->getId(),
                 'name'        => $name,
@@ -424,34 +434,30 @@ final class CompanyTerminalService
 
     private function handleCompanySetNameStep(array $state, string $rawInput, string $userId): array
     {
-        // Single-step wizard: just take the input as name
-        $name = trim($rawInput);
+        $response = $this->companySetNameNonInteractive($rawInput);
+        $this->wiz->clear($userId);
+        return $response;
+    }
 
-        if ($name === '') {
-            $this->wiz->clear($userId);
-            return [
-                'output'  => 'Company name cannot be empty.',
-                'success' => false,
-            ];
+    private function companySetNameNonInteractive(string $name): array
+    {
+        $name = trim($name);
+        if ($name === '' || mb_strlen($name) > 255) {
+            return ['output' => 'Company name must contain 1 to 255 characters.', 'success' => false];
         }
-
         $company = $this->findCompany();
         if (!$company) {
             $company = new Company();
             $this->em->persist($company);
         }
-
         $company->setName($name);
         $this->em->flush();
-
-        $this->wiz->clear($userId);
-
         return [
-            'output'  => sprintf('Company name set to "%s".', $name),
+            'output' => sprintf('Company name set to "%s".', htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')),
+            'companyName' => $company->getName(),
             'success' => true,
         ];
     }
-
 
     // -------------------------------------------------------------------------
     // INTERNAL HELPERS
