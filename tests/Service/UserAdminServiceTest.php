@@ -18,6 +18,7 @@ final class UserAdminServiceTest extends TestCase
 {
     public function testDuplicateEmailDoesNotPartiallyChangeTheUser(): void
     {
+        $existingHash = password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT);
         $user = (new User())->setUsername('Original')->setEmail('original@example.test');
         $other = (new User())->setEmail('taken@example.test');
         (new \ReflectionProperty(User::class, 'id'))->setValue($other, 2);
@@ -81,8 +82,9 @@ final class UserAdminServiceTest extends TestCase
 
     public function testUpdateKeepsExistingPrivilegesPasswordAndTeams(): void
     {
+        $existingHash = password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT);
         $user = (new User())->setUsername('Original')->setEmail('original@example.test')
-            ->setRoles(['ROLE_ADMIN'])->setIsActive(false)->setPassword('existing-hash');
+            ->setRoles(['ROLE_ADMIN'])->setIsActive(false)->setPassword($existingHash);
         $team = new \App\Entity\Team();
         $user->addTeam($team);
         $users = $this->createStub(UserRepository::class);
@@ -98,7 +100,7 @@ final class UserAdminServiceTest extends TestCase
         self::assertSame('Changed', $user->getUsername());
         self::assertContains('ROLE_ADMIN', $user->getRoles());
         self::assertFalse($user->isActive());
-        self::assertSame('existing-hash', $user->getPassword());
+        self::assertSame($existingHash, $user->getPassword());
         self::assertTrue($user->getTeams()->contains($team));
     }
 

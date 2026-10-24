@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - search feature
 
 ### Changed
+- Compare architecture checks against the pull request base instead of the retired alpha branch, and generate the user test password hash dynamically.
 - Upgrade to PHP 8.5 and Symfony 8.1 with refreshed Composer dependencies; CI uses PHP 8.5.12 and Docker builds reject older PHP security patches.
 - Show project deadlines and overdue warnings directly in compact rows; use purple information buttons, amber editing accents and green save buttons.
 - Show budget calculation results and missing-input feedback directly below the calculation button; cover rates of 30 with browser tests.
