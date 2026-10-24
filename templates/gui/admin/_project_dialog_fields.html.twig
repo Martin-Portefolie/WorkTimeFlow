@@ -1,0 +1,75 @@
+{% if category == 'details' %}
+    <label class="block" for="{{ formId }}_description">{{ 'project.fields.description'|trans }}</label>
+    <textarea form="{{ formId }}" id="{{ formId }}_description" name="description" maxlength="255" data-testid="project-field-description" class="{{ inputClass }}">{{ project.description }}</textarea>
+    <div class="space-y-1"><label class="block" for="{{ formId }}_priority">{{ 'project.fields.priority'|trans }}</label><select form="{{ formId }}" id="{{ formId }}_priority" name="priority" data-testid="project-field-priority" aria-label="{{ 'project.fields.priority'|trans }}" class="{{ inputClass }}">
+        {% for priority in priorities %}<option value="{{ priority.value }}" {% if project.priority.value == priority.value %}selected{% endif %}>{{ ('project.priority.' ~ priority.value)|trans }}</option>{% endfor %}
+    </select></div>
+    <div class="space-y-1"><label class="block" for="{{ formId }}_archived">{{ 'project.fields.archived'|trans }}</label><select form="{{ formId }}" id="{{ formId }}_archived" name="archived" data-testid="project-field-archived" aria-label="{{ 'project.fields.archived'|trans }}" class="{{ inputClass }}">
+        <option value="0" {% if not project.archived %}selected{% endif %}>{{ 'project.active'|trans }}</option>
+        <option value="1" {% if project.archived %}selected{% endif %}>{{ 'project.archived'|trans }}</option>
+    </select></div>
+
+    {% if not isNew %}
+        <p class="text-zinc-500">{{ 'project.last_updated'|trans }}: {{ project.lastUpdated|date('d/m/Y H:i') }}</p>
+        <a href="{{ path('admin_project_download', {id: project.id}) }}" data-turbo="false" class="inline-block text-purple-600 dark:text-purple-400 underline">{{ 'project.download'|trans }}</a>
+    {% endif %}
+{% elseif category == 'budget' %}
+    <div class="space-y-1"><label class="block" for="{{ formId }}_rate">{{ 'project.fields.rate'|trans }}</label><select form="{{ formId }}" id="{{ formId }}_rate" name="rate" data-action="change->project-form#updateBudgetFromEstimate" data-testid="project-field-rate" aria-label="{{ 'project.fields.rate'|trans }}" class="{{ inputClass }}">
+        <option value="">—</option>
+        {% for rate in rates %}<option value="{{ rate.id }}" data-value="{{ rate.value }}" {% if project.rate and project.rate.id == rate.id %}selected{% endif %}>{{ rate.name }} ({{ rate.value }})</option>{% endfor %}
+    </select></div>
+
+    <label class="block" for="{{ formId }}_estimatedHours">{{ 'project.estimated_hours'|trans }}</label>
+    <div class="flex items-center gap-4">
+        <input type="range" form="{{ formId }}" id="{{ formId }}_estimatedHours" name="estimated_hours" min="0" max="500" step="5"
+               value="{{ project.estimatedMinutes is not null ? project.estimatedMinutes / 60 : 0 }}"
+               data-testid="project-field-estimatedHours" data-action="input->project-form#updateEstimate"
+               aria-describedby="{{ formId }}_hours_help" class="h-2 w-full cursor-pointer accent-emerald-500">
+        <output for="{{ formId }}_estimatedHours" data-testid="project-estimated-time" class="whitespace-nowrap">{% if project.estimatedMinutes is not null %}{{ project.estimatedMinutes // 60 }}h {{ project.estimatedMinutes % 60 }}m{% else %}—{% endif %}</output>
+    </div>
+    <p id="{{ formId }}_hours_help" class="text-xs text-zinc-500">{{ 'project.hours_help'|trans }}</p>
+    <input type="hidden" form="{{ formId }}" name="estimatedMinutes" value="{{ project.estimatedMinutes }}" data-testid="project-field-estimatedMinutes">
+    <label class="block" for="{{ formId }}_estimatedBudget">{{ 'project.fields.estimatedBudget'|trans }} ({{ get_company().currency|default('DKK') }})</label>
+    <input form="{{ formId }}" id="{{ formId }}_estimatedBudget" name="estimatedBudget" value="{{ project.estimatedBudget is not null ? project.estimatedBudget|number_format(2, '.', '') : '' }}" inputmode="decimal" data-testid="project-field-estimatedBudget" class="{{ inputClass }}">
+    <button type="button" data-action="project-form#calculateBudget" data-testid="project-calculate-budget" class="border border-amber-500/40 px-3 py-2 text-amber-600 dark:text-amber-400">{{ 'project.calculate'|trans }}</button>
+    <p data-project-form-target="calculation" data-testid="project-calculation-status" data-calculated="{{ 'project.calculated'|trans }}" role="status" aria-atomic="true" class="text-xs text-zinc-600 dark:text-zinc-400"></p>
+    <p class="text-xs text-zinc-500">{{ 'project.calculate_help'|trans }}</p>
+    {% set used = isNew ? 0 : project.totalMinutesUsed %}
+    <dl class="grid grid-cols-2 gap-2 border-y border-zinc-300 py-3 dark:border-zinc-700">
+        <dt>{{ 'project.time_used'|trans }}</dt><dd data-testid="project-time-used">{{ used // 60 }}h {{ used % 60 }}m</dd>
+        <dt>{{ 'project.time_remaining'|trans }}</dt><dd data-testid="project-time-remaining">{% if project.estimatedMinutes is not null %}{% set remaining = max(0, project.estimatedMinutes - used) %}{{ remaining // 60 }}h {{ remaining % 60 }}m{% else %}—{% endif %}</dd>
+        {% if project.estimatedMinutes is not null and used > project.estimatedMinutes %}<dt class="text-amber-600">{{ 'project.over_estimate'|trans }}</dt><dd class="text-amber-600">{{ (used - project.estimatedMinutes) // 60 }}h {{ (used - project.estimatedMinutes) % 60 }}m</dd>{% endif %}
+    </dl>
+    <label class="block" for="{{ formId }}_paid">{{ 'project.fields.paid'|trans }}</label>
+    <select form="{{ formId }}" id="{{ formId }}_paid" name="paid" data-testid="project-field-paid" class="{{ inputClass }}">
+        <option value="0" {% if not project.paid %}selected{% endif %}>{{ 'project.unpaid'|trans }}</option>
+        <option value="1" {% if project.paid %}selected{% endif %}>{{ 'project.paid'|trans }}</option>
+    </select>
+{% elseif category == 'teams' %}
+                <fieldset><legend>{{ 'project.fields.teams'|trans }}</legend>
+                    {% set selectedTeams = project.teams|map(team => team.id) %}
+                    {% for team in teams %}
+                        <label class="flex items-center gap-2 py-1" for="{{ formId }}_team_{{ team.id }}">
+                            <input type="checkbox" form="{{ formId }}" id="{{ formId }}_team_{{ team.id }}" name="teams[]" value="{{ team.id }}" data-testid="project-field-team" {% if team.id in selectedTeams %}checked{% endif %}>{{ team.name }}
+                        </label>
+                    {% else %}<p class="text-zinc-500">{{ 'project.no_teams'|trans }}</p>{% endfor %}
+                </fieldset>
+{% elseif category == 'todos' %}
+    {% for todo in project.todos|default([]) %}
+        {% set minutes = 0 %}{% for log in todo.timelogs %}{% set minutes = minutes + log.totalMinutes %}{% endfor %}
+        <details class="border border-zinc-300 p-3 dark:border-zinc-700" data-testid="project-todo">
+            <summary class="cursor-pointer space-y-1">
+                <span class="block font-medium">{{ todo.name }}</span>
+                <span class="block text-zinc-500">{{ ('project.todo_status.' ~ todo.status.value)|trans }} · {{ minutes // 60 }}h {{ minutes % 60 }}m · {{ todo.timelogs|length }} {{ 'project.logs'|trans }}</span>
+            </summary>
+            <p class="my-2 text-zinc-500">{{ todo.dateStart|date('d/m/Y') }} – {{ todo.dateEnd|date('d/m/Y') }}</p>
+            <ul class="divide-y divide-zinc-200 dark:divide-zinc-800">
+                {% for log in todo.timelogs %}<li class="space-y-1 py-2" data-testid="project-timelog">
+                    <div>{{ log.date|date('d/m/Y H:i') }} · {{ log.totalMinutes // 60 }}h {{ log.totalMinutes % 60 }}m</div>
+                    <div class="text-zinc-500">{{ log.user ? log.user.username : '—' }}</div>
+                    {% if log.description %}<p>{{ log.description }}</p>{% endif %}
+                </li>{% else %}<li class="py-2 text-zinc-500">{{ 'project.no_logs'|trans }}</li>{% endfor %}
+            </ul>
+        </details>
+    {% else %}<p class="text-zinc-500">{{ 'project.no_todos'|trans }}</p>{% endfor %}
+{% endif %}

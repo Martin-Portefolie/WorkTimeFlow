@@ -3,6 +3,8 @@
 namespace App\Service\Terminal\Admin;
 
 use App\Entity\Client;
+use App\Service\Admin\ClientAdminService;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Repository\ClientRepository;
 use App\Service\Terminal\TerminalStateService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,6 +20,8 @@ final class TerminalClientService
         private readonly TerminalStateService $state,
         private readonly Security $security,
         private readonly EntityManagerInterface $em,
+        private readonly ClientAdminService $clientAdmin,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -132,80 +136,26 @@ final class TerminalClientService
             );
         }
 
-        $changed = false;
-
-        if (isset($flags['name'])) {
-            $name = trim((string) $flags['name']);
-
-            if (mb_strlen($name) < 2) {
-                return $this->error('Invalid client name', 'Client name must be at least 2 characters.');
+        $aliases = [
+            'name' => ['name'], 'contactEmail' => ['email', 'contact-email'],
+            'contactPhone' => ['phone', 'contact-phone'], 'contactPerson' => ['contact', 'contact-person'],
+            'adress' => ['address', 'adress'], 'postalCode' => ['postal-code', 'postalCode'],
+            'city' => ['city'], 'country' => ['country'],
+        ];
+        $data = [];
+        foreach ($aliases as $field => $keys) {
+            foreach ($keys as $key) {
+                if (isset($flags[$key])) {
+                    $data[$field] = (string) $flags[$key];
+                    break;
+                }
             }
-
-            $client->setName($name);
-            $changed = true;
         }
-
-        if (isset($flags['email']) || isset($flags['contact-email'])) {
-            $email = trim((string) ($flags['email'] ?? $flags['contact-email']));
-
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return $this->error('Invalid email', sprintf('"%s" is not a valid email address.', $email));
-            }
-
-            $client->setContactEmail(mb_strtolower($email));
-            $changed = true;
+        try {
+            $this->clientAdmin->update($client, $data);
+        } catch (\InvalidArgumentException $exception) {
+            return $this->error('Invalid client details', $this->translator->trans($exception->getMessage()));
         }
-
-        if (isset($flags['phone']) || isset($flags['contact-phone'])) {
-            $phone = trim((string) ($flags['phone'] ?? $flags['contact-phone']));
-
-            if (mb_strlen($phone) < 2) {
-                return $this->error('Invalid phone', 'Phone must be at least 2 characters.');
-            }
-
-            $client->setContactPhone($phone);
-            $changed = true;
-        }
-
-        if (isset($flags['contact']) || isset($flags['contact-person'])) {
-            $contactPerson = trim((string) ($flags['contact'] ?? $flags['contact-person']));
-
-            if (mb_strlen($contactPerson) < 2) {
-                return $this->error('Invalid contact person', 'Contact person must be at least 2 characters.');
-            }
-
-            $client->setContactPerson($contactPerson);
-            $changed = true;
-        }
-
-        if (isset($flags['address']) || isset($flags['adress'])) {
-            $client->setAdress($this->nullableString($flags['address'] ?? $flags['adress']));
-            $changed = true;
-        }
-
-        if (isset($flags['postal-code']) || isset($flags['postalCode'])) {
-            $client->setPostalCode($this->nullableString($flags['postal-code'] ?? $flags['postalCode']));
-            $changed = true;
-        }
-
-        if (isset($flags['city'])) {
-            $client->setCity($this->nullableString($flags['city']));
-            $changed = true;
-        }
-
-        if (isset($flags['country'])) {
-            $client->setCountry($this->nullableString($flags['country']));
-            $changed = true;
-        }
-
-        if (!$changed) {
-            return $this->error(
-                'Nothing to update',
-                'Use one or more flags: --name= --email= --phone= --contact= --address= --postal-code= --city= --country=',
-            );
-        }
-
-        $this->em->flush();
 
         return $this->clientShowPayload('Client updated', $client);
     }
@@ -481,6 +431,7 @@ final class TerminalClientService
                 'view' => 'show',
                 'resource' => 'clients',
                 'title' => $title,
+                'client' => $client,
                 'fields' => $fields,
             ],
         ];

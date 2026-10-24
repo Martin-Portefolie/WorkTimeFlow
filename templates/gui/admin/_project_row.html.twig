@@ -1,0 +1,39 @@
+{% set isNew = project.id is null %}
+{% set formId = 'project_row_' ~ (project.id ?? 'new') %}
+{% set inputClass = 'w-full min-w-28 border border-zinc-300 bg-white px-2 py-1 text-zinc-900 focus:border-amber-500 dark:border-zinc-700 dark:bg-black dark:text-zinc-100' %}
+<tr data-testid="project-row" data-controller="project-form" data-project-row="{{ project.id ?? 'new' }}"
+    data-calculate-error="{{ 'project.calculate_error'|trans }}" data-saving="{{ 'company.saving'|trans }}" data-error="{{ 'project.save_failed'|trans }}" data-expired="{{ 'client.expired'|trans }}"
+    class="border-b border-zinc-200 dark:border-zinc-800 {{ isNew ? 'bg-emerald-500/5 outline outline-1 -outline-offset-1 outline-emerald-500/30' : '' }}">
+    <td class="p-2"><input form="{{ formId }}" id="{{ formId }}_name" name="name" value="{{ project.name }}" required minlength="2" maxlength="255" data-testid="project-field-name" aria-label="{{ 'project.fields.name'|trans }}" class="{{ inputClass }}"></td>
+    <td class="p-2"><select form="{{ formId }}" id="{{ formId }}_client" name="client" required data-testid="project-field-client" aria-label="{{ 'project.fields.client'|trans }}" class="{{ inputClass }}">
+        <option value="">{{ 'project.choose_client'|trans }}</option>
+        {% for client in clients %}<option value="{{ client.id }}" {% if project.client and project.client.id == client.id %}selected{% endif %}>{{ client.name }}</option>{% endfor %}
+    </select></td>
+    <td class="p-2">
+        <input form="{{ formId }}" id="{{ formId }}_deadline" name="deadline" type="date" required
+               value="{{ project.deadline ? project.deadline|date('Y-m-d') : '' }}" data-testid="project-field-deadline"
+               aria-label="{{ 'project.fields.deadline'|trans }}" class="{{ inputClass }}">
+        {% if project.deadline and project.deadline|date('Y-m-d') < 'now'|date('Y-m-d') and not project.archived %}
+            <p data-testid="project-overdue" class="mt-1 border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-amber-700 dark:text-amber-400">{{ 'project.overdue'|trans }}</p>
+        {% endif %}
+    </td>
+    <td class="p-2 text-zinc-500"><span class="block">{{ ('project.priority.' ~ project.priority.value)|trans }}</span><span class="block">{{ (project.archived ? 'project.archived' : 'project.active')|trans }}</span></td>
+    <td class="p-2">
+        <div class="flex flex-wrap gap-2">
+            {% for category in ['details', 'budget', 'teams', 'todos'] %}
+                <button type="button" data-action="project-form#open" data-category="{{ category }}" data-testid="project-open-{{ category }}" aria-haspopup="dialog" aria-controls="{{ formId }}_dialog_{{ category }}" class="whitespace-nowrap border border-purple-500/40 px-2 py-1 text-purple-600 hover:bg-purple-500/10 focus-visible:outline-purple-500 dark:text-purple-400">
+                    {{ ('project.category.' ~ category)|trans }}{% if category == 'teams' %} ({{ project.teams|length }}){% elseif category == 'todos' %} ({{ project.todos|default([])|length }}){% endif %}
+                </button>
+                {% include 'gui/admin/_project_dialog.html.twig' %}
+            {% endfor %}
+        </div>
+    </td>
+    <td class="p-2">
+        <form id="{{ formId }}" method="post" action="{{ isNew ? path('admin_project_create_panel') : path('admin_project_panel', {id: project.id}) }}" novalidate data-turbo="false" data-action="submit->project-form#save:prevent">
+            <input type="hidden" name="_token" value="{{ csrf_token('project_' ~ (project.id ?? 'new')) }}">
+            <button type="submit" data-testid="project-save" class="border border-emerald-500 px-3 py-1 text-emerald-500">{{ 'company.save'|trans }}</button>
+            {% if isNew %}<button type="button" data-action="click->project-list#cancel" data-testid="project-cancel" class="mt-1 text-zinc-500 underline">{{ 'client.cancel'|trans }}</button>{% endif %}
+        </form>
+        <p data-project-form-target="status" data-testid="save-status" role="status" aria-atomic="true" data-state="success" class="form-status">{{ saved|default(false) ? 'company.saved'|trans : '' }}</p>
+    </td>
+</tr>

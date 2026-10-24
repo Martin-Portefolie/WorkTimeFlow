@@ -5,6 +5,9 @@
     : 'border-red-500/20 bg-red-500/5'
     }}"
     data-await="{{ await ? '1' : '0' }}"
+    {% if success and companyName is defined and companyName is not null %}
+        data-company-name="{{ companyName }}"
+    {% endif %}
     {% if gui %}
         data-gui-active="{{ gui.active }}"
         data-gui-view="{{ gui.view }}"
@@ -29,5 +32,8 @@
         <template data-gui-html>
             {{ guiHtml|raw }}
         </template>
+    {% endif %}
+    {% if ratesHtml is defined and ratesHtml %}
+        <template data-company-rates-html>{{ ratesHtml|raw }}</template>
     {% endif %}
 </div>

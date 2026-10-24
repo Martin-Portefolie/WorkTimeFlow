@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Company{% endblock %}
+
+{% block body %}
+    <main class="mx-auto max-w-4xl p-6">
+        <section class="border border-zinc-300 dark:border-zinc-800">
+            <header class="border-b border-zinc-300 px-4 py-3 dark:border-zinc-800">
+                <h1 class="uppercase tracking-wider text-emerald-500">Company setup</h1>
+            </header>
+
+            <div class="p-4">
+                {% if saved %}
+                    <div class="mb-4 border border-emerald-500/40 bg-emerald-500/10 p-3 text-sm text-emerald-500">
+                        Company saved.
+                    </div>
+                {% endif %}
+                {{ form_start(form, {attr: {enctype: 'multipart/form-data'}}) }}
+                {{ form_widget(form) }}
+                <button class="mt-4 border border-emerald-500 px-4 py-2 text-sm text-emerald-500" type="submit">
+                    Continue
+                </button>
+                {{ form_end(form) }}
+            </div>
+        </section>
+    </main>
+{% endblock %}

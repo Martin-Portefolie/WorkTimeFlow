@@ -18,4 +18,45 @@ body {
     @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100;
 }
 
+@layer components {
+    .client-project-dialog {
+        margin: auto;
+        width: min(36rem, calc(100vw - 2rem));
+        max-height: 80vh;
+        overflow-y: auto;
+        border-radius: 0.5rem;
+    }
 
+    .client-project-dialog::backdrop {
+        background: rgb(0 0 0 / 55%);
+    }
+
+    .form-status {
+        @apply mt-2 inline-flex max-w-sm items-center gap-2 rounded border px-2 py-1 text-xs leading-snug;
+    }
+
+    .form-status:empty {
+        display: none;
+    }
+
+    .form-status::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .form-status[data-state="success"] {
+        @apply border-emerald-500/20 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400;
+    }
+
+    .form-status[data-state="saving"] {
+        @apply border-zinc-300 bg-zinc-100 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400;
+    }
+
+    .form-status[data-state="error"] {
+        @apply border-red-500/20 bg-red-500/5 text-red-700 dark:text-red-400;
+    }
+}

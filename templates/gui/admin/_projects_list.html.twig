@@ -1,0 +1,24 @@
+<section class="p-4" data-controller="project-list" data-testid="projects-panel">
+    <div class="mb-3 flex items-center justify-between">
+        <h2 class="uppercase tracking-wider text-emerald-500">{{ 'project.title'|trans }}</h2>
+        <button type="button" data-action="click->project-list#add" data-testid="project-create" class="border border-emerald-500 px-3 py-1 text-xs text-emerald-500">{{ 'project.create'|trans }}</button>
+    </div>
+    <p class="mb-3 text-xs text-zinc-500">{{ 'project.help'|trans }}</p>
+    <div class="overflow-auto border border-zinc-300 dark:border-zinc-800">
+        <table class="w-full text-left text-xs">
+            <thead class="border-b border-zinc-300 text-zinc-500 dark:border-zinc-800"><tr>
+                {% for field in ['name', 'client', 'deadline', 'archived', 'details'] %}
+                    <th class="p-2 font-normal">{{ ('project.fields.' ~ field)|trans }}</th>
+                {% endfor %}
+                <th class="p-2 font-normal">{{ 'client.actions'|trans }}</th>
+            </tr></thead>
+            <tbody data-project-list-target="rows" data-testid="project-rows">
+                {% for project in projects %}{% include 'gui/admin/_project_row.html.twig' %}{% endfor %}
+                <tr data-project-list-target="empty" {% if projects|length %}hidden{% endif %}><td colspan="6" class="p-3 text-zinc-500">{{ 'project.empty'|trans }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <template data-project-list-target="newRow">
+        {% include 'gui/admin/_project_row.html.twig' with {project: {id: null, name: '', description: '', client: null, deadline: null, priority: {value: 'medium'}, rate: null, archived: false, paid: false, estimatedBudget: null, estimatedMinutes: null, teams: []}} %}
+    </template>
+</section>

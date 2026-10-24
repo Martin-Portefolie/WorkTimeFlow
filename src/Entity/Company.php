@@ -10,6 +10,23 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 class Company
 {
+    #[ORM\Column(length: 3, options: ['default' => 'DKK'])]
+    private string $currency = 'DKK';
+
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(string $currency): static
+    {
+        if (!preg_match('/^[A-Z]{3}$/D', $currency)) {
+            throw new \InvalidArgumentException('company.currency_invalid');
+        }
+        $this->currency = $currency;
+        return $this;
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

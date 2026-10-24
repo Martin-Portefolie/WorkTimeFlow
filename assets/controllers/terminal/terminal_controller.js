@@ -162,6 +162,18 @@ export default class extends Controller {
                 if (lineEl && lineEl.getAttribute) {
                     this.awaiting = lineEl.getAttribute('data-await') === '1';
 
+                    const ratesTemplate = lineEl.querySelector('template[data-company-rates-html]');
+                    const ratesPanel = document.getElementById('company_rates');
+                    if (ratesPanel && ratesTemplate?.content.firstElementChild) {
+                        ratesPanel.replaceWith(ratesTemplate.content.firstElementChild.cloneNode(true));
+                    }
+
+                    if (lineEl.hasAttribute('data-company-name')) {
+                        document.dispatchEvent(new CustomEvent('wtf:company:updated', {
+                            detail: { name: lineEl.getAttribute('data-company-name') },
+                        }));
+                    }
+
                     const active = lineEl.getAttribute('data-gui-active');
                     const view = lineEl.getAttribute('data-gui-view');
 

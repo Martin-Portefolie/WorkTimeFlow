@@ -26,34 +26,15 @@ export default class extends Controller {
     }
 
     updateSidebar(active) {
-        document
-            .querySelectorAll('[data-key]')
-            .forEach((el) => {
-                const isActive = el.dataset.key === active;
-
-                el.classList.toggle(
-                    'border-emerald-500/40',
-                    isActive
-                );
-
-                el.classList.toggle(
-                    'bg-emerald-500/10',
-                    isActive
-                );
-
-                el.classList.toggle(
-                    'text-emerald-400',
-                    isActive
-                );
-
-                if (!isActive) {
-                    el.classList.remove(
-                        'border-emerald-500/40',
-                        'bg-emerald-500/10',
-                        'text-emerald-400'
-                    );
-                }
-            });
+        const selected = ['border-emerald-500', 'bg-emerald-500/10', 'text-emerald-500', 'dark:border-emerald-500/40', 'dark:text-emerald-400'];
+        const unselected = ['border-transparent', 'text-zinc-600', 'hover:border-zinc-300', 'hover:bg-white', 'hover:text-zinc-900', 'dark:text-zinc-400', 'dark:hover:border-zinc-700', 'dark:hover:bg-zinc-900', 'dark:hover:text-zinc-100'];
+        this.element.querySelectorAll('[data-key]').forEach((element) => {
+            const isActive = element.dataset.key === active;
+            selected.forEach(name => element.classList.toggle(name, isActive));
+            unselected.forEach(name => element.classList.toggle(name, !isActive));
+            if (isActive) element.setAttribute('aria-current', 'page');
+            else element.removeAttribute('aria-current');
+        });
     }
 
     runCommand(event) {
@@ -69,4 +50,24 @@ export default class extends Controller {
             }),
         );
     }
+
+    loadClient(event) {
+        return this.loadPanel(event);
+    }
+
+    async loadPanel(event) {
+        event.preventDefault();
+        const trigger = event.currentTarget;
+        const url = trigger.dataset.url || trigger.getAttribute('href');
+        try {
+            const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!response.ok || response.redirected) throw new Error(trigger.dataset.error);
+            const html = await response.text();
+            const active = trigger.dataset.key || 'clients';
+            this.update({ detail: { active, view: active, html } });
+        } catch (error) {
+            window.alert(trigger.dataset.error);
+        }
+    }
+
 }

@@ -16,6 +16,12 @@ class RateRepository extends ServiceEntityRepository
         parent::__construct($registry, Rate::class);
     }
 
+    public function isUsedByProject(Rate $rate): bool
+    {
+        return $this->getEntityManager()->getRepository(\App\Entity\Project::class)
+            ->count(['rate' => $rate]) > 0;
+    }
+
     /**
      * Rates for selection in the terminal wizard.
      *

@@ -21,7 +21,7 @@ class ClientRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('c')
             ->leftJoin('c.projects', 'p')
-            ->addSelect('c.id, c.name, c.city, c.country, c.contactPerson, c.contactEmail, c.contactPhone')
+            ->addSelect('c.id, c.name, c.city, c.country, c.contactPerson, c.contactEmail, c.contactPhone, c.adress, c.postalCode')
             ->addSelect('COUNT(DISTINCT p.id) AS projectsCount')
             ->groupBy('c.id')
             ->orderBy('c.name', 'DESC')
@@ -37,7 +37,30 @@ class ClientRepository extends ServiceEntityRepository
         ')->setParameter('q', '%'.$q.'%');
         }
 
-        return $qb->getQuery()->getArrayResult();
+        $rows = $qb->getQuery()->getArrayResult();
+        if (!$rows) {
+            return [];
+        }
+
+        // Fetch projects for the selected clients together, without limiting projects per client.
+        $projects = $this->createQueryBuilder('c')
+            ->select('c.id AS clientId, p.id AS id, p.name AS name, p.isArchived AS archived')
+            ->innerJoin('c.projects', 'p')
+            ->where('c.id IN (:ids)')
+            ->setParameter('ids', array_column($rows, 'id'))
+            ->orderBy('p.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+        $byClient = [];
+        foreach ($projects as $project) {
+            $byClient[$project['clientId']][] = ['id' => $project['id'], 'name' => $project['name'], 'archived' => (bool) $project['archived']];
+        }
+        foreach ($rows as &$row) {
+            $row['projects'] = $byClient[$row['id']] ?? [];
+        }
+        unset($row);
+
+        return $rows;
     }
 
     /** @param string $key id (digits) OR exact email OR exact name (case-insensitive) */

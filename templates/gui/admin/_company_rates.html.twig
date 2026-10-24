@@ -1,0 +1,93 @@
+{% set currency = currency|default('DKK') %}
+{% set currencyRegions = currency_regions() %}
+{% set selectedRegion = currency_region(currency) %}
+<section id="company_rates" data-testid="company-rates" class="p-4" data-controller="company-form"
+         data-saving="{{ 'company.saving'|trans }}"
+         data-error="{{ 'company.rates.failed'|trans }}"
+         data-confirm="{{ 'company.rates.confirm_delete'|trans }}">
+    <h3 class="mb-3 uppercase tracking-wider text-emerald-500">{{ 'company.rates.title'|trans }}</h3>
+    <form id="company_currency_form" data-testid="company-currency-form" method="post" action="{{ path('admin_company_currency_update') }}" data-turbo="false"
+          data-action="submit->company-form#saveRate:prevent" class="mb-3 flex flex-wrap items-center gap-2">
+        <input type="hidden" name="_token" value="{{ csrf_token('company_currency') }}">
+        <label for="company_currency_region" class="text-xs text-zinc-500">{{ 'company.currency_region'|trans }}</label>
+        <select id="company_currency_region" data-testid="company-currency-region" name="region" required
+                data-company-form-target="region" data-action="change->company-form#changeCurrencyRegion"
+                class="border border-zinc-300 bg-white px-2 py-1 text-xs dark:border-zinc-700 dark:bg-black">
+            {% for region, codes in currencyRegions %}
+                <option value="{{ region }}" {{ selectedRegion == region ? 'selected' : '' }}>{{ ('regions.' ~ region ~ '.name')|trans({}, 'currencies') }}</option>
+            {% endfor %}
+        </select>
+        <label for="company_currency" class="text-xs text-zinc-500">{{ 'company.currency'|trans }}</label>
+        <select id="company_currency" data-testid="company-currency" name="currency" required data-company-form-target="currency"
+                class="border border-zinc-300 bg-white px-2 py-1 text-xs dark:border-zinc-700 dark:bg-black">
+            {% if currency not in currencyRegions[selectedRegion] %}
+                <option value="{{ currency }}" selected disabled>{{ ('currencies.' ~ currency ~ '.name')|trans({}, 'currencies') }} ({{ currency }}) — {{ 'company.currency_replace'|trans }}</option>
+            {% endif %}
+            {% for code in currencyRegions[selectedRegion] %}
+                <option value="{{ code }}" {{ currency == code ? 'selected' : '' }}>{{ ('currencies.' ~ code ~ '.name')|trans({}, 'currencies') }} ({{ code }})</option>
+            {% endfor %}
+        </select>
+        <button type="submit" data-testid="company-currency-save" class="border border-emerald-500 px-3 py-1 text-xs text-emerald-500">{{ 'company.save'|trans }}</button>
+    </form>
+    {% for region, codes in currencyRegions %}
+        <template data-company-form-target="currencyOptions" data-region="{{ region }}">
+            {% for code in codes %}
+                <option value="{{ code }}">{{ ('currencies.' ~ code ~ '.name')|trans({}, 'currencies') }} ({{ code }})</option>
+            {% endfor %}
+        </template>
+    {% endfor %}
+    <p class="mb-3 text-xs text-zinc-500">{{ 'company.currency_help'|trans }}</p>
+    <div class="overflow-auto border border-zinc-300 dark:border-zinc-800">
+        <table class="w-full min-w-[400px] text-left text-xs">
+            <thead class="border-b border-zinc-300 text-zinc-500 dark:border-zinc-800">
+            <tr>
+                <th class="p-2 font-normal uppercase">{{ 'company.rates.name'|trans }}</th>
+                <th class="p-2 font-normal uppercase">{{ 'company.rates.value'|trans }} ({{ currency }})</th>
+                <th class="p-2 font-normal uppercase">{{ 'company.rates.actions'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for rate in rates %}
+                {% set formId = 'company_rate_' ~ rate.id %}
+                <tr data-testid="company-rate-row" data-rate-id="{{ rate.id }}" class="border-b border-zinc-200 dark:border-zinc-800">
+                    <td class="p-2">
+                        <input id="{{ formId }}_name" data-testid="rate-name" form="{{ formId }}" name="name" value="{{ rate.name }}" required maxlength="255"
+                               aria-label="{{ 'company.rates.name'|trans }}"
+                               class="w-full border border-zinc-300 bg-white px-2 py-1 dark:border-zinc-700 dark:bg-black">
+                    </td>
+                    <td class="p-2">
+                        <input id="{{ formId }}_value" data-testid="rate-value" form="{{ formId }}" name="value" value="{{ rate.value }}" required inputmode="decimal"
+                               aria-label="{{ 'company.rates.value'|trans }} ({{ currency }})"
+                               class="w-28 border border-zinc-300 bg-white px-2 py-1 dark:border-zinc-700 dark:bg-black">
+                    </td>
+                    <td class="p-2">
+                        <form id="{{ formId }}" method="post" action="{{ path('admin_company_rate_save', {id: rate.id}) }}"
+                              data-turbo="false" data-action="submit->company-form#saveRate:prevent" class="flex gap-2">
+                            <input type="hidden" name="_token" value="{{ csrf_token('company_rates') }}">
+                            <button type="submit" data-testid="rate-save" name="action" value="save" class="border border-emerald-500 px-3 py-1 text-emerald-500">{{ 'company.save'|trans }}</button>
+                            <button type="submit" data-testid="rate-delete" name="action" value="delete" formnovalidate class="border border-red-500 px-3 py-1 text-red-500">{{ 'company.rates.delete'|trans }}</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3" class="p-3 text-zinc-500">{{ 'company.rates.empty'|trans }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <form id="company_rate_new" data-testid="company-rate-new" method="post" action="{{ path('admin_company_rate_save') }}" data-turbo="false"
+          data-action="submit->company-form#saveRate:prevent" class="mt-3 flex flex-wrap items-end gap-2">
+        <input type="hidden" name="_token" value="{{ csrf_token('company_rates') }}">
+        <label class="text-xs text-zinc-500">
+            {{ 'company.rates.name'|trans }}
+            <input id="company_rate_new_name" data-testid="rate-name" name="name" required maxlength="255" class="mt-1 block border border-zinc-300 bg-white px-2 py-1 text-zinc-900 dark:border-zinc-700 dark:bg-black dark:text-zinc-100">
+        </label>
+        <label class="text-xs text-zinc-500">
+            {{ 'company.rates.value'|trans }} ({{ currency }})
+            <input id="company_rate_new_value" data-testid="rate-value" name="value" required inputmode="decimal" value="0.00" class="mt-1 block w-28 border border-zinc-300 bg-white px-2 py-1 text-zinc-900 dark:border-zinc-700 dark:bg-black dark:text-zinc-100">
+        </label>
+        <button type="submit" data-testid="rate-save" name="action" value="save" class="border border-emerald-500 px-3 py-1 text-xs text-emerald-500">{{ 'company.rates.add'|trans }}</button>
+    </form>
+    <p class="mt-2 text-xs text-zinc-500">{{ 'company.rates.value_help'|trans }}</p>
+    <p data-company-form-target="status" data-testid="save-status" role="status" aria-atomic="true" data-state="success" class="form-status">{{ saved|default(false) ? 'company.saved'|trans : '' }}</p>
+</section>

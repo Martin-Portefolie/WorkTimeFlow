@@ -1,3 +1,5 @@
+{% set company = get_company() %}
+
 <div class="space-y-4 p-4">
     <header class="border border-zinc-300 bg-zinc-100 p-4 dark:border-zinc-800 dark:bg-zinc-950">
         <div class="text-xs uppercase tracking-[0.3em] text-emerald-500 dark:text-emerald-400">
@@ -12,6 +14,58 @@
             Terminal-first GUI control panel.
         </p>
     </header>
+
+    <turbo-frame id="company_panel" data-testid="company-panel">
+    <section class="border border-zinc-300 dark:border-zinc-800">
+        <header class="border-b border-zinc-300 px-4 py-3 dark:border-zinc-800">
+            <h2 class="uppercase tracking-wider text-emerald-500">Company</h2>
+        </header>
+
+        <dl class="divide-y divide-zinc-200 text-xs dark:divide-zinc-800">
+            <div class="grid grid-cols-[220px_1fr] items-center">
+                <dt class="bg-zinc-100 p-3 text-zinc-500 dark:bg-zinc-950"><label for="company_logo">Logo</label></dt>
+                <dd class="p-3 text-zinc-900 dark:text-zinc-100"
+                    data-controller="company-form"
+                    data-testid="company-logo-editor" data-save-url="{{ path('admin_company_logo_update') }}"
+                    data-token="{{ csrf_token('company_logo') }}"
+                    data-saving="{{ 'company.saving'|trans }}"
+                    data-saved="{{ 'company.saved'|trans }}"
+                    data-error="{{ 'company.upload_error'|trans }}">
+                    <img data-company-form-target="preview" data-testid="company-logo-preview" src="{{ asset(company_logo(company)) }}" alt="{{ company and company.name ? company.name : 'WorkTimeFlow' }}" class="h-10 w-10 rounded-xl object-contain ring-1 ring-emerald-500/30">
+                    <div class="mt-3 flex flex-wrap items-center gap-2">
+                        <input id="company_logo" name="logo" data-testid="company-logo-input" type="file" accept="image/png,image/jpeg,image/webp" aria-label="{{ 'company.choose_logo'|trans }}" data-company-form-target="file" class="min-w-0 max-w-full cursor-pointer text-xs file:mr-3 file:cursor-pointer file:border file:border-yellow-500 file:bg-yellow-500/10 file:px-3 file:py-2 file:text-xs file:font-medium file:text-yellow-700 hover:file:bg-yellow-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-500 dark:file:text-yellow-400">
+                        <button type="button" data-company-form-target="upload" data-testid="company-logo-save" data-action="click->company-form#saveLogo" class="border border-emerald-500 px-3 py-1 text-xs text-emerald-500">{{ 'company.save'|trans }}</button>
+                    </div>
+                    <p class="mt-1 text-xs text-zinc-500">{{ 'company.logo_help'|trans }}</p>
+                    <span data-company-form-target="status" data-testid="save-status" role="status" aria-atomic="true" data-state="success" class="form-status"></span>
+                </dd>
+            </div>
+            <div class="grid grid-cols-[220px_1fr] items-center">
+                <dt class="bg-zinc-100 p-3 text-zinc-500 dark:bg-zinc-950"><label for="company_name">{{ 'company.name'|trans }}</label></dt>
+                <dd class="p-3 text-zinc-900 dark:text-zinc-100" data-controller="company-form" data-testid="company-name-editor" data-save-url="{{ path('admin_company_name_update') }}"
+                    data-saving="{{ 'company.saving'|trans }}" data-saved="{{ 'company.saved'|trans }}"
+                    data-error="{{ 'company.save_error'|trans }}">
+                    <div class="flex gap-2">
+                        <input
+                            type="text"
+                            data-company-form-target="input"
+                            id="company_name" name="company_name" data-testid="company-name-input"
+                            value="{{ company and company.name ? company.name : '' }}"
+                            placeholder="WorkTimeFlow"
+                            class="min-w-0 flex-1 border border-zinc-300 bg-white px-2 py-1 dark:border-zinc-700 dark:bg-black"
+                        >
+                        <button type="button" data-action="click->company-form#saveName" data-testid="company-name-save" class="border border-emerald-500 px-3 py-1 text-xs text-emerald-500">
+                            {{ 'company.save'|trans }}
+                        </button>
+                    </div>
+                    <span data-company-form-target="status" data-testid="save-status" role="status" aria-atomic="true" data-state="success" class="form-status"></span>
+                </dd>
+            </div>
+        </dl>
+
+        {% include 'gui/admin/_company_rates.html.twig' with {rates: company ? company.rates : [], currency: company ? company.currency : 'DKK'} only %}
+    </section>
+    </turbo-frame>
 
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {% include 'gui/admin/_stat_card.html.twig' with {

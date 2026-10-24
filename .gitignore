@@ -17,6 +17,7 @@ __pycache__/
 /public/bundles/
 /var/
 /vendor/
+/drivers/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
@@ -26,5 +27,6 @@ __pycache__/
 
 ###> symfony/asset-mapper ###
 /public/assets/
+/public/uploads/company/
 /assets/vendor/
 ###< symfony/asset-mapper ###

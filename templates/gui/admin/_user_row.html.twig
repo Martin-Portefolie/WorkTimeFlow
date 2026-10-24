@@ -1,0 +1,43 @@
+{% set isNew = user.id is null %}
+{% set formId = 'user_row_' ~ (user.id ?? 'new') %}
+<tr data-testid="user-row" data-controller="user-form" data-user-row="{{ isNew ? 'new' : user.id }}"
+    data-saving="{{ 'company.saving'|trans }}" data-error="{{ 'user.save_failed'|trans }}" data-expired="{{ 'client.expired'|trans }}"
+    class="border-b border-zinc-200 dark:border-zinc-800 {{ isNew ? 'bg-emerald-500/5 outline outline-1 -outline-offset-1 outline-emerald-500/30' : '' }}">
+    {% for field in ['username', 'email'] %}
+        <td class="p-2">
+            <input id="{{ formId }}_{{ field }}" data-testid="user-field-{{ field }}" form="{{ formId }}" name="{{ field }}" value="{{ attribute(user, field)|default('') }}"
+                   aria-label="{{ ('user.fields.' ~ field)|trans }}" placeholder="{{ ('user.fields.' ~ field)|trans }}"
+                   type="{{ field == 'email' ? 'email' : 'text' }}" autocomplete="off" required
+                   maxlength="{{ field == 'email' ? 180 : 255 }}" {% if field == 'username' %}minlength="2"{% endif %}
+                   class="w-full min-w-28 border border-transparent bg-transparent px-2 py-1 text-zinc-900 hover:border-zinc-300 focus:border-emerald-500 focus:bg-white focus:outline-none dark:text-zinc-100 dark:hover:border-zinc-700 dark:focus:bg-black">
+        </td>
+    {% endfor %}
+    {% set isSelf = not isNew and app.user and app.user.id == user.id %}
+    <td class="p-2" data-testid="user-roles">
+        <select id="{{ formId }}_role" form="{{ formId }}" name="role" data-testid="user-field-role" aria-label="{{ 'user.fields.roles'|trans }}"
+                {% if isSelf %}disabled title="{{ 'user.self_access'|trans }}"{% endif %}
+                class="border border-zinc-300 bg-white px-2 py-1 disabled:opacity-60 dark:border-zinc-700 dark:bg-black">
+            <option value="ROLE_USER" {% if 'ROLE_ADMIN' not in user.roles %}selected{% endif %}>{{ 'user.member'|trans }}</option>
+            <option value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}selected{% endif %}>{{ 'user.admin'|trans }}</option>
+        </select>
+    </td>
+    <td class="p-2" data-testid="user-active">
+        <select id="{{ formId }}_active" form="{{ formId }}" name="active" data-testid="user-field-active" aria-label="{{ 'user.fields.active'|trans }}"
+                {% if isSelf %}disabled title="{{ 'user.self_access'|trans }}"{% endif %}
+                class="border border-zinc-300 bg-white px-2 py-1 disabled:opacity-60 dark:border-zinc-700 dark:bg-black">
+            <option value="1" {% if user.active %}selected{% endif %}>{{ 'user.active'|trans }}</option>
+            <option value="0" {% if not user.active %}selected{% endif %}>{{ 'user.inactive'|trans }}</option>
+        </select>
+    </td>
+    <td class="p-2">
+        <form id="{{ formId }}" method="post" action="{{ isNew ? path('admin_user_create_panel') : path('admin_user_panel', {id: user.id}) }}"
+              data-testid="user-form" data-turbo="false" data-action="submit->user-form#save:prevent">
+            <input type="hidden" name="_token" value="{{ csrf_token('user_' ~ (user.id ?? 'new')) }}">
+            <button type="submit" data-testid="user-save" class="border border-emerald-500 px-3 py-1 text-emerald-500">{{ 'company.save'|trans }}</button>
+            {% if isNew %}
+                <button type="button" data-action="click->user-list#cancel" data-testid="user-cancel" class="mt-1 text-zinc-500 underline">{{ 'client.cancel'|trans }}</button>
+            {% endif %}
+        </form>
+        <p data-user-form-target="status" data-testid="save-status" role="status" aria-atomic="true" data-state="success" class="form-status">{{ created|default(false) ? 'user.created'|trans : (saved|default(false) ? 'company.saved'|trans : '') }}</p>
+    </td>
+</tr>

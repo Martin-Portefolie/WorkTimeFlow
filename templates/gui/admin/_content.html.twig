@@ -1,6 +1,6 @@
 <div
-    data-gui--admin-gui-target="content"
-    class="h-full overflow-auto bg-white text-zinc-900 dark:bg-black dark:text-zinc-300"
+    data-gui--admin-gui-target="content" data-testid="admin-content"
+    class="min-h-0 flex-1 overflow-auto bg-white text-zinc-900 dark:bg-black dark:text-zinc-300"
 >
     {% include 'gui/admin/_content_inner.html.twig' with {
         view: view|default('overview')

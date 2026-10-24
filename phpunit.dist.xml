@@ -20,6 +20,7 @@
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
+            <exclude>tests/Browser</exclude>
         </testsuite>
     </testsuites>
 
@@ -40,6 +41,7 @@
     </source>
 
     <extensions>
+        <bootstrap class="Symfony\Component\Panther\ServerExtension" />
         <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
             <parameter name="clock-mock-namespaces" value="App" />
             <parameter name="dns-mock-namespaces" value="App" />

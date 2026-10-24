@@ -1,0 +1,1582 @@
+# Domain: currencies. Use with Twig trans({}, "currencies").
+# Country/currency associations: user-supplied https://www.iban.com/currency-codes table.
+# Localized names: Symfony Intl, with explicit labels for special units.
+# Region groups are for navigation: Russia/Cyprus in Europe; Turkey in Middle East;
+# Caucasus/Kazakhstan in Asia; Mexico/Greenland/Bermuda in North America.
+# Countries use ISO alpha-2 keys. Currency numbers remain strings, including leading zeroes.
+# Duplicate Cuba entry removed. Special units and Antarctic territories retained separately.
+# Reviewed against SIX ISO 4217 List One, published 2026-09-17.
+# Source: https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml
+# kind: fund marks special fund/accounting codes, excluded from ordinary currency choices.
+# Norfolk Island corrected to AUD.
+# Example: regions.europe.countries.DK.currencies.DKK
+
+currencies:
+  AED:
+    name: "dirham fra de Forenede Arabiske Emirater"
+    number: "784"
+  AFN:
+    name: "afghansk afghani"
+    number: "971"
+  ALL:
+    name: "albansk lek"
+    number: "008"
+  AMD:
+    name: "armensk dram"
+    number: "051"
+  AOA:
+    name: "angolansk kwanza"
+    number: "973"
+  ARS:
+    name: "argentinsk peso"
+    number: "032"
+  AUD:
+    name: "australsk dollar"
+    number: "036"
+  AWG:
+    name: "arubansk florin"
+    number: "533"
+  AZN:
+    name: "aserbajdsjansk manat"
+    number: "944"
+  BAM:
+    name: "bosnien-hercegovinsk konvertibel mark"
+    number: "977"
+  BBD:
+    name: "barbadisk dollar"
+    number: "052"
+  BDT:
+    name: "bangladeshisk taka"
+    number: "050"
+  BHD:
+    name: "bahrainsk dinar"
+    number: "048"
+  BIF:
+    name: "burundisk franc"
+    number: "108"
+  BMD:
+    name: "bermudansk dollar"
+    number: "060"
+  BND:
+    name: "bruneisk dollar"
+    number: "096"
+  BOB:
+    name: "boliviansk boliviano"
+    number: "068"
+  BOV:
+    name: "Boliviansk Mvdol (regningsenhed)"
+    number: "984"
+    kind: fund
+  BRL:
+    name: "brasiliansk real"
+    number: "986"
+  BSD:
+    name: "bahamansk dollar"
+    number: "044"
+  BTN:
+    name: "bhutansk ngultrum"
+    number: "064"
+  BWP:
+    name: "botswansk pula"
+    number: "072"
+  BYN:
+    name: "hviderussisk rubel"
+    number: "933"
+  BZD:
+    name: "belizisk dollar"
+    number: "084"
+  CAD:
+    name: "Canadiske dollar"
+    number: "124"
+  CDF:
+    name: "congolesisk franc"
+    number: "976"
+  CHE:
+    name: "WIR-euro (regningsenhed)"
+    number: "947"
+    kind: fund
+  CHF:
+    name: "schweizerfranc"
+    number: "756"
+  CHW:
+    name: "WIR-franc (regningsenhed)"
+    number: "948"
+    kind: fund
+  CLF:
+    name: "Chilensk regningsenhed (UF)"
+    number: "990"
+    kind: fund
+  CLP:
+    name: "chilensk peso"
+    number: "152"
+  CNY:
+    name: "kinesisk yuan"
+    number: "156"
+  COP:
+    name: "colombiansk peso"
+    number: "170"
+  COU:
+    name: "Colombiansk realværdienhed (UVR)"
+    number: "970"
+    kind: fund
+  CRC:
+    name: "costaricansk colón"
+    number: "188"
+  CUP:
+    name: "cubansk peso"
+    number: "192"
+  CVE:
+    name: "kapverdisk escudo"
+    number: "132"
+  CZK:
+    name: "tjekkisk koruna"
+    number: "203"
+  DJF:
+    name: "djiboutisk franc"
+    number: "262"
+  DKK:
+    name: "Danske kroner"
+    number: "208"
+  DOP:
+    name: "dominikansk peso"
+    number: "214"
+  DZD:
+    name: "algerisk dinar"
+    number: "012"
+  EGP:
+    name: "egyptisk pund"
+    number: "818"
+  ERN:
+    name: "eritreisk nakfa"
+    number: "232"
+  ETB:
+    name: "etiopisk birr"
+    number: "230"
+  EUR:
+    name: "Euro"
+    number: "978"
+  FJD:
+    name: "fijiansk dollar"
+    number: "242"
+  FKP:
+    name: "pund fra Falklandsøerne"
+    number: "238"
+  GBP:
+    name: "britisk pund"
+    number: "826"
+  GEL:
+    name: "georgisk lari"
+    number: "981"
+  GHS:
+    name: "ghanesisk cedi"
+    number: "936"
+  GIP:
+    name: "gibraltarisk pund"
+    number: "292"
+  GMD:
+    name: "gambisk dalasi"
+    number: "270"
+  GNF:
+    name: "guineansk franc"
+    number: "324"
+  GTQ:
+    name: "guatemalansk quetzal"
+    number: "320"
+  GYD:
+    name: "guyansk dollar"
+    number: "328"
+  HKD:
+    name: "hongkongsk dollar"
+    number: "344"
+  HNL:
+    name: "honduransk lempira"
+    number: "340"
+  HTG:
+    name: "haitisk gourde"
+    number: "332"
+  HUF:
+    name: "ungarsk forint"
+    number: "348"
+  IDR:
+    name: "indonesisk rupiah"
+    number: "360"
+  ILS:
+    name: "ny israelsk shekel"
+    number: "376"
+  INR:
+    name: "indisk rupee"
+    number: "356"
+  IQD:
+    name: "irakisk dinar"
+    number: "368"
+  IRR:
+    name: "iransk rial"
+    number: "364"
+  ISK:
+    name: "islandsk krone"
+    number: "352"
+  JMD:
+    name: "jamaicansk dollar"
+    number: "388"
+  JOD:
+    name: "jordansk dinar"
+    number: "400"
+  JPY:
+    name: "japansk yen"
+    number: "392"
+  KES:
+    name: "kenyansk shilling"
+    number: "404"
+  KGS:
+    name: "kirgisisk som"
+    number: "417"
+  KHR:
+    name: "cambodjansk riel"
+    number: "116"
+  KMF:
+    name: "comorisk franc"
+    number: "174"
+  KPW:
+    name: "nordkoreansk won"
+    number: "408"
+  KRW:
+    name: "sydkoreansk won"
+    number: "410"
+  KWD:
+    name: "kuwaitisk dinar"
+    number: "414"
+  KYD:
+    name: "caymansk dollar"
+    number: "136"
+  KZT:
+    name: "kasakhisk tenge"
+    number: "398"
+  LAK:
+    name: "laotisk kip"
+    number: "418"
+  LBP:
+    name: "libanesisk pund"
+    number: "422"
+  LKR:
+    name: "srilankansk rupee"
+    number: "144"
+  LRD:
+    name: "liberisk dollar"
+    number: "430"
+  LSL:
+    name: "lesothisk loti"
+    number: "426"
+  LYD:
+    name: "libysk dinar"
+    number: "434"
+  MAD:
+    name: "marokkansk dirham"
+    number: "504"
+  MDL:
+    name: "moldovisk leu"
+    number: "498"
+  MGA:
+    name: "madagaskisk ariary"
+    number: "969"
+  MKD:
+    name: "makedonsk denar"
+    number: "807"
+  MMK:
+    name: "myanmarsk kyat"
+    number: "104"
+  MNT:
+    name: "mongolsk tugrik"
+    number: "496"
+  MOP:
+    name: "macaosk pataca"
+    number: "446"
+  MRU:
+    name: "mauritansk ouguiya"
+    number: "929"
+  MUR:
+    name: "mauritisk rupee"
+    number: "480"
+  MVR:
+    name: "maldivisk rufiyaa"
+    number: "462"
+  MWK:
+    name: "malawisk kwacha"
+    number: "454"
+  MXN:
+    name: "mexicansk peso"
+    number: "484"
+  MXV:
+    name: "Mexicansk investeringsenhed (UDI)"
+    number: "979"
+    kind: fund
+  MYR:
+    name: "malaysisk ringgit"
+    number: "458"
+  MZN:
+    name: "mozambiquisk metical"
+    number: "943"
+  NAD:
+    name: "namibisk dollar"
+    number: "516"
+  NGN:
+    name: "nigeriansk naira"
+    number: "566"
+  NIO:
+    name: "nicaraguansk cordoba"
+    number: "558"
+  NOK:
+    name: "norsk krone"
+    number: "578"
+  NPR:
+    name: "nepalesisk rupee"
+    number: "524"
+  NZD:
+    name: "newzealandsk dollar"
+    number: "554"
+  OMR:
+    name: "omansk rial"
+    number: "512"
+  PAB:
+    name: "panamansk balboa"
+    number: "590"
+  PEN:
+    name: "peruansk sol"
+    number: "604"
+  PGK:
+    name: "papuansk kina"
+    number: "598"
+  PHP:
+    name: "filippinsk peso"
+    number: "608"
+  PKR:
+    name: "pakistansk rupee"
+    number: "586"
+  PLN:
+    name: "polsk zloty"
+    number: "985"
+  PYG:
+    name: "paraguaysk guarani"
+    number: "600"
+  QAR:
+    name: "qatarsk rial"
+    number: "634"
+  RON:
+    name: "rumænsk leu"
+    number: "946"
+  RSD:
+    name: "serbisk dinar"
+    number: "941"
+  RUB:
+    name: "russisk rubel"
+    number: "643"
+  RWF:
+    name: "rwandisk franc"
+    number: "646"
+  SAR:
+    name: "saudiarabisk riyal"
+    number: "682"
+  SBD:
+    name: "salomonsk dollar"
+    number: "090"
+  SCR:
+    name: "seychellisk rupee"
+    number: "690"
+  SDG:
+    name: "sudansk pund"
+    number: "938"
+  SEK:
+    name: "svensk krone"
+    number: "752"
+  SGD:
+    name: "singaporeansk dollar"
+    number: "702"
+  SHP:
+    name: "pund fra Saint Helena"
+    number: "654"
+  SLE:
+    name: "sierraleonsk leone"
+    number: "925"
+  SOS:
+    name: "somalisk shilling"
+    number: "706"
+  SRD:
+    name: "surinamsk dollar"
+    number: "968"
+  SSP:
+    name: "sydsudansk pund"
+    number: "728"
+  STN:
+    name: "dobra fra Sao Tome og Principe"
+    number: "930"
+  SVC:
+    name: "Salvadoransk colon"
+    number: "222"
+  SYP:
+    name: "syrisk pund"
+    number: "760"
+  SZL:
+    name: "swazilandsk lilangeni"
+    number: "748"
+  THB:
+    name: "thailandsk baht"
+    number: "764"
+  TJS:
+    name: "tadsjikisk somoni"
+    number: "972"
+  TMT:
+    name: "turkmensk manat"
+    number: "934"
+  TND:
+    name: "tunesisk dinar"
+    number: "788"
+  TOP:
+    name: "tongansk paʻanga"
+    number: "776"
+  TRY:
+    name: "tyrkisk lira"
+    number: "949"
+  TTD:
+    name: "trinidadisk dollar"
+    number: "780"
+  TWD:
+    name: "ny taiwansk dollar"
+    number: "901"
+  TZS:
+    name: "tanzanisk shilling"
+    number: "834"
+  UAH:
+    name: "ukrainsk grynia"
+    number: "980"
+  UGX:
+    name: "ugandisk shilling"
+    number: "800"
+  USD:
+    name: "Amerikanske dollar"
+    number: "840"
+  USN:
+    name: "Amerikanske dollar (afregning næste dag)"
+    number: "997"
+    kind: fund
+  UYI:
+    name: "Uruguayansk peso i indekserede enheder (UI)"
+    number: "940"
+    kind: fund
+  UYU:
+    name: "uruguayansk peso"
+    number: "858"
+  UYW:
+    name: "Uruguayansk lønindeksenhed (UP)"
+    number: "927"
+    kind: fund
+  UZS:
+    name: "usbekisk sum"
+    number: "860"
+  VED:
+    name: "Bolívar Soberano"
+    number: "926"
+  VES:
+    name: "venezuelansk bolivar"
+    number: "928"
+  VND:
+    name: "vietnamesisk dong"
+    number: "704"
+  VUV:
+    name: "vanuaisk vatu"
+    number: "548"
+  WST:
+    name: "samoansk tala"
+    number: "882"
+  XAF:
+    name: "CFA-franc (BEAC)"
+    number: "950"
+  XCD:
+    name: "østkaribisk dollar"
+    number: "951"
+  XCG:
+    name: "caribiske gylden"
+    number: "532"
+  XDR:
+    name: "Særlige trækningsrettigheder (SDR)"
+    number: "960"
+  XOF:
+    name: "CFA-franc BCEAO"
+    number: "952"
+  XPF:
+    name: "CFP-franc"
+    number: "953"
+  XSU:
+    name: "Sucre"
+    number: "994"
+  XUA:
+    name: "ADB-regningsenhed"
+    number: "965"
+  YER:
+    name: "yemenitisk rial"
+    number: "886"
+  ZAR:
+    name: "sydafrikansk rand"
+    number: "710"
+  ZMW:
+    name: "zambisk kwacha"
+    number: "967"
+  ZWG:
+    name: "Zimbabwe Gold"
+    number: "924"
+
+regions:
+  europe:
+    name: "Europa"
+    countries:
+      AD:
+        name: "Andorra"
+        currencies:
+          EUR: "Euro"
+      AL:
+        name: "Albanien"
+        currencies:
+          ALL: "albansk lek"
+      AT:
+        name: "Østrig"
+        currencies:
+          EUR: "Euro"
+      AX:
+        name: "Åland"
+        currencies:
+          EUR: "Euro"
+      BA:
+        name: "Bosnien-Hercegovina"
+        currencies:
+          BAM: "bosnien-hercegovinsk konvertibel mark"
+      BE:
+        name: "Belgien"
+        currencies:
+          EUR: "Euro"
+      BG:
+        name: "Bulgarien"
+        currencies:
+          EUR: "Euro"
+      BY:
+        name: "Belarus"
+        currencies:
+          BYN: "hviderussisk rubel"
+      CH:
+        name: "Schweiz"
+        currencies:
+          CHE: "WIR-euro (regningsenhed)"
+          CHF: "schweizerfranc"
+          CHW: "WIR-franc (regningsenhed)"
+      CY:
+        name: "Cypern"
+        currencies:
+          EUR: "Euro"
+      CZ:
+        name: "Tjekkiet"
+        currencies:
+          CZK: "tjekkisk koruna"
+      DE:
+        name: "Tyskland"
+        currencies:
+          EUR: "Euro"
+      DK:
+        name: "Danmark"
+        currencies:
+          DKK: "Danske kroner"
+      EE:
+        name: "Estland"
+        currencies:
+          EUR: "Euro"
+      ES:
+        name: "Spanien"
+        currencies:
+          EUR: "Euro"
+      FI:
+        name: "Finland"
+        currencies:
+          EUR: "Euro"
+      FO:
+        name: "Færøerne"
+        currencies:
+          DKK: "Danske kroner"
+      FR:
+        name: "Frankrig"
+        currencies:
+          EUR: "Euro"
+      GB:
+        name: "Storbritannien"
+        currencies:
+          GBP: "britisk pund"
+      GG:
+        name: "Guernsey"
+        currencies:
+          GBP: "britisk pund"
+      GI:
+        name: "Gibraltar"
+        currencies:
+          GIP: "gibraltarisk pund"
+      GR:
+        name: "Grækenland"
+        currencies:
+          EUR: "Euro"
+      HR:
+        name: "Kroatien"
+        currencies:
+          EUR: "Euro"
+      HU:
+        name: "Ungarn"
+        currencies:
+          HUF: "ungarsk forint"
+      IE:
+        name: "Irland"
+        currencies:
+          EUR: "Euro"
+      IM:
+        name: "Isle of Man"
+        currencies:
+          GBP: "britisk pund"
+      IS:
+        name: "Island"
+        currencies:
+          ISK: "islandsk krone"
+      IT:
+        name: "Italien"
+        currencies:
+          EUR: "Euro"
+      JE:
+        name: "Jersey"
+        currencies:
+          GBP: "britisk pund"
+      LI:
+        name: "Liechtenstein"
+        currencies:
+          CHF: "schweizerfranc"
+      LT:
+        name: "Litauen"
+        currencies:
+          EUR: "Euro"
+      LU:
+        name: "Luxembourg"
+        currencies:
+          EUR: "Euro"
+      LV:
+        name: "Letland"
+        currencies:
+          EUR: "Euro"
+      MC:
+        name: "Monaco"
+        currencies:
+          EUR: "Euro"
+      MD:
+        name: "Moldova"
+        currencies:
+          MDL: "moldovisk leu"
+      ME:
+        name: "Montenegro"
+        currencies:
+          EUR: "Euro"
+      MK:
+        name: "Nordmakedonien"
+        currencies:
+          MKD: "makedonsk denar"
+      MT:
+        name: "Malta"
+        currencies:
+          EUR: "Euro"
+      NL:
+        name: "Nederlandene"
+        currencies:
+          EUR: "Euro"
+      NO:
+        name: "Norge"
+        currencies:
+          NOK: "norsk krone"
+      PL:
+        name: "Polen"
+        currencies:
+          PLN: "polsk zloty"
+      PT:
+        name: "Portugal"
+        currencies:
+          EUR: "Euro"
+      RO:
+        name: "Rumænien"
+        currencies:
+          RON: "rumænsk leu"
+      RS:
+        name: "Serbien"
+        currencies:
+          RSD: "serbisk dinar"
+      RU:
+        name: "Rusland"
+        currencies:
+          RUB: "russisk rubel"
+      SE:
+        name: "Sverige"
+        currencies:
+          SEK: "svensk krone"
+      SI:
+        name: "Slovenien"
+        currencies:
+          EUR: "Euro"
+      SJ:
+        name: "Svalbard og Jan Mayen"
+        currencies:
+          NOK: "norsk krone"
+      SK:
+        name: "Slovakiet"
+        currencies:
+          EUR: "Euro"
+      SM:
+        name: "San Marino"
+        currencies:
+          EUR: "Euro"
+      UA:
+        name: "Ukraine"
+        currencies:
+          UAH: "ukrainsk grynia"
+      VA:
+        name: "Vatikanstaten"
+        currencies:
+          EUR: "Euro"
+  north_america:
+    name: "Nordamerika"
+    countries:
+      BM:
+        name: "Bermuda"
+        currencies:
+          BMD: "bermudansk dollar"
+      CA:
+        name: "Canada"
+        currencies:
+          CAD: "Canadiske dollar"
+      GL:
+        name: "Grønland"
+        currencies:
+          DKK: "Danske kroner"
+      MX:
+        name: "Mexico"
+        currencies:
+          MXN: "mexicansk peso"
+          MXV: "Mexicansk investeringsenhed (UDI)"
+      PM:
+        name: "Saint Pierre og Miquelon"
+        currencies:
+          EUR: "Euro"
+      US:
+        name: "USA"
+        currencies:
+          USD: "Amerikanske dollar"
+          USN: "Amerikanske dollar (afregning næste dag)"
+  central_america_caribbean:
+    name: "Mellemamerika og Caribien"
+    countries:
+      AG:
+        name: "Antigua og Barbuda"
+        currencies:
+          XCD: "østkaribisk dollar"
+      AI:
+        name: "Anguilla"
+        currencies:
+          XCD: "østkaribisk dollar"
+      AW:
+        name: "Aruba"
+        currencies:
+          AWG: "arubansk florin"
+      BB:
+        name: "Barbados"
+        currencies:
+          BBD: "barbadisk dollar"
+      BL:
+        name: "Saint Barthélemy"
+        currencies:
+          EUR: "Euro"
+      BQ:
+        name: "De tidligere Nederlandske Antiller"
+        currencies:
+          USD: "Amerikanske dollar"
+      BS:
+        name: "Bahamas"
+        currencies:
+          BSD: "bahamansk dollar"
+      BZ:
+        name: "Belize"
+        currencies:
+          BZD: "belizisk dollar"
+      CR:
+        name: "Costa Rica"
+        currencies:
+          CRC: "costaricansk colón"
+      CU:
+        name: "Cuba"
+        currencies:
+          CUP: "cubansk peso"
+      CW:
+        name: "Curaçao"
+        currencies:
+          XCG: "caribiske gylden"
+      DM:
+        name: "Dominica"
+        currencies:
+          XCD: "østkaribisk dollar"
+      DO:
+        name: "Den Dominikanske Republik"
+        currencies:
+          DOP: "dominikansk peso"
+      GD:
+        name: "Grenada"
+        currencies:
+          XCD: "østkaribisk dollar"
+      GP:
+        name: "Guadeloupe"
+        currencies:
+          EUR: "Euro"
+      GT:
+        name: "Guatemala"
+        currencies:
+          GTQ: "guatemalansk quetzal"
+      HN:
+        name: "Honduras"
+        currencies:
+          HNL: "honduransk lempira"
+      HT:
+        name: "Haiti"
+        currencies:
+          HTG: "haitisk gourde"
+          USD: "Amerikanske dollar"
+      JM:
+        name: "Jamaica"
+        currencies:
+          JMD: "jamaicansk dollar"
+      KN:
+        name: "Saint Kitts og Nevis"
+        currencies:
+          XCD: "østkaribisk dollar"
+      KY:
+        name: "Caymanøerne"
+        currencies:
+          KYD: "caymansk dollar"
+      LC:
+        name: "Saint Lucia"
+        currencies:
+          XCD: "østkaribisk dollar"
+      MF:
+        name: "Saint Martin"
+        currencies:
+          EUR: "Euro"
+      MQ:
+        name: "Martinique"
+        currencies:
+          EUR: "Euro"
+      MS:
+        name: "Montserrat"
+        currencies:
+          XCD: "østkaribisk dollar"
+      NI:
+        name: "Nicaragua"
+        currencies:
+          NIO: "nicaraguansk cordoba"
+      PA:
+        name: "Panama"
+        currencies:
+          PAB: "panamansk balboa"
+          USD: "Amerikanske dollar"
+      PR:
+        name: "Puerto Rico"
+        currencies:
+          USD: "Amerikanske dollar"
+      SV:
+        name: "El Salvador"
+        currencies:
+          SVC: "Salvadoransk colon"
+          USD: "Amerikanske dollar"
+      SX:
+        name: "Sint Maarten"
+        currencies:
+          XCG: "caribiske gylden"
+      TC:
+        name: "Turks- og Caicosøerne"
+        currencies:
+          USD: "Amerikanske dollar"
+      TT:
+        name: "Trinidad og Tobago"
+        currencies:
+          TTD: "trinidadisk dollar"
+      VC:
+        name: "Saint Vincent og Grenadinerne"
+        currencies:
+          XCD: "østkaribisk dollar"
+      VG:
+        name: "De Britiske Jomfruøer"
+        currencies:
+          USD: "Amerikanske dollar"
+      VI:
+        name: "De Amerikanske Jomfruøer"
+        currencies:
+          USD: "Amerikanske dollar"
+  south_america:
+    name: "Sydamerika"
+    countries:
+      AR:
+        name: "Argentina"
+        currencies:
+          ARS: "argentinsk peso"
+      BO:
+        name: "Bolivia"
+        currencies:
+          BOB: "boliviansk boliviano"
+          BOV: "Boliviansk Mvdol (regningsenhed)"
+      BR:
+        name: "Brasilien"
+        currencies:
+          BRL: "brasiliansk real"
+      CL:
+        name: "Chile"
+        currencies:
+          CLF: "Chilensk regningsenhed (UF)"
+          CLP: "chilensk peso"
+      CO:
+        name: "Colombia"
+        currencies:
+          COP: "colombiansk peso"
+          COU: "Colombiansk realværdienhed (UVR)"
+      EC:
+        name: "Ecuador"
+        currencies:
+          USD: "Amerikanske dollar"
+      FK:
+        name: "Falklandsøerne"
+        currencies:
+          FKP: "pund fra Falklandsøerne"
+      GF:
+        name: "Fransk Guyana"
+        currencies:
+          EUR: "Euro"
+      GY:
+        name: "Guyana"
+        currencies:
+          GYD: "guyansk dollar"
+      PE:
+        name: "Peru"
+        currencies:
+          PEN: "peruansk sol"
+      PY:
+        name: "Paraguay"
+        currencies:
+          PYG: "paraguaysk guarani"
+      SR:
+        name: "Surinam"
+        currencies:
+          SRD: "surinamsk dollar"
+      UY:
+        name: "Uruguay"
+        currencies:
+          UYI: "Uruguayansk peso i indekserede enheder (UI)"
+          UYU: "uruguayansk peso"
+          UYW: "Uruguayansk lønindeksenhed (UP)"
+      VE:
+        name: "Venezuela"
+        currencies:
+          VED: "Bolívar Soberano"
+          VES: "venezuelansk bolivar"
+  north_africa:
+    name: "Nordafrika"
+    countries:
+      DZ:
+        name: "Algeriet"
+        currencies:
+          DZD: "algerisk dinar"
+      EG:
+        name: "Egypten"
+        currencies:
+          EGP: "egyptisk pund"
+      EH:
+        name: "Vestsahara"
+        currencies:
+          MAD: "marokkansk dirham"
+      LY:
+        name: "Libyen"
+        currencies:
+          LYD: "libysk dinar"
+      MA:
+        name: "Marokko"
+        currencies:
+          MAD: "marokkansk dirham"
+      SD:
+        name: "Sudan"
+        currencies:
+          SDG: "sudansk pund"
+      TN:
+        name: "Tunesien"
+        currencies:
+          TND: "tunesisk dinar"
+  sub_saharan_africa:
+    name: "Afrika syd for Sahara"
+    countries:
+      AO:
+        name: "Angola"
+        currencies:
+          AOA: "angolansk kwanza"
+      BF:
+        name: "Burkina Faso"
+        currencies:
+          XOF: "CFA-franc BCEAO"
+      BI:
+        name: "Burundi"
+        currencies:
+          BIF: "burundisk franc"
+      BJ:
+        name: "Benin"
+        currencies:
+          XOF: "CFA-franc BCEAO"
+      BW:
+        name: "Botswana"
+        currencies:
+          BWP: "botswansk pula"
+      CD:
+        name: "Congo-Kinshasa"
+        currencies:
+          CDF: "congolesisk franc"
+      CF:
+        name: "Den Centralafrikanske Republik"
+        currencies:
+          XAF: "CFA-franc (BEAC)"
+      CG:
+        name: "Congo-Brazzaville"
+        currencies:
+          XAF: "CFA-franc (BEAC)"
+      CI:
+        name: "Elfenbenskysten"
+        currencies:
+          XOF: "CFA-franc BCEAO"
+      CM:
+        name: "Cameroun"
+        currencies:
+          XAF: "CFA-franc (BEAC)"
+      CV:
+        name: "Kap Verde"
+        currencies:
+          CVE: "kapverdisk escudo"
+      DJ:
+        name: "Djibouti"
+        currencies:
+          DJF: "djiboutisk franc"
+      ER:
+        name: "Eritrea"
+        currencies:
+          ERN: "eritreisk nakfa"
+      ET:
+        name: "Etiopien"
+        currencies:
+          ETB: "etiopisk birr"
+      GA:
+        name: "Gabon"
+        currencies:
+          XAF: "CFA-franc (BEAC)"
+      GH:
+        name: "Ghana"
+        currencies:
+          GHS: "ghanesisk cedi"
+      GM:
+        name: "Gambia"
+        currencies:
+          GMD: "gambisk dalasi"
+      GN:
+        name: "Guinea"
+        currencies:
+          GNF: "guineansk franc"
+      GQ:
+        name: "Ækvatorialguinea"
+        currencies:
+          XAF: "CFA-franc (BEAC)"
+      GW:
+        name: "Guinea-Bissau"
+        currencies:
+          XOF: "CFA-franc BCEAO"
+      KE:
+        name: "Kenya"
+        currencies:
+          KES: "kenyansk shilling"
+      KM:
+        name: "Comorerne"
+        currencies:
+          KMF: "comorisk franc"
+      LR:
+        name: "Liberia"
+        currencies:
+          LRD: "liberisk dollar"
+      LS:
+        name: "Lesotho"
+        currencies:
+          LSL: "lesothisk loti"
+          ZAR: "sydafrikansk rand"
+      MG:
+        name: "Madagaskar"
+        currencies:
+          MGA: "madagaskisk ariary"
+      ML:
+        name: "Mali"
+        currencies:
+          XOF: "CFA-franc BCEAO"
+      MR:
+        name: "Mauretanien"
+        currencies:
+          MRU: "mauritansk ouguiya"
+      MU:
+        name: "Mauritius"
+        currencies:
+          MUR: "mauritisk rupee"
+      MW:
+        name: "Malawi"
+        currencies:
+          MWK: "malawisk kwacha"
+      MZ:
+        name: "Mozambique"
+        currencies:
+          MZN: "mozambiquisk metical"
+      NA:
+        name: "Namibia"
+        currencies:
+          NAD: "namibisk dollar"
+          ZAR: "sydafrikansk rand"
+      NE:
+        name: "Niger"
+        currencies:
+          XOF: "CFA-franc BCEAO"
+      NG:
+        name: "Nigeria"
+        currencies:
+          NGN: "nigeriansk naira"
+      RE:
+        name: "Réunion"
+        currencies:
+          EUR: "Euro"
+      RW:
+        name: "Rwanda"
+        currencies:
+          RWF: "rwandisk franc"
+      SC:
+        name: "Seychellerne"
+        currencies:
+          SCR: "seychellisk rupee"
+      SH:
+        name: "St. Helena"
+        currencies:
+          SHP: "pund fra Saint Helena"
+      SL:
+        name: "Sierra Leone"
+        currencies:
+          SLE: "sierraleonsk leone"
+      SN:
+        name: "Senegal"
+        currencies:
+          XOF: "CFA-franc BCEAO"
+      SO:
+        name: "Somalia"
+        currencies:
+          SOS: "somalisk shilling"
+      SS:
+        name: "Sydsudan"
+        currencies:
+          SSP: "sydsudansk pund"
+      ST:
+        name: "São Tomé og Príncipe"
+        currencies:
+          STN: "dobra fra Sao Tome og Principe"
+      SZ:
+        name: "Eswatini"
+        currencies:
+          SZL: "swazilandsk lilangeni"
+      TD:
+        name: "Tchad"
+        currencies:
+          XAF: "CFA-franc (BEAC)"
+      TG:
+        name: "Togo"
+        currencies:
+          XOF: "CFA-franc BCEAO"
+      TZ:
+        name: "Tanzania"
+        currencies:
+          TZS: "tanzanisk shilling"
+      UG:
+        name: "Uganda"
+        currencies:
+          UGX: "ugandisk shilling"
+      YT:
+        name: "Mayotte"
+        currencies:
+          EUR: "Euro"
+      ZA:
+        name: "Sydafrika"
+        currencies:
+          ZAR: "sydafrikansk rand"
+      ZM:
+        name: "Zambia"
+        currencies:
+          ZMW: "zambisk kwacha"
+      ZW:
+        name: "Zimbabwe"
+        currencies:
+          ZWG: "Zimbabwe Gold"
+  middle_east:
+    name: "Mellemøsten"
+    countries:
+      AE:
+        name: "De Forenede Arabiske Emirater"
+        currencies:
+          AED: "dirham fra de Forenede Arabiske Emirater"
+      BH:
+        name: "Bahrain"
+        currencies:
+          BHD: "bahrainsk dinar"
+      IL:
+        name: "Israel"
+        currencies:
+          ILS: "ny israelsk shekel"
+      IQ:
+        name: "Irak"
+        currencies:
+          IQD: "irakisk dinar"
+      IR:
+        name: "Iran"
+        currencies:
+          IRR: "iransk rial"
+      JO:
+        name: "Jordan"
+        currencies:
+          JOD: "jordansk dinar"
+      KW:
+        name: "Kuwait"
+        currencies:
+          KWD: "kuwaitisk dinar"
+      LB:
+        name: "Libanon"
+        currencies:
+          LBP: "libanesisk pund"
+      OM:
+        name: "Oman"
+        currencies:
+          OMR: "omansk rial"
+      PS:
+        name: "De palæstinensiske områder"
+        currency_status: "Ingen fælles valuta"
+      QA:
+        name: "Qatar"
+        currencies:
+          QAR: "qatarsk rial"
+      SA:
+        name: "Saudi-Arabien"
+        currencies:
+          SAR: "saudiarabisk riyal"
+      SY:
+        name: "Syrien"
+        currencies:
+          SYP: "syrisk pund"
+      TR:
+        name: "Tyrkiet"
+        currencies:
+          TRY: "tyrkisk lira"
+      YE:
+        name: "Yemen"
+        currencies:
+          YER: "yemenitisk rial"
+  asia:
+    name: "Asien"
+    countries:
+      AF:
+        name: "Afghanistan"
+        currencies:
+          AFN: "afghansk afghani"
+      AM:
+        name: "Armenien"
+        currencies:
+          AMD: "armensk dram"
+      AZ:
+        name: "Aserbajdsjan"
+        currencies:
+          AZN: "aserbajdsjansk manat"
+      BD:
+        name: "Bangladesh"
+        currencies:
+          BDT: "bangladeshisk taka"
+      BN:
+        name: "Brunei"
+        currencies:
+          BND: "bruneisk dollar"
+      BT:
+        name: "Bhutan"
+        currencies:
+          BTN: "bhutansk ngultrum"
+          INR: "indisk rupee"
+      CC:
+        name: "Cocosøerne"
+        currencies:
+          AUD: "australsk dollar"
+      CN:
+        name: "Kina"
+        currencies:
+          CNY: "kinesisk yuan"
+      CX:
+        name: "Juleøen"
+        currencies:
+          AUD: "australsk dollar"
+      GE:
+        name: "Georgien"
+        currencies:
+          GEL: "georgisk lari"
+      HK:
+        name: "SAR Hongkong"
+        currencies:
+          HKD: "hongkongsk dollar"
+      ID:
+        name: "Indonesien"
+        currencies:
+          IDR: "indonesisk rupiah"
+      IN:
+        name: "Indien"
+        currencies:
+          INR: "indisk rupee"
+      IO:
+        name: "Det Britiske Territorium i Det Indiske Ocean"
+        currencies:
+          USD: "Amerikanske dollar"
+      JP:
+        name: "Japan"
+        currencies:
+          JPY: "japansk yen"
+      KG:
+        name: "Kirgisistan"
+        currencies:
+          KGS: "kirgisisk som"
+      KH:
+        name: "Cambodja"
+        currencies:
+          KHR: "cambodjansk riel"
+      KP:
+        name: "Nordkorea"
+        currencies:
+          KPW: "nordkoreansk won"
+      KR:
+        name: "Sydkorea"
+        currencies:
+          KRW: "sydkoreansk won"
+      KZ:
+        name: "Kasakhstan"
+        currencies:
+          KZT: "kasakhisk tenge"
+      LA:
+        name: "Laos"
+        currencies:
+          LAK: "laotisk kip"
+      LK:
+        name: "Sri Lanka"
+        currencies:
+          LKR: "srilankansk rupee"
+      MM:
+        name: "Myanmar (Burma)"
+        currencies:
+          MMK: "myanmarsk kyat"
+      MN:
+        name: "Mongoliet"
+        currencies:
+          MNT: "mongolsk tugrik"
+      MO:
+        name: "SAR Macao"
+        currencies:
+          MOP: "macaosk pataca"
+      MV:
+        name: "Maldiverne"
+        currencies:
+          MVR: "maldivisk rufiyaa"
+      MY:
+        name: "Malaysia"
+        currencies:
+          MYR: "malaysisk ringgit"
+      NP:
+        name: "Nepal"
+        currencies:
+          NPR: "nepalesisk rupee"
+      PH:
+        name: "Filippinerne"
+        currencies:
+          PHP: "filippinsk peso"
+      PK:
+        name: "Pakistan"
+        currencies:
+          PKR: "pakistansk rupee"
+      SG:
+        name: "Singapore"
+        currencies:
+          SGD: "singaporeansk dollar"
+      TH:
+        name: "Thailand"
+        currencies:
+          THB: "thailandsk baht"
+      TJ:
+        name: "Tadsjikistan"
+        currencies:
+          TJS: "tadsjikisk somoni"
+      TL:
+        name: "Timor-Leste"
+        currencies:
+          USD: "Amerikanske dollar"
+      TM:
+        name: "Turkmenistan"
+        currencies:
+          TMT: "turkmensk manat"
+      TW:
+        name: "Taiwan"
+        currencies:
+          TWD: "ny taiwansk dollar"
+      UZ:
+        name: "Usbekistan"
+        currencies:
+          UZS: "usbekisk sum"
+      VN:
+        name: "Vietnam"
+        currencies:
+          VND: "vietnamesisk dong"
+  oceania:
+    name: "Oceanien"
+    countries:
+      AS:
+        name: "Amerikansk Samoa"
+        currencies:
+          USD: "Amerikanske dollar"
+      AU:
+        name: "Australien"
+        currencies:
+          AUD: "australsk dollar"
+      CK:
+        name: "Cookøerne"
+        currencies:
+          NZD: "newzealandsk dollar"
+      FJ:
+        name: "Fiji"
+        currencies:
+          FJD: "fijiansk dollar"
+      FM:
+        name: "Mikronesien"
+        currencies:
+          USD: "Amerikanske dollar"
+      GU:
+        name: "Guam"
+        currencies:
+          USD: "Amerikanske dollar"
+      KI:
+        name: "Kiribati"
+        currencies:
+          AUD: "australsk dollar"
+      MH:
+        name: "Marshalløerne"
+        currencies:
+          USD: "Amerikanske dollar"
+      MP:
+        name: "Nordmarianerne"
+        currencies:
+          USD: "Amerikanske dollar"
+      NC:
+        name: "Ny Kaledonien"
+        currencies:
+          XPF: "CFP-franc"
+      NF:
+        name: "Norfolk Island"
+        currencies:
+          AUD: "australsk dollar"
+      NR:
+        name: "Nauru"
+        currencies:
+          AUD: "australsk dollar"
+      NU:
+        name: "Niue"
+        currencies:
+          NZD: "newzealandsk dollar"
+      NZ:
+        name: "New Zealand"
+        currencies:
+          NZD: "newzealandsk dollar"
+      PF:
+        name: "Fransk Polynesien"
+        currencies:
+          XPF: "CFP-franc"
+      PG:
+        name: "Papua Ny Guinea"
+        currencies:
+          PGK: "papuansk kina"
+      PN:
+        name: "Pitcairn"
+        currencies:
+          NZD: "newzealandsk dollar"
+      PW:
+        name: "Palau"
+        currencies:
+          USD: "Amerikanske dollar"
+      SB:
+        name: "Salomonøerne"
+        currencies:
+          SBD: "salomonsk dollar"
+      TK:
+        name: "Tokelau"
+        currencies:
+          NZD: "newzealandsk dollar"
+      TO:
+        name: "Tonga"
+        currencies:
+          TOP: "tongansk paʻanga"
+      TV:
+        name: "Tuvalu"
+        currencies:
+          AUD: "australsk dollar"
+      UM:
+        name: "Amerikanske oversøiske øer"
+        currencies:
+          USD: "Amerikanske dollar"
+      VU:
+        name: "Vanuatu"
+        currencies:
+          VUV: "vanuaisk vatu"
+      WF:
+        name: "Wallis og Futuna"
+        currencies:
+          XPF: "CFP-franc"
+      WS:
+        name: "Samoa"
+        currencies:
+          WST: "samoansk tala"
+
+supplementary:
+  antarctic_territories:
+    name: "Antarktiske områder"
+    countries:
+      AQ:
+        name: "Antarktis"
+        currency_status: "Ingen fælles valuta"
+      BV:
+        name: "Bouvetøen"
+        currencies:
+          NOK: "norsk krone"
+      GS:
+        name: "South Georgia og De Sydlige Sandwichøer"
+        currency_status: "Ingen fælles valuta"
+      HM:
+        name: "Heard Island og McDonald Islands"
+        currencies:
+          AUD: "australsk dollar"
+      TF:
+        name: "De Franske Besiddelser i Det Sydlige Indiske Ocean og Antarktis"
+        currencies:
+          EUR: "Euro"
+  international:
+    name: "Internationale regningsenheder"
+    institutions:
+      imf:
+        name: "Den Internationale Valutafond (IMF)"
+        currencies:
+          XDR: "Særlige trækningsrettigheder (SDR)"
+      sucre:
+        name: "Det regionale betalingssystem SUCRE"
+        currencies:
+          XSU: "Sucre"
+      african_development_bank:
+        name: "Den Afrikanske Udviklingsbanks medlemslande"
+        currencies:
+          XUA: "ADB-regningsenhed"
