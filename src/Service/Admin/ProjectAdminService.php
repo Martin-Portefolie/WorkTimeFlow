@@ -42,7 +42,7 @@ final class ProjectAdminService
         $client = ctype_digit($clientId) ? $this->clients->find((int) $clientId) : null;
         if (!$client) $this->invalid('client');
         $rawDate = $this->text($data, 'deadline');
-        $deadline = \DateTimeImmutable::createFromFormat('!Y-m-d', $rawDate);
+        $deadline = \DateTime::createFromFormat('!Y-m-d', $rawDate);
         if (!$deadline || $deadline->format('Y-m-d') !== $rawDate || $deadline->format('Y') < '1000') $this->invalid('deadline');
         $priority = Priority::tryFrom($this->text($data, 'priority'));
         if (!$priority) $this->invalid('priority');

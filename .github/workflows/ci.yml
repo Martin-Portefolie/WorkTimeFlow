@@ -55,7 +55,7 @@ jobs:
         run: python3 .github/scripts/check_changelog.py "$BASE_SHA" "$HEAD_SHA"
 
   test:
-    name: Symfony and tests (PHP 8.4)
+    name: Symfony and tests (PHP 8.5.12)
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -89,7 +89,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5.12'
           extensions: ctype, curl, dom, gd, iconv, intl, mbstring, pdo_mysql, pdo_sqlite, xml, xmlwriter, zip
           coverage: none
           tools: composer:v2
@@ -99,6 +99,9 @@ jobs:
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Audit dependency security
+        run: composer audit --locked
 
       - name: Check PHP syntax
         run: find src tests migrations -name '*.php' -print0 | xargs -0 -n1 php -l
@@ -125,7 +128,7 @@ jobs:
       - name: Install browser driver
         run: vendor/bin/bdi detect drivers
 
-      - name: Test Company, Clients and Users in Chrome
+      - name: Test admin GUI in Chrome
         env:
           PANTHER_NO_SANDBOX: '1'
         run: composer test:browser

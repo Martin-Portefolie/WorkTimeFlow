@@ -1,6 +1,6 @@
 # Browser tests
 
-Panther runs real headless Chrome tests for Company, Clients and Users in Danish and English.
+Panther runs real headless Chrome tests for Company, Clients, Users and Projects in Danish and English.
 PHP needs `pdo_sqlite`, `curl` and `gd`; Google Chrome must be installed.
 
 From the project directory (on your host machine):
@@ -46,3 +46,7 @@ Welcome emails use the existing asynchronous Messenger routing. In development, 
 `docker compose exec app php bin/console messenger:consume async -vv` to process the
 queue. Delivery uses the configured `MAILER_DSN`; local Mailpit captures email rather
 than sending it to an external inbox.
+
+Projects coverage includes creation/cancellation, editing and archive status, team
+assignment/removal, clearing rates, estimate validation and persistence, and opening
+a project from its client modal.

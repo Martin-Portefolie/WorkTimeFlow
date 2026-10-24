@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Editable Projects GUI with inline creation, client/rate/team selection, estimates, payment/archive status, validation and Danish/English browser tests. Client project modals open the editable project panel.
 - Editable user role and active status in the admin GUI, including creation, with server-side protection against self-deactivation and removing your own administrator role.
 - Inline user name/email editing and user creation in the admin GUI, with duplicate-email validation, automatically generated initial passwords delivered through the existing welcome-email queue, and Danish/English browser tests.
 - Panther browser tests for Company and Clients in Danish and English, with an isolated SQLite database and CI screenshots on failure.
@@ -27,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - search feature
 
 ### Changed
+- Upgrade to PHP 8.5 and Symfony 8.1 with refreshed Composer dependencies; CI uses PHP 8.5.12 and Docker builds reject older PHP security patches.
+- Show project deadlines and overdue warnings directly in compact rows; use purple information buttons, amber editing accents and green save buttons.
+- Show budget calculation results and missing-input feedback directly below the calculation button; cover rates of 30 with browser tests.
+- Project time estimates use a 0–500 hour slider in five-hour steps, with live budget calculation and minute-based persistence; existing estimates remain unchanged until the slider is moved.
+- Compact project rows with separate detail, budget/time, team and todo/log modals; include last update, deadline alerts, time totals, optional budget calculation and the existing Word download.
 - Client rows show a clickable project count, opening a modal with active and archived projects grouped separately.
 - Restore project counts and clickable project names in client rows, including after inline saves.
 - Dashboard navigation loads the overview back into the admin panel and correctly updates the active sidebar item.

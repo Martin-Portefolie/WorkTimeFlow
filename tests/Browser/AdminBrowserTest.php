@@ -26,6 +26,7 @@ final class AdminBrowserTest extends PantherTestCase
     private int $activeProjectId;
     private int $inactiveProjectId;
     private int $memberId;
+    private int $teamId;
 
     protected function setUp(): void
     {
@@ -52,12 +53,18 @@ final class AdminBrowserTest extends PantherTestCase
             ->setRoles(['ROLE_USER'])->setIsActive(false)->setPassword($admin->getPassword());
         $company = (new Company())->setName('Panther company');
         $rate = (new Rate())->setName('Standard')->setValue('1250.75')->setCompany($company);
+        $hourlyRate = (new Rate())->setName('Hourly 30')->setValue('30.00')->setCompany($company);
         $customer = (new Customer())->setName('Existing client')->setContactPerson('Alice')
             ->setContactEmail('alice@example.test')->setContactPhone('+45 12 34 56 78')
             ->setAdress('Test street 12')->setPostalCode('0123')->setCity('Aarhus')->setCountry('Danmark');
-        $active = (new Project())->setName('Active website')->setClient($customer)->setRate($rate)->setDeadline(new \DateTime('+1 month'));
+        $team = (new \App\Entity\Team())->setName('Project team');
+        $active = (new Project())->setEstimatedTime(90)->setName('Active website')->setClient($customer)->setRate($rate)->setDeadline(new \DateTime('-1 day'));
         $inactive = (new Project())->setName('Archived website')->setClient($customer)->setArchived(true)->setDeadline(new \DateTime('-1 month'));
-        foreach ([$admin, $member, $company, $rate, $customer, $active, $inactive] as $entity) {
+        $todo = (new \App\Entity\Todo())->setName('Browser task')->setDateStart(new \DateTime('2026-10-01'))->setDateEnd(new \DateTime('2026-10-02'));
+        $log = (new \App\Entity\Timelog())->setUser($member)->setDate(new \DateTime('2026-10-01'))->setTotalMinutes(60)->setDescription('Browser work');
+        $active->addTodo($todo);
+        $todo->addTimelog($log);
+        foreach ([$admin, $member, $company, $rate, $hourlyRate, $customer, $team, $active, $inactive, $todo, $log] as $entity) {
             $em->persist($entity);
         }
         $em->flush();
@@ -66,6 +73,7 @@ final class AdminBrowserTest extends PantherTestCase
         $this->activeProjectId = $active->getId();
         $this->inactiveProjectId = $inactive->getId();
         $this->memberId = $member->getId();
+        $this->teamId = $team->getId();
         self::ensureKernelShutdown();
 
         $this->browser = self::createPantherClient([
@@ -156,6 +164,149 @@ final class AdminBrowserTest extends PantherTestCase
         self::assertTrue($createdUser->isActive());
         self::assertNotEmpty($createdUser->getPassword());
         self::assertStringNotContainsString($createdUser->getPassword(), $this->browser->getWebDriver()->getPageSource());
+    }
+
+    #[DataProvider('locales')]
+    public function testInlineProjectsAndRelations(string $locale): void
+    {
+        $this->login($locale);
+        $this->click('[data-testid="nav-projects"]');
+        $this->browser->waitForVisibility('[data-testid="projects-panel"]');
+        $row = '[data-project-row="' . $this->activeProjectId . '"]';
+        $this->browser->waitForVisibility($row . ' [data-testid="project-field-deadline"]');
+        self::assertSelectorTextContains($row . ' [data-testid="project-overdue"]', $locale === 'da' ? 'overskredet' : 'passed');
+        self::assertSelectorNotExists('[data-project-row="' . $this->inactiveProjectId . '"] [data-testid="project-overdue"]');
+        $this->fill($row . ' [data-testid="project-field-name"]', 'Updated website');
+        $this->projectDialog($row, 'details');
+        $this->select($row . ' [data-testid="project-field-priority"]', 'high');
+        $this->select($row . ' [data-testid="project-field-archived"]', '1');
+        $this->closeProjectDialog($row);
+        $this->projectDialog($row, 'budget');
+        self::assertSame('90', $this->value($row . ' [data-testid="project-field-estimatedMinutes"]'));
+        self::assertSelectorTextContains($row . ' [data-testid="project-estimated-time"]', '1h 30m');
+        $slider = $this->browser->getWebDriver()->findElement(WebDriverBy::cssSelector($row . ' [data-testid="project-field-estimatedHours"]'));
+        $slider->sendKeys([WebDriverKeys::HOME, WebDriverKeys::ARROW_RIGHT]);
+        self::assertSame('300', $this->value($row . ' [data-testid="project-field-estimatedMinutes"]'));
+        self::assertSelectorTextContains($row . ' [data-testid="project-estimated-time"]', '5h');
+        self::assertSame('6253.75', $this->value($row . ' [data-testid="project-field-estimatedBudget"]'));
+        $this->fill($row . ' [data-testid="project-field-estimatedBudget"]', '1200,50');
+        $this->closeProjectDialog($row);
+        $this->projectDialog($row, 'teams');
+        $this->click($row . ' [data-testid="project-field-team"][value="' . $this->teamId . '"]');
+        $this->click($row . ' dialog[open] [data-testid="project-dialog-save"]');
+        $this->saved($row . ' dialog[open]', $locale);
+        $this->browser->waitForVisibility($row . ' [data-testid="project-dialog-teams"][open]');
+        $this->closeProjectDialog($row);
+        self::assertSame('high', $this->value($row . ' [data-testid="project-field-priority"]'));
+        self::assertSame('1', $this->value($row . ' [data-testid="project-field-archived"]'));
+
+        $this->projectDialog($row, 'budget');
+        self::assertSelectorTextContains($row . ' [data-testid="project-time-used"]', '1h 0m');
+        self::assertSelectorTextContains($row . ' [data-testid="project-time-remaining"]', '4h 0m');
+        // Tampering with the hidden minutes must still be rejected by the server.
+        $this->browser->executeScript('document.querySelector("[data-project-row=\"' . $this->activeProjectId . '\"] input[name=estimatedMinutes]").value = "-1";');
+        $this->click($row . ' dialog[open] [data-testid="project-dialog-save"]');
+        $this->browser->waitForVisibility($row . ' dialog[open] [data-testid="save-status"][data-state="error"]');
+        $this->closeProjectDialog($row);
+        $this->projectDialog($row, 'todos');
+        $this->click($row . ' [data-testid="project-todo"] summary');
+        self::assertSelectorTextContains($row . ' [data-testid="project-timelog"]', 'Existing member');
+        self::assertSelectorTextContains($row . ' [data-testid="project-timelog"]', 'Browser work');
+        $this->browser->getWebDriver()->getKeyboard()->pressKey(WebDriverKeys::ESCAPE);
+        $this->browser->waitForInvisibility($row . ' dialog[open]');
+
+        $this->click('[data-testid="project-create"]');
+        $this->click('[data-testid="project-create"]');
+        $draft = '[data-project-row="new"]';
+        self::assertCount(1, $this->browser->getWebDriver()->findElements(WebDriverBy::cssSelector($draft)));
+        $this->fill($draft . ' [data-testid="project-field-name"]', 'New project');
+        $this->select($draft . ' [data-testid="project-field-client"]', (string) $this->customerId);
+        // The required deadline stays visible in the row.
+        $this->click($draft . ' [data-testid="project-save"]');
+        self::assertSelectorNotExists($draft . ' dialog[open]');
+        $this->browser->executeScript('document.querySelector("[data-project-row=new] input[name=deadline]").value = "2027-03-15";');
+        $this->projectDialog($draft, 'budget');
+        $this->select($draft . ' [data-testid="project-field-rate"]', '1');
+        $this->closeProjectDialog($draft);
+        $this->click($draft . ' [data-testid="project-save"]');
+        $this->browser->waitForInvisibility($draft);
+        self::assertSame('New project', $this->value('[data-testid="project-rows"] > tr:first-child input[name="name"]'));
+        self::assertSame('same-document', $this->browser->executeScript('return window.pantherPageMarker;'));
+        $this->click('[data-testid="project-create"]');
+        $this->click($draft . ' [data-testid="project-cancel"]');
+        $this->browser->waitForInvisibility($draft);
+
+        $this->openClients();
+        $client = '[data-client-row="' . $this->customerId . '"]';
+        $this->click($client . ' [data-testid="client-projects-open"]');
+        $dialog = $client . ' [data-testid="client-projects-dialog"][open]';
+        self::assertSelectorTextContains($dialog . ' [data-testid="client-projects-inactive"]', 'Updated website');
+        $this->click($dialog . ' [data-project-id="' . $this->activeProjectId . '"]');
+        $this->browser->waitForVisibility('[data-testid="projects-panel"]');
+        $this->projectDialog($row, 'budget');
+        self::assertSame('1200.50', $this->value($row . ' [data-testid="project-field-estimatedBudget"]'));
+        self::assertSame('300', $this->value($row . ' [data-testid="project-field-estimatedMinutes"]'));
+        $this->select($row . ' [data-testid="project-field-rate"]', '');
+        $this->closeProjectDialog($row);
+        $this->projectDialog($row, 'teams');
+        self::assertTrue($this->browser->getWebDriver()->findElement(WebDriverBy::cssSelector($row . ' [data-testid="project-field-team"]'))->isSelected());
+        $this->click($row . ' [data-testid="project-field-team"]');
+        $this->click($row . ' dialog[open] [data-testid="project-dialog-save"]');
+        $this->saved($row . ' dialog[open]', $locale);
+        $this->browser->waitForVisibility($row . ' dialog[open]');
+        $this->closeProjectDialog($row);
+        $this->click('[data-testid="nav-dashboard"]');
+        $this->browser->waitForVisibility('[data-testid="company-name-input"]');
+        $this->click('[data-testid="nav-projects"]');
+        $this->browser->waitForVisibility('[data-testid="projects-panel"]');
+        $this->projectDialog($row, 'teams');
+        self::assertFalse($this->browser->getWebDriver()->findElement(WebDriverBy::cssSelector($row . ' [data-testid="project-field-team"]'))->isSelected());
+        self::assertSame('', $this->value($row . ' [data-testid="project-field-rate"]'));
+        self::assertSame('same-document', $this->browser->executeScript('return window.pantherPageMarker;'));
+        $this->closeProjectDialog($row);
+    }
+
+    #[DataProvider('locales')]
+    public function testBudgetButtonWithThirtyPerHour(string $locale): void
+    {
+        $this->login($locale);
+        $this->click('[data-testid="nav-projects"]');
+        $this->browser->waitForVisibility('[data-testid="projects-panel"]');
+        $row = '[data-project-row="' . $this->activeProjectId . '"]';
+        $this->projectDialog($row, 'budget');
+        $this->select($row . ' [data-testid="project-field-rate"]', '2');
+        // Existing 90-minute estimate must be used even though it is between slider steps.
+        $this->fill($row . ' [data-testid="project-field-estimatedBudget"]', '0');
+        $this->click($row . ' [data-testid="project-calculate-budget"]');
+        self::assertSame('45.00', $this->value($row . ' [data-testid="project-field-estimatedBudget"]'));
+        $slider = $this->browser->getWebDriver()->findElement(WebDriverBy::cssSelector($row . ' [data-testid="project-field-estimatedHours"]'));
+        $slider->sendKeys([WebDriverKeys::HOME, WebDriverKeys::ARROW_RIGHT]);
+        self::assertSame('150.00', $this->value($row . ' [data-testid="project-field-estimatedBudget"]'));
+        $this->fill($row . ' [data-testid="project-field-estimatedBudget"]', '0');
+        $this->click($row . ' [data-testid="project-calculate-budget"]');
+        self::assertSame('150.00', $this->value($row . ' [data-testid="project-field-estimatedBudget"]'));
+        self::assertSelectorTextContains($row . ' [data-testid="project-calculation-status"]', '150.00');
+        $this->select($row . ' [data-testid="project-field-rate"]', '');
+        $this->click($row . ' [data-testid="project-calculate-budget"]');
+        self::assertSelectorTextContains($row . ' [data-testid="project-calculation-status"]', $locale === 'da' ? 'Vælg en rate' : 'Choose a rate');
+        $this->closeProjectDialog($row);
+    }
+
+    private function projectDialog(string $row, string $category): void
+    {
+        $this->click($row . ' [data-testid="project-open-' . $category . '"]');
+        $this->browser->waitForVisibility($row . ' [data-testid="project-dialog-' . $category . '"][open]');
+    }
+
+    private function closeProjectDialog(string $row): void
+    {
+        $this->click($row . ' dialog[open] [data-testid="project-dialog-close"]');
+        $this->browser->waitForInvisibility($row . ' dialog[open]');
+    }
+
+    private function select(string $selector, string $value): void
+    {
+        (new WebDriverSelect($this->browser->getWebDriver()->findElement(WebDriverBy::cssSelector($selector))))->selectByValue($value);
     }
 
     private function login(string $locale): void

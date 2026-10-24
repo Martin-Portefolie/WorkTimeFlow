@@ -90,3 +90,37 @@ active `ROLE_USER`; both dropdowns can be changed before creation. The randomly
 generated initial password is sent through the existing welcome
 email and Messenger queue. Passwords are never rendered into the GUI. Users are saved through `AdminController` and
 `UserAdminService`. The legacy UsersController remains reference code.
+
+## Projects
+
+Use `nav-projects`, `projects-panel`, `project-create`, `project-save`,
+`project-cancel` and `project-details` as `data-testid` values. Scope existing rows
+with `[data-project-row="42"]` and the new draft with `[data-project-row="new"]`.
+Field selectors use `project-field-` followed by `name`, `client`, `deadline`,
+`priority`, `rate`, `archived`, `description`, `estimatedBudget`, `estimatedMinutes`
+or `paid`. Open a category using `project-open-details`, `project-open-budget`,
+`project-open-teams` or `project-open-todos`. Dialogs use `project-dialog-` with
+the same category suffix; scope dialog controls to `dialog[open]`.
+Team checkboxes use `project-field-team` and their entity ID as the value.
+
+The main list includes up to 100 projects, including archived projects. Clicking a
+project in a client's modal opens a panel containing that project. Saves replace
+the row without reloading the page. Relation and value validation lives in
+`ProjectAdminService`; HTTP routes live in `AdminController`. Legacy project
+controllers remain unchanged.
+
+Project modal controls use `project-dialog-close` and `project-dialog-save`.
+`project-calculate-budget` computes an editable estimate from the selected rate and
+minutes. `project-time-used` and `project-time-remaining` show persisted time totals.
+Todos and nested logs use `project-todo` and `project-timelog`. Escape/backdrop/Close
+dismisses a modal while retaining draft values. Save persists all fields and
+reopens the same category with feedback; required fields open their owning modal.
+
+The project estimate slider uses `project-field-estimatedHours` (0–500 hours, step 5),
+with `project-estimated-time` as its visible output. `project-field-estimatedMinutes`
+is a hidden submitted field; existing non-step estimates are preserved until user input.
+Moving the slider or changing the rate recalculates the budget when both are set.
+
+Project deadlines are editable directly in each row. `project-overdue` marks an
+active project whose saved deadline is before today; archived projects do not show
+this warning. Category buttons are purple, editing accents amber, and Save green.

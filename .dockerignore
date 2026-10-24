@@ -1,0 +1,12 @@
+.git
+.idea
+.env.local
+.env.*.local
+vendor/
+var/
+node_modules/
+drivers/
+.phpunit.cache/
+public/assets/
+public/bundles/
+public/uploads/

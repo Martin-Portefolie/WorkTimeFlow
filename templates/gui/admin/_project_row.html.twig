@@ -1,53 +1,35 @@
 {% set isNew = project.id is null %}
 {% set formId = 'project_row_' ~ (project.id ?? 'new') %}
-{% set inputClass = 'w-full min-w-28 border border-zinc-300 bg-white px-2 py-1 text-zinc-900 focus:border-emerald-500 dark:border-zinc-700 dark:bg-black dark:text-zinc-100' %}
+{% set inputClass = 'w-full min-w-28 border border-zinc-300 bg-white px-2 py-1 text-zinc-900 focus:border-amber-500 dark:border-zinc-700 dark:bg-black dark:text-zinc-100' %}
 <tr data-testid="project-row" data-controller="project-form" data-project-row="{{ project.id ?? 'new' }}"
-    data-saving="{{ 'company.saving'|trans }}" data-error="{{ 'project.save_failed'|trans }}" data-expired="{{ 'client.expired'|trans }}"
+    data-calculate-error="{{ 'project.calculate_error'|trans }}" data-saving="{{ 'company.saving'|trans }}" data-error="{{ 'project.save_failed'|trans }}" data-expired="{{ 'client.expired'|trans }}"
     class="border-b border-zinc-200 dark:border-zinc-800 {{ isNew ? 'bg-emerald-500/5 outline outline-1 -outline-offset-1 outline-emerald-500/30' : '' }}">
     <td class="p-2"><input form="{{ formId }}" id="{{ formId }}_name" name="name" value="{{ project.name }}" required minlength="2" maxlength="255" data-testid="project-field-name" aria-label="{{ 'project.fields.name'|trans }}" class="{{ inputClass }}"></td>
     <td class="p-2"><select form="{{ formId }}" id="{{ formId }}_client" name="client" required data-testid="project-field-client" aria-label="{{ 'project.fields.client'|trans }}" class="{{ inputClass }}">
         <option value="">{{ 'project.choose_client'|trans }}</option>
         {% for client in clients %}<option value="{{ client.id }}" {% if project.client and project.client.id == client.id %}selected{% endif %}>{{ client.name }}</option>{% endfor %}
     </select></td>
-    <td class="p-2"><input form="{{ formId }}" id="{{ formId }}_deadline" name="deadline" type="date" required value="{{ project.deadline ? project.deadline|date('Y-m-d') : '' }}" data-testid="project-field-deadline" aria-label="{{ 'project.fields.deadline'|trans }}" class="{{ inputClass }}"></td>
-    <td class="p-2"><select form="{{ formId }}" id="{{ formId }}_priority" name="priority" data-testid="project-field-priority" aria-label="{{ 'project.fields.priority'|trans }}" class="{{ inputClass }}">
-        {% for priority in priorities %}<option value="{{ priority.value }}" {% if project.priority.value == priority.value %}selected{% endif %}>{{ ('project.priority.' ~ priority.value)|trans }}</option>{% endfor %}
-    </select></td>
-    <td class="p-2"><select form="{{ formId }}" id="{{ formId }}_rate" name="rate" data-testid="project-field-rate" aria-label="{{ 'project.fields.rate'|trans }}" class="{{ inputClass }}">
-        <option value="">—</option>
-        {% for rate in rates %}<option value="{{ rate.id }}" {% if project.rate and project.rate.id == rate.id %}selected{% endif %}>{{ rate.name }} ({{ rate.value }})</option>{% endfor %}
-    </select></td>
-    <td class="p-2"><select form="{{ formId }}" id="{{ formId }}_archived" name="archived" data-testid="project-field-archived" aria-label="{{ 'project.fields.archived'|trans }}" class="{{ inputClass }}">
-        <option value="0" {% if not project.archived %}selected{% endif %}>{{ 'project.active'|trans }}</option>
-        <option value="1" {% if project.archived %}selected{% endif %}>{{ 'project.archived'|trans }}</option>
-    </select></td>
     <td class="p-2">
-        <details data-testid="project-details" class="min-w-48">
-            <summary class="cursor-pointer text-emerald-500">{{ 'project.fields.details'|trans }}</summary>
-            <div class="space-y-2 py-2">
-                {% for field, value in {description: project.description, estimatedBudget: project.estimatedBudget, estimatedMinutes: project.estimatedMinutes} %}
-                    <label for="{{ formId }}_{{ field }}" class="block">{{ ('project.fields.' ~ field)|trans }}</label>
-                    <input form="{{ formId }}" id="{{ formId }}_{{ field }}" name="{{ field }}" value="{{ value }}" data-testid="project-field-{{ field }}" class="{{ inputClass }}"
-                           {% if field == 'description' %}maxlength="255"{% else %}inputmode="{{ field == 'estimatedMinutes' ? 'numeric' : 'decimal' }}"{% endif %}>
-                {% endfor %}
-                <label for="{{ formId }}_paid" class="block">{{ 'project.fields.paid'|trans }}</label>
-                <select form="{{ formId }}" id="{{ formId }}_paid" name="paid" data-testid="project-field-paid" class="{{ inputClass }}">
-                    <option value="0" {% if not project.paid %}selected{% endif %}>{{ 'project.unpaid'|trans }}</option>
-                    <option value="1" {% if project.paid %}selected{% endif %}>{{ 'project.paid'|trans }}</option>
-                </select>
-                <fieldset><legend>{{ 'project.fields.teams'|trans }}</legend>
-                    {% set selectedTeams = project.teams|map(team => team.id) %}
-                    {% for team in teams %}
-                        <label class="flex items-center gap-2 py-1" for="{{ formId }}_team_{{ team.id }}">
-                            <input type="checkbox" form="{{ formId }}" id="{{ formId }}_team_{{ team.id }}" name="teams[]" value="{{ team.id }}" data-testid="project-field-team" {% if team.id in selectedTeams %}checked{% endif %}>{{ team.name }}
-                        </label>
-                    {% else %}<p class="text-zinc-500">{{ 'project.no_teams'|trans }}</p>{% endfor %}
-                </fieldset>
-            </div>
-        </details>
+        <input form="{{ formId }}" id="{{ formId }}_deadline" name="deadline" type="date" required
+               value="{{ project.deadline ? project.deadline|date('Y-m-d') : '' }}" data-testid="project-field-deadline"
+               aria-label="{{ 'project.fields.deadline'|trans }}" class="{{ inputClass }}">
+        {% if project.deadline and project.deadline|date('Y-m-d') < 'now'|date('Y-m-d') and not project.archived %}
+            <p data-testid="project-overdue" class="mt-1 border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-amber-700 dark:text-amber-400">{{ 'project.overdue'|trans }}</p>
+        {% endif %}
+    </td>
+    <td class="p-2 text-zinc-500"><span class="block">{{ ('project.priority.' ~ project.priority.value)|trans }}</span><span class="block">{{ (project.archived ? 'project.archived' : 'project.active')|trans }}</span></td>
+    <td class="p-2">
+        <div class="flex flex-wrap gap-2">
+            {% for category in ['details', 'budget', 'teams', 'todos'] %}
+                <button type="button" data-action="project-form#open" data-category="{{ category }}" data-testid="project-open-{{ category }}" aria-haspopup="dialog" aria-controls="{{ formId }}_dialog_{{ category }}" class="whitespace-nowrap border border-purple-500/40 px-2 py-1 text-purple-600 hover:bg-purple-500/10 focus-visible:outline-purple-500 dark:text-purple-400">
+                    {{ ('project.category.' ~ category)|trans }}{% if category == 'teams' %} ({{ project.teams|length }}){% elseif category == 'todos' %} ({{ project.todos|default([])|length }}){% endif %}
+                </button>
+                {% include 'gui/admin/_project_dialog.html.twig' %}
+            {% endfor %}
+        </div>
     </td>
     <td class="p-2">
-        <form id="{{ formId }}" method="post" action="{{ isNew ? path('admin_project_create_panel') : path('admin_project_panel', {id: project.id}) }}" data-turbo="false" data-action="submit->project-form#save:prevent">
+        <form id="{{ formId }}" method="post" action="{{ isNew ? path('admin_project_create_panel') : path('admin_project_panel', {id: project.id}) }}" novalidate data-turbo="false" data-action="submit->project-form#save:prevent">
             <input type="hidden" name="_token" value="{{ csrf_token('project_' ~ (project.id ?? 'new')) }}">
             <button type="submit" data-testid="project-save" class="border border-emerald-500 px-3 py-1 text-emerald-500">{{ 'company.save'|trans }}</button>
             {% if isNew %}<button type="button" data-action="click->project-list#cancel" data-testid="project-cancel" class="mt-1 text-zinc-500 underline">{{ 'client.cancel'|trans }}</button>{% endif %}

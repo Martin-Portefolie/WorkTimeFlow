@@ -1,5 +1,8 @@
-FROM dunglas/frankenphp:php8.4
+FROM dunglas/frankenphp:php8.5
 WORKDIR /app
+
+# Refuse base images without the October 2026 PHP security fixes.
+RUN php -r 'exit(version_compare(PHP_VERSION, "8.5.12", ">=") ? 0 : 1);'
 
 RUN install-php-extensions intl zip pdo_mysql opcache gd
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
