@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - search feature
 
 ### Changed
+- Apply security patches to 12 Symfony components and PHPUnit to resolve the dependency advisories blocking CI, without changing minor versions.
 - Local Docker dev serves assets live through AssetMapper (no compiled `public/assets` outside prod), and a `tailwind` compose service rebuilds the CSS when templates or assets change.
 - Use descriptive variable and query-alias names in the active admin/terminal implementation and its tests; keep project/team list queries in repositories.
 - Compare architecture checks against the pull request base instead of the retired alpha branch, and generate the user test password hash dynamically.
