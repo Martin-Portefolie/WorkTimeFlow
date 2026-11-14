@@ -27,7 +27,7 @@ final class TerminalTimelogService
         private readonly TodoRepository $todos,
         private readonly UserRepository $users,
         private readonly UserProjectService $access,
-        private readonly EntityManagerInterface $em,
+        private readonly EntityManagerInterface $entityManager,
         private readonly TerminalStateService $state,
         private readonly Security $security,
     ) {
@@ -41,8 +41,8 @@ final class TerminalTimelogService
             $todo = isset($flags['todo']) ? $this->todos->find($this->integer($flags['todo'], 'todo')) : null;
             $projectId = isset($flags['project']) ? $this->integer($flags['project'], 'project') : null;
             $date = isset($flags['date']) ? $this->date($flags['date']) : null;
-        } catch (\InvalidArgumentException $e) {
-            return $this->error($e->getMessage());
+        } catch (\InvalidArgumentException $exception) {
+            return $this->error($exception->getMessage());
         }
         if ((isset($flags['user']) && !$user) || (isset($flags['todo']) && !$todo)) {
             return $this->error('User or Todo not found.');
@@ -63,12 +63,12 @@ final class TerminalTimelogService
         ]);
     }
 
-    public function show(array $args = []): array
+    public function show(array $arguments = []): array
     {
         try {
-            return $this->details($this->find($args));
-        } catch (\InvalidArgumentException $e) {
-            return $this->error($e->getMessage());
+            return $this->details($this->find($arguments));
+        } catch (\InvalidArgumentException $exception) {
+            return $this->error($exception->getMessage());
         }
     }
 
@@ -81,18 +81,18 @@ final class TerminalTimelogService
         try {
             $log = new Timelog();
             $this->apply($log, $flags);
-            $this->em->persist($log);
-            $this->em->flush();
+            $this->entityManager->persist($log);
+            $this->entityManager->flush();
             return $this->details($log, 'Timelog created');
-        } catch (\InvalidArgumentException $e) {
-            return $this->error($e->getMessage());
+        } catch (\InvalidArgumentException $exception) {
+            return $this->error($exception->getMessage());
         }
     }
 
-    public function update(array $args = [], array $flags = []): array
+    public function update(array $arguments = [], array $flags = []): array
     {
         try {
-            $log = $this->find($args);
+            $log = $this->find($arguments);
             if ($flags === []) {
                 return $this->error('Use --minutes=, --date= or --description= to update a timelog.');
             }
@@ -103,23 +103,23 @@ final class TerminalTimelogService
             $minutes = isset($flags['minutes']) ? $this->integer($flags['minutes'], 'minutes', 1, 1440) : $log->getTotalMinutes();
             $description = isset($flags['description']) ? $this->description($flags['description']) : $log->getDescription();
             $log->setDate($date)->setTotalMinutes($minutes)->setDescription($description);
-            $this->em->flush();
+            $this->entityManager->flush();
             return $this->details($log, 'Timelog updated');
-        } catch (\InvalidArgumentException $e) {
-            return $this->error($e->getMessage());
+        } catch (\InvalidArgumentException $exception) {
+            return $this->error($exception->getMessage());
         }
     }
 
-    public function delete(array $args = []): array
+    public function delete(array $arguments = []): array
     {
         try {
-            $log = $this->find($args);
+            $log = $this->find($arguments);
             $this->state->set($this->actor(), ['mode' => 'timelogs:delete', 'id' => $log->getId()]);
             $result = $this->details($log, 'Delete this timelog? Type yes to confirm or cancel to abort.');
             $result['await'] = true;
             return $result;
-        } catch (\InvalidArgumentException $e) {
-            return $this->error($e->getMessage());
+        } catch (\InvalidArgumentException $exception) {
+            return $this->error($exception->getMessage());
         }
     }
 
@@ -142,8 +142,8 @@ final class TerminalTimelogService
             if (!$log) {
                 return $this->error('Timelog no longer exists.');
             }
-            $this->em->remove($log);
-            $this->em->flush();
+            $this->entityManager->remove($log);
+            $this->entityManager->flush();
             return ['success' => true, 'output' => 'Timelog deleted.'];
         }
         $data = $state['data'];
@@ -167,8 +167,8 @@ final class TerminalTimelogService
                     }
                 }
                 $data[$key] = $value;
-            } catch (\InvalidArgumentException $e) {
-                return $this->prompt($data, $e->getMessage());
+            } catch (\InvalidArgumentException $exception) {
+                return $this->prompt($data, $exception->getMessage());
             }
             $this->state->set($this->actor(), ['mode' => 'timelogs:add', 'data' => $data]);
             return $this->prompt($data);
@@ -196,9 +196,9 @@ final class TerminalTimelogService
         $log->setUser($user)->setTodo($todo)->setDate($date)->setTotalMinutes($minutes)->setDescription($description);
     }
 
-    private function find(array $args): Timelog
+    private function find(array $arguments): Timelog
     {
-        $id = $this->integer($args[0] ?? '', 'timelog ID');
+        $id = $this->integer($arguments[0] ?? '', 'timelog ID');
         return $this->logs->find($id) ?? throw new \InvalidArgumentException('Timelog not found.');
     }
 

@@ -32,17 +32,17 @@ final class AdminBrowserTest extends PantherTestCase
     {
         parent::setUp();
         self::bootKernel();
-        $em = self::getContainer()->get(EntityManagerInterface::class);
-        $db = $em->getConnection();
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $connection = $entityManager->getConnection();
         // Refuse any schema reset unless the dedicated browser bootstrap owns this database.
         $expected = $_SERVER['PANTHER_TEST_DATABASE'] ?? '';
-        if (!$db->getDatabasePlatform() instanceof SQLitePlatform || $expected === ''
-            || ($db->getParams()['path'] ?? '') !== $expected
+        if (!$connection->getDatabasePlatform() instanceof SQLitePlatform || $expected === ''
+            || ($connection->getParams()['path'] ?? '') !== $expected
             || !str_starts_with($expected, dirname(__DIR__, 2) . '/var/browser-tests/')) {
             throw new \RuntimeException('Browser tests require the isolated database from phpunit.panther.xml.');
         }
-        $schema = new SchemaTool($em);
-        $metadata = $em->getMetadataFactory()->getAllMetadata();
+        $schema = new SchemaTool($entityManager);
+        $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
         $schema->dropSchema($metadata);
         $schema->createSchema($metadata);
 
@@ -65,9 +65,9 @@ final class AdminBrowserTest extends PantherTestCase
         $active->addTodo($todo);
         $todo->addTimelog($log);
         foreach ([$admin, $member, $company, $rate, $hourlyRate, $customer, $team, $active, $inactive, $todo, $log] as $entity) {
-            $em->persist($entity);
+            $entityManager->persist($entity);
         }
-        $em->flush();
+        $entityManager->flush();
         self::assertSame(1, $company->getId());
         $this->customerId = $customer->getId();
         $this->activeProjectId = $active->getId();
@@ -88,9 +88,9 @@ final class AdminBrowserTest extends PantherTestCase
     {
         // Only remove an upload belonging to this run's isolated company.
         if (self::$kernel !== null) {
-            $em = self::getContainer()->get(EntityManagerInterface::class);
-            $em->clear();
-            $logo = $em->find(Company::class, 1)?->getLogo();
+            $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+            $entityManager->clear();
+            $logo = $entityManager->find(Company::class, 1)?->getLogo();
             if ($logo && preg_match('#^uploads/company/[a-f0-9]{32}\.(png|jpg|jpeg|webp)$#', $logo)) {
                 $file = dirname(__DIR__, 2) . '/public/' . $logo;
                 if (is_file($file)) unlink($file);
@@ -156,9 +156,9 @@ final class AdminBrowserTest extends PantherTestCase
         self::assertSame('1', $this->value($row . ' [data-testid="user-field-active"]'));
 
         // The generated password is only sent by email, never returned to the GUI.
-        $em = self::getContainer()->get(EntityManagerInterface::class);
-        $em->clear();
-        $createdUser = $em->getRepository(User::class)->findOneBy(['email' => 'new@example.test']);
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $entityManager->clear();
+        $createdUser = $entityManager->getRepository(User::class)->findOneBy(['email' => 'new@example.test']);
         self::assertNotNull($createdUser);
         self::assertSame(['ROLE_USER'], $createdUser->getRoles());
         self::assertTrue($createdUser->isActive());

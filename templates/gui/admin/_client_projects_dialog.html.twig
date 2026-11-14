@@ -7,8 +7,8 @@
     </header>
     <div class="space-y-4 p-4">
         {% set groups = [
-            {key: 'active', label: 'client.active_projects', items: projects|filter(p => not (p.archived|default(false)))},
-            {key: 'inactive', label: 'client.inactive_projects', items: projects|filter(p => p.archived|default(false))}
+            {key: 'active', label: 'client.active_projects', items: projects|filter(project => not (project.archived|default(false)))},
+            {key: 'inactive', label: 'client.inactive_projects', items: projects|filter(project => project.archived|default(false))}
         ] %}
         {% for group in groups %}
             <section data-testid="client-projects-{{ group.key }}">

@@ -28,9 +28,9 @@ final class CompanyTerminalServiceTest extends TestCase
         $company = new Company();
         $companies = $this->createStub(CompanyRepository::class);
         $companies->method('findBy')->willReturn([$company]);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::once())->method('flush');
-        $service = new CompanyTerminalService($companies, $this->createStub(RateRepository::class), $em,
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('flush');
+        $service = new CompanyTerminalService($companies, $this->createStub(RateRepository::class), $entityManager,
             new TerminalStateService(new ArrayAdapter()), $this->createStub(Security::class));
         $response = $service->companySetNameCommand($tokens);
         self::assertTrue($response['success']);
@@ -44,14 +44,14 @@ final class CompanyTerminalServiceTest extends TestCase
         $company = new Company();
         $companies = $this->createStub(CompanyRepository::class);
         $companies->method('findBy')->willReturn([$company]);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::once())->method('persist')->with(self::callback(
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('persist')->with(self::callback(
             static fn ($rate) => $rate instanceof \App\Entity\Rate
                 && $rate->getName() === 'gg' && $rate->getValue() === '11.00'
                 && $rate->getCompany() === $company
         ));
-        $em->expects(self::once())->method('flush');
-        $service = new CompanyTerminalService($companies, $this->createStub(RateRepository::class), $em,
+        $entityManager->expects(self::once())->method('flush');
+        $service = new CompanyTerminalService($companies, $this->createStub(RateRepository::class), $entityManager,
             new TerminalStateService(new ArrayAdapter()), $this->createStub(Security::class));
         $response = $service->ratesAddCommand(['--name=gg', '--value=11']);
         self::assertTrue($response['success']);
@@ -61,10 +61,10 @@ final class CompanyTerminalServiceTest extends TestCase
 
     public function testInvalidRateFlagsDoNotWrite(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::never())->method('persist');
-        $em->expects(self::never())->method('flush');
-        $service = new CompanyTerminalService($this->createStub(CompanyRepository::class), $this->createStub(RateRepository::class), $em,
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('persist');
+        $entityManager->expects(self::never())->method('flush');
+        $service = new CompanyTerminalService($this->createStub(CompanyRepository::class), $this->createStub(RateRepository::class), $entityManager,
             new TerminalStateService(new ArrayAdapter()), $this->createStub(Security::class));
         foreach ([['--name=gg'], ['--name=gg', '--value=-1'], ['--name=gg', '--value=0.001']] as $tokens) {
             self::assertFalse($service->ratesAddCommand($tokens)['success']);
@@ -73,9 +73,9 @@ final class CompanyTerminalServiceTest extends TestCase
 
     public function testEmptyNameDoesNotWrite(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::never())->method('flush');
-        $service = new CompanyTerminalService($this->createStub(CompanyRepository::class), $this->createStub(RateRepository::class), $em,
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('flush');
+        $service = new CompanyTerminalService($this->createStub(CompanyRepository::class), $this->createStub(RateRepository::class), $entityManager,
             new TerminalStateService(new ArrayAdapter()), $this->createStub(Security::class));
         $response = $service->companySetNameCommand(['--name=']);
         self::assertFalse($response['success']);

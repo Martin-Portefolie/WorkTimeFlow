@@ -30,31 +30,31 @@ class TimelogRepository extends ServiceEntityRepository
         ?\DateTimeInterface $date = null,
         int $limit = 50,
     ): array {
-        $qb = $this->createQueryBuilder('log')
-            ->leftJoin('log.user', 'u')->addSelect('u')
+        $queryBuilder = $this->createQueryBuilder('log')
+            ->leftJoin('log.user', 'user')->addSelect('user')
             ->leftJoin('log.todo', 'todo')->addSelect('todo')
-            ->leftJoin('todo.project', 'p')->addSelect('p')
+            ->leftJoin('todo.project', 'project')->addSelect('project')
             ->orderBy('log.date', 'DESC')
             ->addOrderBy('log.id', 'DESC')
             ->setMaxResults($limit);
 
         if ($user) {
-            $qb->andWhere('log.user = :user')->setParameter('user', $user);
+            $queryBuilder->andWhere('log.user = :user')->setParameter('user', $user);
         }
         if ($todo) {
-            $qb->andWhere('log.todo = :todo')->setParameter('todo', $todo);
+            $queryBuilder->andWhere('log.todo = :todo')->setParameter('todo', $todo);
         }
         if ($projectId !== null) {
-            $qb->andWhere('p.id = :project')->setParameter('project', $projectId);
+            $queryBuilder->andWhere('project.id = :project')->setParameter('project', $projectId);
         }
         if ($date) {
             $end = (clone $date)->modify('+1 day');
-            $qb->andWhere('log.date >= :start AND log.date < :end')
+            $queryBuilder->andWhere('log.date >= :start AND log.date < :end')
                 ->setParameter('start', $date)
                 ->setParameter('end', $end);
         }
 
-        return $qb->getQuery()->getResult();
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /** @return Timelog[] */

@@ -17,7 +17,7 @@ final class ClientAdminService
 
     public function __construct(
         private readonly ClientRepository $clients,
-        private readonly EntityManagerInterface $em,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -29,7 +29,7 @@ final class ClientAdminService
     public function update(Client $client, array $data): void
     {
         $this->apply($client, $data);
-        $this->em->flush();
+        $this->entityManager->flush();
     }
 
     public function create(array $data): Client
@@ -41,8 +41,8 @@ final class ClientAdminService
         }
         $client = new Client();
         $this->apply($client, $data);
-        $this->em->persist($client);
-        $this->em->flush();
+        $this->entityManager->persist($client);
+        $this->entityManager->flush();
 
         return $client;
     }

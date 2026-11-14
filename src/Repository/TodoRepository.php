@@ -21,33 +21,33 @@ class TodoRepository extends ServiceEntityRepository
     /** @return Todo[] */
     public function findForTerminalList(?string $search = null, ?Project $project = null, int $limit = 50): array
     {
-        $qb = $this->createQueryBuilder('todo')
-            ->leftJoin('todo.project', 'p')->addSelect('p')
+        $queryBuilder = $this->createQueryBuilder('todo')
+            ->leftJoin('todo.project', 'project')->addSelect('project')
             ->orderBy('todo.name', 'ASC')
             ->addOrderBy('todo.id', 'ASC')
             ->setMaxResults($limit);
 
         if ($search !== null && $search !== '') {
-            $condition = 'LOWER(todo.name) LIKE :q OR LOWER(p.name) LIKE :q';
+            $condition = 'LOWER(todo.name) LIKE :searchTerm OR LOWER(project.name) LIKE :searchTerm';
             if (ctype_digit($search)) {
                 $condition = 'todo.id = :id OR ' . $condition;
-                $qb->setParameter('id', (int) $search);
+                $queryBuilder->setParameter('id', (int) $search);
             }
-            $qb->andWhere($condition)->setParameter('q', '%' . mb_strtolower($search) . '%');
+            $queryBuilder->andWhere($condition)->setParameter('searchTerm', '%' . mb_strtolower($search) . '%');
         }
         if ($project) {
-            $qb->andWhere('todo.project = :project')->setParameter('project', $project);
+            $queryBuilder->andWhere('todo.project = :project')->setParameter('project', $project);
         }
 
-        return $qb->getQuery()->getResult();
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /** @return Todo[] */
     public function findAccessibleToUser(User $user): array
     {
         return $this->createQueryBuilder('todo')
-            ->join('todo.project', 'p')
-            ->join('p.teams', 'team')
+            ->join('todo.project', 'project')
+            ->join('project.teams', 'team')
             ->where('team IN (:teams)')
             ->setParameter('teams', $user->getTeams())
             ->getQuery()

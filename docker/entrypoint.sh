@@ -80,21 +80,31 @@ echo "Installing ImportMap vendor assets…"
 bin/console importmap:install --no-interaction || echo "WARN: importmap:install failed (continuing)"
 
 # ------------------------------------------------------------------------------
-# Tailwind CSS (one-shot, prod)
+# Tailwind CSS + AssetMapper
+# prod: one-shot minified build and compiled public/assets
+# dev:  no compiled assets, so AssetMapper serves changes directly; the
+#       tailwind compose service keeps the CSS rebuilt with --watch
 # ------------------------------------------------------------------------------
-echo "Building Tailwind CSS (env=$APP_ENV)…"
-bin/console tailwind:build --minify || echo "WARN: Tailwind build failed (continuing)"
+if [ "$APP_ENV" = "prod" ]; then
+  echo "Building Tailwind CSS (env=$APP_ENV)…"
+  bin/console tailwind:build --minify || echo "WARN: Tailwind build failed (continuing)"
 
-# ------------------------------------------------------------------------------
-# AssetMapper compile (writes public/assets + manifest.json)
-# ------------------------------------------------------------------------------
-echo "Compiling AssetMapper…"
-bin/console asset-map:compile || echo "WARN: asset-map:compile failed (continuing)"
+  echo "Compiling AssetMapper…"
+  bin/console asset-map:compile || echo "WARN: asset-map:compile failed (continuing)"
+else
+  echo "Building Tailwind CSS (env=$APP_ENV)…"
+  bin/console tailwind:build || echo "WARN: Tailwind build failed (continuing)"
+
+  echo "Removing compiled public/assets so AssetMapper serves live assets…"
+  rm -rf public/assets
+fi
 
 # ------------------------------------------------------------------------------
 # Sanity checks
 # ------------------------------------------------------------------------------
-if [ -f public/assets/manifest.json ]; then
+if [ "$APP_ENV" != "prod" ]; then
+  echo "Dev mode: assets served live by AssetMapper"
+elif [ -f public/assets/manifest.json ]; then
   echo "Manifest present at public/assets/manifest.json"
   if ls public/assets/styles/app*.css >/dev/null 2>&1; then
     echo "Tailwind output: $(ls -1 public/assets/styles/app*.css | head -n1)"

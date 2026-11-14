@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ProjectAdminServiceTest extends TestCase
 {
-    private function service(EntityManagerInterface $em, Client $client, Rate $rate, Team $team): ProjectAdminService
+    private function service(EntityManagerInterface $entityManager, Client $client, Rate $rate, Team $team): ProjectAdminService
     {
         $clients = $this->createStub(ClientRepository::class);
         $clients->method('find')->willReturnCallback(static fn ($id) => $id === 1 ? $client : null);
@@ -19,7 +19,7 @@ final class ProjectAdminServiceTest extends TestCase
         $rates->method('find')->willReturnCallback(static fn ($id) => $id === 1 ? $rate : null);
         $teams = $this->createStub(TeamRepository::class);
         $teams->method('find')->willReturnCallback(static fn ($id) => $id === 1 ? $team : null);
-        return new ProjectAdminService($this->createStub(ProjectRepository::class), $clients, $rates, $teams, $em);
+        return new ProjectAdminService($this->createStub(ProjectRepository::class), $clients, $rates, $teams, $entityManager);
     }
 
     private function data(): array
@@ -29,12 +29,12 @@ final class ProjectAdminServiceTest extends TestCase
 
     public function testCreationSavesRelationsAndNormalizedEstimates(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::once())->method('persist');
-        $em->expects(self::once())->method('flush');
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('persist');
+        $entityManager->expects(self::once())->method('flush');
         $client = new Client(); $rate = new Rate(); $team = new Team();
         $project = new Project();
-        $this->service($em, $client, $rate, $team)->save($project, $this->data());
+        $this->service($entityManager, $client, $rate, $team)->save($project, $this->data());
         self::assertSame('Website', $project->getName());
         self::assertSame($client, $project->getClient());
         self::assertSame($rate, $project->getRate());
@@ -46,14 +46,14 @@ final class ProjectAdminServiceTest extends TestCase
 
     public function testUpdateClearsOptionalRelationsAndEstimates(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::never())->method('persist');
-        $em->expects(self::once())->method('flush');
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('persist');
+        $entityManager->expects(self::once())->method('flush');
         $client = new Client(); $rate = new Rate(); $team = new Team();
         $project = (new Project())->setRate($rate)->addTeam($team)->setEstimatedBudget('12.00')->setEstimatedTime(50);
         (new \ReflectionProperty(Project::class, 'id'))->setValue($project, 1);
         $data = array_replace($this->data(), ['rate' => '', 'teams' => [], 'estimatedBudget' => '', 'estimatedMinutes' => '']);
-        $this->service($em, $client, $rate, $team)->save($project, $data);
+        $this->service($entityManager, $client, $rate, $team)->save($project, $data);
         self::assertNull($project->getRate());
         self::assertNull($project->getEstimatedBudget());
         self::assertNull($project->getEstimatedMinutes());
@@ -82,17 +82,17 @@ final class ProjectAdminServiceTest extends TestCase
     #[DataProvider('invalidValues')]
     public function testInvalidInputDoesNotMutateExistingProject(string $field, mixed $value): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::never())->method('flush');
-        $em->expects(self::never())->method('persist');
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('flush');
+        $entityManager->expects(self::never())->method('persist');
         $client = new Client(); $rate = new Rate(); $team = new Team();
         $project = (new Project())->setName('Original')->setClient($client)->setRate($rate)->addTeam($team);
         $data = $this->data(); $data[$field] = $value;
         try {
-            $this->service($em, $client, $rate, $team)->save($project, $data);
+            $this->service($entityManager, $client, $rate, $team)->save($project, $data);
             self::fail('Invalid data accepted.');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('project.invalid.' . $field, $e->getMessage());
+        } catch (\InvalidArgumentException $exception) {
+            self::assertSame('project.invalid.' . $field, $exception->getMessage());
         }
         self::assertSame('Original', $project->getName());
         self::assertSame($rate, $project->getRate());

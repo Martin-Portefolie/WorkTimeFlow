@@ -19,7 +19,7 @@ final class TerminalClientService
         private readonly ClientRepository $clientRepository,
         private readonly TerminalStateService $state,
         private readonly Security $security,
-        private readonly EntityManagerInterface $em,
+        private readonly EntityManagerInterface $entityManager,
         private readonly ClientAdminService $clientAdmin,
         private readonly TranslatorInterface $translator,
     ) {
@@ -31,10 +31,10 @@ final class TerminalClientService
 
     public function list(array $flags = []): array
     {
-        $q = isset($flags['q']) ? trim((string) $flags['q']) : null;
+        $searchTerm = isset($flags['q']) ? trim((string) $flags['q']) : null;
         $limit = isset($flags['limit']) ? max(1, (int) $flags['limit']) : 25;
 
-        $rows = $this->clientRepository->fetchListRowsSearched($limit, $q ?: null);
+        $rows = $this->clientRepository->fetchListRowsSearched($limit, $searchTerm ?: null);
 
         return [
             'success' => true,
@@ -67,9 +67,9 @@ final class TerminalClientService
     // Clicking project should run: projects:show <id> / p.s <id>
     // Clicking "Projects" header/count should run: projects:list --client=<id>
     // Terminal output and right-side UI object should both update from same command result.
-    public function show(array $args = []): array
+    public function show(array $arguments = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return $this->error(
@@ -116,9 +116,9 @@ final class TerminalClientService
     // Update Client
     // -----------------------------------------------------
 
-    public function update(array $args = [], array $flags = []): array
+    public function update(array $arguments = [], array $flags = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return $this->error(
@@ -164,9 +164,9 @@ final class TerminalClientService
     // Delete Client
     // -----------------------------------------------------
 
-    public function delete(array $args = [], array $flags = []): array
+    public function delete(array $arguments = [], array $flags = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return $this->error(
@@ -200,8 +200,8 @@ final class TerminalClientService
 
         $name = $client->getName();
 
-        $this->em->remove($client);
-        $this->em->flush();
+        $this->entityManager->remove($client);
+        $this->entityManager->flush();
 
         return [
             'success' => true,
@@ -374,8 +374,8 @@ final class TerminalClientService
             $client->setCity($data['city'] ?? null);
             $client->setCountry($data['country'] ?? null);
 
-            $this->em->persist($client);
-            $this->em->flush();
+            $this->entityManager->persist($client);
+            $this->entityManager->flush();
             $this->state->clear($userId);
 
             return $this->clientShowPayload('Client created', $client);

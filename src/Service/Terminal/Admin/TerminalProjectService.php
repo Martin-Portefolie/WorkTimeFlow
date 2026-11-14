@@ -76,7 +76,7 @@ final class TerminalProjectService
         private readonly TeamRepository $teamRepository,
         private readonly TerminalStateService $state,
         private readonly Security $security,
-        private readonly EntityManagerInterface $em,
+        private readonly EntityManagerInterface $entityManager,
         private readonly DateInputParser $dateInputParser,
     ) {
     }
@@ -87,7 +87,7 @@ final class TerminalProjectService
 
     public function list(array $flags = []): array
     {
-        $q = isset($flags['q']) ? trim((string) $flags['q']) : null;
+        $searchTerm = isset($flags['q']) ? trim((string) $flags['q']) : null;
         $limit = isset($flags['limit']) ? max(1, (int) $flags['limit']) : 50;
         $archivedFlag = strtolower((string) ($flags['archived'] ?? 'active'));
 
@@ -95,53 +95,26 @@ final class TerminalProjectService
             $archivedFlag = 'active';
         }
 
-        $qb = $this->projectRepository->createQueryBuilder('p')
-            ->leftJoin('p.client', 'c')->addSelect('c')
-            ->leftJoin('p.teams', 't')->addSelect('t')
-            ->leftJoin('p.rate', 'r')->addSelect('r')
-            ->orderBy('p.lastUpdated', 'DESC')
-            ->setMaxResults($limit);
-
-        if ($archivedFlag === 'active') {
-            $qb->andWhere('p.isArchived = :archived')->setParameter('archived', false);
-        }
-
-        if ($archivedFlag === 'archived') {
-            $qb->andWhere('p.isArchived = :archived')->setParameter('archived', true);
-        }
-
-        if ($q) {
-            if (ctype_digit($q)) {
-                $qb->andWhere('p.id = :id OR LOWER(p.name) LIKE :q OR LOWER(c.name) LIKE :q')
-                    ->setParameter('id', (int) $q)
-                    ->setParameter('q', '%' . mb_strtolower($q) . '%');
-            } else {
-                $qb->andWhere('LOWER(p.name) LIKE :q OR LOWER(c.name) LIKE :q')
-                    ->setParameter('q', '%' . mb_strtolower($q) . '%');
-            }
-        }
-
+        $client = null;
         if (isset($flags['client'])) {
             $client = $this->resolveClient((string) $flags['client']);
 
             if (!$client) {
                 return $this->error('Client not found', sprintf('No client found for "%s".', $flags['client']));
             }
-
-            $qb->andWhere('p.client = :client')->setParameter('client', $client);
         }
 
         $rows = array_map(
             fn (Project $project) => $this->projectListRow($project),
-            $qb->getQuery()->getResult(),
+            $this->projectRepository->findForTerminalList($searchTerm, $limit, $archivedFlag, $client),
         );
 
-        usort($rows, static function (array $a, array $b): int {
-            if ($a['isOverrun'] !== $b['isOverrun']) {
-                return $a['isOverrun'] ? -1 : 1;
+        usort($rows, static function (array $firstProject, array $secondProject): int {
+            if ($firstProject['isOverrun'] !== $secondProject['isOverrun']) {
+                return $firstProject['isOverrun'] ? -1 : 1;
             }
 
-            return ($b['lastUpdatedTimestamp'] ?? 0) <=> ($a['lastUpdatedTimestamp'] ?? 0);
+            return ($secondProject['lastUpdatedTimestamp'] ?? 0) <=> ($firstProject['lastUpdatedTimestamp'] ?? 0);
         });
 
         return [
@@ -166,7 +139,7 @@ final class TerminalProjectService
                 ],
                 'rows' => $rows,
                 'projects' => $rows,
-                'search' => $q,
+                'search' => $searchTerm,
                 'archivedFlag' => $archivedFlag,
                 'shownCount' => count($rows),
                 'limit' => $limit,
@@ -178,9 +151,9 @@ final class TerminalProjectService
     // Show Project
     // -----------------------------------------------------
 
-    public function show(array $args = []): array
+    public function show(array $arguments = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return $this->error(
@@ -242,9 +215,9 @@ final class TerminalProjectService
     // Update Project
     // -----------------------------------------------------
 
-    public function update(array $args = [], array $flags = []): array
+    public function update(array $arguments = [], array $flags = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return $this->error(
@@ -371,7 +344,7 @@ final class TerminalProjectService
             );
         }
 
-        $this->em->flush();
+        $this->entityManager->flush();
 
         return $this->projectShowPayload('Project updated', $project);
     }
@@ -380,9 +353,9 @@ final class TerminalProjectService
     // Delete Project
     // -----------------------------------------------------
 
-    public function delete(array $args = [], array $flags = []): array
+    public function delete(array $arguments = [], array $flags = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return $this->error('Missing project identifier', 'Usage: projects:delete <id|name> --force');
@@ -400,8 +373,8 @@ final class TerminalProjectService
 
         $name = $project->getName();
 
-        $this->em->remove($project);
-        $this->em->flush();
+        $this->entityManager->remove($project);
+        $this->entityManager->flush();
 
         return [
             'success' => true,
@@ -754,8 +727,8 @@ final class TerminalProjectService
             $project->addTeam($team);
         }
 
-        $this->em->persist($project);
-        $this->em->flush();
+        $this->entityManager->persist($project);
+        $this->entityManager->flush();
 
         return ['success' => true, 'project' => $project];
     }

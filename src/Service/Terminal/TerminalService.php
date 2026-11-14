@@ -107,12 +107,12 @@ final class TerminalService
 
         // ── Let any active wizard consume the input (even if it's blank) ──
         if ($isAdmin) {
-            if ($resp = $this->timelogModule->handleInteractive($raw)) { return $resp; }
-            if ($resp = $this->userModule->handleInteractive($raw))   { return $resp; }
-            if ($resp = $this->clientModule->handleInteractive($raw)) { return $resp; }
-            if ($resp = $this->companyModule->handleInteractive($raw)) { return $resp; }
-            if ($resp = $this->teamModule->handleInteractive($raw))   { return $resp; }
-            if ($resp = $this->projectModule->handleInteractive($raw))   { return $resp; }
+            if ($response = $this->timelogModule->handleInteractive($raw)) { return $response; }
+            if ($response = $this->userModule->handleInteractive($raw))   { return $response; }
+            if ($response = $this->clientModule->handleInteractive($raw)) { return $response; }
+            if ($response = $this->companyModule->handleInteractive($raw)) { return $response; }
+            if ($response = $this->teamModule->handleInteractive($raw))   { return $response; }
+            if ($response = $this->projectModule->handleInteractive($raw))   { return $response; }
         }
 
         // At this point we know no wizard is active / interested.
@@ -176,7 +176,7 @@ final class TerminalService
         $cmd    = array_shift($tokens) ?? '';
         $parsed = ArgsParser::parse($tokens);
 
-        $args  = $parsed['args'];
+        $arguments  = $parsed['args'];
         $flags = $parsed['flags'];
 
         return match ($cmd) {
@@ -433,16 +433,16 @@ final class TerminalService
                 'users/list'
             ),
             'users:show' => $this->withGui(
-                $this->userModule->show($args),
+                $this->userModule->show($arguments),
                 'users',
                 'users/show'
             ),
             'users:add'              => $this->userModule->add($flags),
-            'users:update'           => $this->userModule->update($args, $flags),
-            'users:forgot-password' => $this->userModule->forgotPassword($args, $flags),
-            'users:delete'           => $this->userModule->delete($args, $flags),
-            'users:deactivate' =>       $this->userModule->deactivate($args),
-            'users:activate' =>         $this->userModule->activate($args),
+            'users:update'           => $this->userModule->update($arguments, $flags),
+            'users:forgot-password' => $this->userModule->forgotPassword($arguments, $flags),
+            'users:delete'           => $this->userModule->delete($arguments, $flags),
+            'users:deactivate' =>       $this->userModule->deactivate($arguments),
+            'users:activate' =>         $this->userModule->activate($arguments),
 
             // clients
             'clients:list'   => $this->withGui(
@@ -451,13 +451,13 @@ final class TerminalService
                 'clients/list'
             ),
             'clients:show' => $this->withGui(
-                $this->clientModule->show($args),
+                $this->clientModule->show($arguments),
                 'clients',
                 'clients/show'
             ),
             'clients:add'    => $this->clientModule->add($flags),
-            'clients:update' => $this->withGui($this->clientModule->update($args, $flags), 'clients', 'clients/show'),
-            'clients:delete' => $this->clientModule->delete($args, $flags),
+            'clients:update' => $this->withGui($this->clientModule->update($arguments, $flags), 'clients', 'clients/show'),
+            'clients:delete' => $this->clientModule->delete($arguments, $flags),
 
             // company
             'company:show'     => $this->companyModule->companyShowCommand($tokens),
@@ -476,15 +476,15 @@ final class TerminalService
                 'teams/list'
             ),
             'teams:show' => $this->withGui(
-                $this->teamModule->show($args),
+                $this->teamModule->show($arguments),
                 'teams',
                 'teams/show'
             ),
             'teams:add' => $this->teamModule->add($flags),
-            'teams:update' => $this->teamModule->update($args, $flags),
-            'teams:delete' => $this->teamModule->delete($args, $flags),
-            'teams:add-user' => $this->teamModule->addUser($args, $flags),
-            'teams:remove-user' => $this->teamModule->removeUser($args, $flags),
+            'teams:update' => $this->teamModule->update($arguments, $flags),
+            'teams:delete' => $this->teamModule->delete($arguments, $flags),
+            'teams:add-user' => $this->teamModule->addUser($arguments, $flags),
+            'teams:remove-user' => $this->teamModule->removeUser($arguments, $flags),
 
             // projects
             'projects:list' => $this->withGui(
@@ -493,13 +493,13 @@ final class TerminalService
                 'projects/list'
             ),
             'projects:show' => $this->withGui(
-                $this->projectModule->show($args),
+                $this->projectModule->show($arguments),
                 'projects',
                 'projects/show'
             ),
             'projects:add' => $this->projectModule->add($flags),
-            'projects:update' => $this->projectModule->update($args, $flags),
-            'projects:delete' => $this->projectModule->delete($args, $flags),
+            'projects:update' => $this->projectModule->update($arguments, $flags),
+            'projects:delete' => $this->projectModule->delete($arguments, $flags),
 
             // todos
             'todos:list' => $this->withGui(
@@ -508,16 +508,16 @@ final class TerminalService
                 'todos/list'
             ),
             'todos:show' => $this->withGui(
-                $this->todoModule->show($args),
+                $this->todoModule->show($arguments),
                 'todos',
                 'todos/show'
             ),
 
             'timelogs:list' => $this->withGui($this->timelogModule->list($flags), 'timelogs', 'timelogs/list'),
-            'timelogs:show' => $this->withGui($this->timelogModule->show($args), 'timelogs', 'timelogs/show'),
+            'timelogs:show' => $this->withGui($this->timelogModule->show($arguments), 'timelogs', 'timelogs/show'),
             'timelogs:add' => $this->timelogModule->add($flags),
-            'timelogs:update' => $this->timelogModule->update($args, $flags),
-            'timelogs:delete' => $this->timelogModule->delete($args),
+            'timelogs:update' => $this->timelogModule->update($arguments, $flags),
+            'timelogs:delete' => $this->timelogModule->delete($arguments),
 
             default => ['output' => 'Unhandled admin command', 'success' => false],
         };

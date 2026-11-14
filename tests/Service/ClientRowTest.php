@@ -22,7 +22,7 @@ final class ClientRowTest extends TestCase
         $translator->addResource('yaml', $root . '/translations/messages.da.yaml', 'da');
         $twig = new Environment(new FilesystemLoader($root . '/templates'), ['autoescape' => 'html', 'strict_variables' => true]);
         $twig->addExtension(new TranslationExtension($translator));
-        $twig->addFunction(new TwigFunction('path', static fn (string $route, array $args = []): string => '/' . $route . (isset($args['id']) ? '/' . $args['id'] : '')));
+        $twig->addFunction(new TwigFunction('path', static fn (string $route, array $arguments = []): string => '/' . $route . (isset($arguments['id']) ? '/' . $arguments['id'] : '')));
         $twig->addFunction(new TwigFunction('csrf_token', static fn (string $id): string => $id));
         return $twig;
     }

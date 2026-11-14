@@ -25,6 +25,38 @@ services:
     user: "0:0"
   #    entrypoint: ["/bin/sh","-lc","/app/docker/entrypoint.sh"]
 
+  tailwind:
+    image: worktimeflow-app       # reuse the app image built above
+    pull_policy: never
+    container_name: worktimeflow_tailwind
+    entrypoint: []
+    # Tailwind v4 --watch gets no file events through the macOS bind mount, so
+    # poll templates/assets once a second and rebuild when something changed.
+    command:
+      - sh
+      - -c
+      - |
+        touch /tmp/tailwind.stamp
+        php bin/console tailwind:build
+        while sleep 1; do
+          if [ -n "$$(find templates assets -path assets/vendor -prune -o -type f -newer /tmp/tailwind.stamp -print -quit)" ]; then
+            touch /tmp/tailwind.stamp
+            php bin/console tailwind:build
+          fi
+        done
+    environment:
+      APP_ENV: dev
+      HOME: /tmp
+    volumes:
+      - ./:/app
+      - dev_var:/app/var
+    depends_on:
+      app:
+        condition: service_started
+    tty: true
+    user: "0:0"
+    restart: unless-stopped
+
   database:
     image: mariadb:11.4
     container_name: wtf_mariadb

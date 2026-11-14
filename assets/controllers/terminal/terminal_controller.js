@@ -86,9 +86,9 @@ export default class extends Controller {
     /* ========== UI helpers ========== */
     focusTile() {
         this.inputTarget.focus();
-        const v = this.inputTarget.value;
+        const inputValue = this.inputTarget.value;
         this.inputTarget.value = '';
-        this.inputTarget.value = v;
+        this.inputTarget.value = inputValue;
     }
     blurTile() {
         if (document.activeElement === this.inputTarget) this.inputTarget.blur();
@@ -112,72 +112,72 @@ export default class extends Controller {
                   // When awaiting, treat the whole line as one payload (no splitting on ';')
                       const commands = isAwait
                 ? [raw] // allow blanks and semicolons verbatim during wizard
-                    : raw.split(';').map(s => s.trim()).filter(Boolean);
-        for (const cmd of commands) {
+                    : raw.split(';').map(commandText => commandText.trim()).filter(Boolean);
+        for (const command of commands) {
             // client-only clear
-            if (['clear','cls'].includes(cmd.toLowerCase())) {
+            if (['clear','cls'].includes(command.toLowerCase())) {
                 this.clearOutput();
                 continue;
             }
 
                       // While awaiting a wizard step: bypass aliasing & allowlist entirely
-                          let firstToken = cmd;
-                   let canonical  = cmd;
+                          let firstToken = command;
+                   let canonical  = command;
                       if (!isAwait) {
                             // ---- alias normalization BEFORE allowlist check ----
-                                firstToken = (cmd.split(/\s+/)[0] || '');
+                                firstToken = (command.split(/\s+/)[0] || '');
                             canonical  = ALIASES[firstToken] || firstToken;
                             // Role-aware client filter; server still enforces
                                 if (this.allowlistValue && !this.allowlistValue.includes(canonical)) {
                                   const message = document.createElement('div');
                                   message.className = 'term-hint text-xs text-red-400';
-                                  message.textContent = `> ${cmd}: ${firstToken} is not viable`;
+                                  message.textContent = `> ${command}: ${firstToken} is not viable`;
                                   this.outputTarget.append(message);
                                   this.scrollToBottom();
                                   continue;
                                 }
                           }
 
-            // Echo then POST (you can send `cmd` as-is; server also normalizes)
+            // Echo then POST (you can send `command` as-is; server also normalizes)
             const pending = document.createElement('div');
-            pending.textContent = `> ${cmd}`;
+            pending.textContent = `> ${command}`;
             this.outputTarget.append(pending);
             this.scrollToBottom();
 
             try {
                 const form = new FormData();
-                form.append('input', cmd);
-                const res = await fetch(this.runUrlValue, {
+                form.append('input', command);
+                const response = await fetch(this.runUrlValue, {
                     method: 'POST',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' },
                     body: form
                 });
-                const html = await res.text();
+                const html = await response.text();
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = html;
-                const lineEl = wrapper.firstElementChild || wrapper;
-                pending.replaceWith(lineEl);
+                const lineElement = wrapper.firstElementChild || wrapper;
+                pending.replaceWith(lineElement);
                 this.scrollToBottom();
                 // Update awaiting flag for next input (wizard mode)
-                if (lineEl && lineEl.getAttribute) {
-                    this.awaiting = lineEl.getAttribute('data-await') === '1';
+                if (lineElement && lineElement.getAttribute) {
+                    this.awaiting = lineElement.getAttribute('data-await') === '1';
 
-                    const ratesTemplate = lineEl.querySelector('template[data-company-rates-html]');
+                    const ratesTemplate = lineElement.querySelector('template[data-company-rates-html]');
                     const ratesPanel = document.getElementById('company_rates');
                     if (ratesPanel && ratesTemplate?.content.firstElementChild) {
                         ratesPanel.replaceWith(ratesTemplate.content.firstElementChild.cloneNode(true));
                     }
 
-                    if (lineEl.hasAttribute('data-company-name')) {
+                    if (lineElement.hasAttribute('data-company-name')) {
                         document.dispatchEvent(new CustomEvent('wtf:company:updated', {
-                            detail: { name: lineEl.getAttribute('data-company-name') },
+                            detail: { name: lineElement.getAttribute('data-company-name') },
                         }));
                     }
 
-                    const active = lineEl.getAttribute('data-gui-active');
-                    const view = lineEl.getAttribute('data-gui-view');
+                    const active = lineElement.getAttribute('data-gui-active');
+                    const view = lineElement.getAttribute('data-gui-view');
 
-                    const guiTemplate = lineEl.querySelector(
+                    const guiTemplate = lineElement.querySelector(
                         'template[data-gui-html]'
                     );
 
@@ -198,8 +198,8 @@ export default class extends Controller {
                     this.awaiting = false;
                 }
 
-            } catch (e) {
-                pending.textContent = `Error: ${e.message}`;
+            } catch (error) {
+                pending.textContent = `Error: ${error.message}`;
             }
         }
 
@@ -222,27 +222,27 @@ export default class extends Controller {
     /* ========== Keyboard (window) ========== */
     hotkeys(event) {
         const key = event.key.toLowerCase();
-        const isCmd = event.metaKey || event.ctrlKey;
+        const isCommandKey = event.metaKey || event.ctrlKey;
         const isShift = event.shiftKey;
         const isAlt = event.altKey;
         const isFocused = document.activeElement === this.inputTarget;
 
         // --- Focus terminal: ⌘/Ctrl + . ---
-        if (isCmd && !isShift && !isAlt && key === '.') {
+        if (isCommandKey && !isShift && !isAlt && key === '.') {
             event.preventDefault();
             this.focusTile();
             return;
         }
 
         // --- Command palette: ⌘/Ctrl + \ ---
-        if (isCmd && !isShift && !isAlt && key === '\\') {
+        if (isCommandKey && !isShift && !isAlt && key === '\\') {
             event.preventDefault();
             this.openPalette();
             return;
         }
 
         // --- Clear output: ⌘/Ctrl + Shift + L ---
-        if (isCmd && isShift && !isAlt && key === 'l') {
+        if (isCommandKey && isShift && !isAlt && key === 'l') {
             event.preventDefault();
             this.clearOutput();
             this.inputTarget.focus();
@@ -250,16 +250,16 @@ export default class extends Controller {
         }
 
         // --- When input is focused, support history + escape ---
-        if (isFocused && !isCmd && !isAlt) {
+        if (isFocused && !isCommandKey && !isAlt) {
 
             // Only history navigation when caret is at start/end
             const start = this.inputTarget.selectionStart;
             const end = this.inputTarget.selectionEnd;
-            const len = this.inputTarget.value.length;
+            const inputLength = this.inputTarget.value.length;
 
             if (event.key === 'ArrowUp') {
                 event.preventDefault();
-                this.showHistoryPrev();
+                this.showHistoryPrevious();
                 return;
             }
 
@@ -279,8 +279,8 @@ export default class extends Controller {
 
 
 
-    onEsc(e) {
-        e.preventDefault();
+    onEsc(event) {
+        event.preventDefault();
         this.blurTile();
     }
 
@@ -292,7 +292,7 @@ export default class extends Controller {
     }
 
     /* ========== History navigation (↑/↓) ========== */
-    showHistoryPrev() {
+    showHistoryPrevious() {
         const items = this.history.last(10);
         if (items.length === 0) return;
 
@@ -324,9 +324,9 @@ export default class extends Controller {
     }
 
     moveCaretToEnd() {
-        const v = this.inputTarget.value;
+        const inputValue = this.inputTarget.value;
         this.inputTarget.value = '';
-        this.inputTarget.value = v;
+        this.inputTarget.value = inputValue;
     }
 
     /* ========== Command palette (Cmd/Ctrl + K) ========== */
@@ -336,7 +336,7 @@ export default class extends Controller {
         // Build dataset: mix last 10 history and allowlist (unique)
         const recent = this.history.last(10);
         const allowed = (this.allowlistValue || []).slice();
-        const merged = [...new Set([...recent.map(s => s.split(/\s+/)[0]), ...allowed])]; // command names
+        const merged = [...new Set([...recent.map(commandText => commandText.split(/\s+/)[0]), ...allowed])]; // command names
 
         this.paletteItems = merged.map(name => ({ name })); // simple structure
         this.renderPaletteList(this.paletteItems);
@@ -407,20 +407,20 @@ export default class extends Controller {
     }
 
     filterPalette() {
-        const q = (this.paletteInputTarget.value || '').toLowerCase().trim();
-        if (!q) {
+        const searchTerm = (this.paletteInputTarget.value || '').toLowerCase().trim();
+        if (!searchTerm) {
             this.renderPaletteList(this.paletteItems);
             return;
         }
-        const filtered = this.paletteItems.filter(it => it.name.toLowerCase().includes(q));
+        const filtered = this.paletteItems.filter(paletteItem => paletteItem.name.toLowerCase().includes(searchTerm));
         this.renderPaletteList(filtered);
     }
 
     pickFirstPalette() {
-        const firstBtn = this.paletteListTarget.querySelector('button[data-cmd]');
-        if (!firstBtn) return;
-        const cmd = firstBtn.getAttribute('data-cmd');
-        this.insertCommand(cmd);
+        const firstButton = this.paletteListTarget.querySelector('button[data-cmd]');
+        if (!firstButton) return;
+        const command = firstButton.getAttribute('data-cmd');
+        this.insertCommand(command);
         this.closePalette();
     }
 
@@ -434,23 +434,23 @@ export default class extends Controller {
             this.paletteListTarget.appendChild(empty);
             return;
         }
-        for (const it of items) {
+        for (const paletteItem of items) {
             const row = document.createElement('button');
             row.type = 'button';
             row.className = 'w-full text-left px-3 py-2 hover:bg-zinc-900 text-zinc-200 border-b border-zinc-800';
-            row.dataset.cmd = it.name;
-            row.textContent = it.name;
+            row.dataset.cmd = paletteItem.name;
+            row.textContent = paletteItem.name;
             row.addEventListener('click', () => {
-                this.insertCommand(it.name);
+                this.insertCommand(paletteItem.name);
                 this.closePalette();
             });
             this.paletteListTarget.appendChild(row);
         }
     }
 
-    insertCommand(cmd) {
+    insertCommand(command) {
         const existing = (this.inputTarget.value || '').trim();
-        this.inputTarget.value = existing ? `${existing}; ${cmd}` : cmd;
+        this.inputTarget.value = existing ? `${existing}; ${command}` : command;
         this.focusTile();
     }
 
@@ -494,27 +494,27 @@ export default class extends Controller {
 
 /* ===============================
  * HistoryStore (localStorage)
- * - Keeps at most `cap` entries
+ * - Keeps at most `capacity` entries
  * - Dedup consecutive duplicates
- * - last(n): newest -> oldest slice
+ * - last(count): newest -> oldest slice
  * ============================= */
 class HistoryStore {
-    constructor(key, cap = 50) {
+    constructor(key, capacity = 50) {
         this.key = key;
-        this.cap = cap;
-        this.arr = this._load();
+        this.capacity = capacity;
+        this.entries = this._load();
     }
-    push(cmd) {
-        cmd = (cmd || '').trim();
-        if (!cmd) return;
+    push(command) {
+        command = (command || '').trim();
+        if (!command) return;
         // Skip if identical to the last stored command
-        if (this.arr.length && this.arr[this.arr.length - 1] === cmd) return;
-        this.arr.push(cmd);
-        if (this.arr.length > this.cap) this.arr = this.arr.slice(-this.cap);
+        if (this.entries.length && this.entries[this.entries.length - 1] === command) return;
+        this.entries.push(command);
+        if (this.entries.length > this.capacity) this.entries = this.entries.slice(-this.capacity);
         this._save();
     }
-    last(n = 10) {
-        return this.arr.slice(-n);
+    last(count = 10) {
+        return this.entries.slice(-count);
     }
     _load() {
         try {
@@ -524,6 +524,6 @@ class HistoryStore {
         } catch { return []; }
     }
     _save() {
-        try { localStorage.setItem(this.key, JSON.stringify(this.arr)); } catch {}
+        try { localStorage.setItem(this.key, JSON.stringify(this.entries)); } catch {}
     }
 }
