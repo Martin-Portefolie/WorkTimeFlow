@@ -80,15 +80,15 @@ final class DateInputParser
         }
 
         // "next mon"
-        if (preg_match('#^next\s+(mon|tue|wed|thu|fri|sat|sun)$#', $raw, $m)) {
-            $weekday = $m[1];
+        if (preg_match('#^next\s+(mon|tue|wed|thu|fri|sat|sun)$#', $raw, $matches)) {
+            $weekday = $matches[1];
             return $base->modify("next $weekday");
         }
 
         // "mon-2" or "fri+1"  => next <weekday> + N weeks
-        if (preg_match('#^(mon|tue|wed|thu|fri|sat|sun)([+-])(\d+)$#', $raw, $m)) {
-            $weekday  = $m[1];
-            $weeks    = (int) $m[3];
+        if (preg_match('#^(mon|tue|wed|thu|fri|sat|sun)([+-])(\d+)$#', $raw, $matches)) {
+            $weekday  = $matches[1];
+            $weeks    = (int) $matches[3];
 
             // start from next weekday
             $target = $base->modify("next $weekday");
@@ -101,8 +101,8 @@ final class DateInputParser
         }
 
         // "mon", "fri" -> this weekday or next if passed
-        if (preg_match('#^(mon|tue|wed|thu|fri|sat|sun)$#', $raw, $m)) {
-            $weekday = $m[1];
+        if (preg_match('#^(mon|tue|wed|thu|fri|sat|sun)$#', $raw, $matches)) {
+            $weekday = $matches[1];
             $target  = $base->modify("this $weekday");
 
             // if "this weekday" is before today, move one week ahead
@@ -125,14 +125,14 @@ final class DateInputParser
 
         // dd/mm/yyyy
         if (preg_match('#^(\d{2})/(\d{2})/(\d{4})$#', $raw)) {
-            $d = \DateTimeImmutable::createFromFormat('d/m/Y', $raw);
-            return $d ?: null;
+            $parsedDate = \DateTimeImmutable::createFromFormat('d/m/Y', $raw);
+            return $parsedDate ?: null;
         }
 
         // yyyy-mm-dd
         if (preg_match('#^(\d{4})-(\d{2})-(\d{2})$#', $raw)) {
-            $d = \DateTimeImmutable::createFromFormat('Y-m-d', $raw);
-            return $d ?: null;
+            $parsedDate = \DateTimeImmutable::createFromFormat('Y-m-d', $raw);
+            return $parsedDate ?: null;
         }
 
         return null;

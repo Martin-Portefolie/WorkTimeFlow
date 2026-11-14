@@ -17,38 +17,38 @@ class ClientRepository extends ServiceEntityRepository
     }
 
 
-    public function fetchListRowsSearched(int $limit, ?string $q): array
+    public function fetchListRowsSearched(int $limit, ?string $searchTerm): array
     {
-        $qb = $this->createQueryBuilder('c')
-            ->leftJoin('c.projects', 'p')
-            ->addSelect('c.id, c.name, c.city, c.country, c.contactPerson, c.contactEmail, c.contactPhone, c.adress, c.postalCode')
-            ->addSelect('COUNT(DISTINCT p.id) AS projectsCount')
-            ->groupBy('c.id')
-            ->orderBy('c.name', 'DESC')
+        $queryBuilder = $this->createQueryBuilder('client')
+            ->leftJoin('client.projects', 'project')
+            ->addSelect('client.id, client.name, client.city, client.country, client.contactPerson, client.contactEmail, client.contactPhone, client.adress, client.postalCode')
+            ->addSelect('COUNT(DISTINCT project.id) AS projectsCount')
+            ->groupBy('client.id')
+            ->orderBy('client.name', 'DESC')
             ->setMaxResults($limit);
 
-        if ($q) {
-            $qb->andWhere('
-            c.name LIKE :q OR
-            c.city LIKE :q OR
-            c.country LIKE :q OR
-            c.contactPerson LIKE :q OR
-            c.contactEmail LIKE :q
-        ')->setParameter('q', '%'.$q.'%');
+        if ($searchTerm) {
+            $queryBuilder->andWhere('
+            client.name LIKE :searchTerm OR
+            client.city LIKE :searchTerm OR
+            client.country LIKE :searchTerm OR
+            client.contactPerson LIKE :searchTerm OR
+            client.contactEmail LIKE :searchTerm
+        ')->setParameter('searchTerm', '%'.$searchTerm.'%');
         }
 
-        $rows = $qb->getQuery()->getArrayResult();
+        $rows = $queryBuilder->getQuery()->getArrayResult();
         if (!$rows) {
             return [];
         }
 
         // Fetch projects for the selected clients together, without limiting projects per client.
-        $projects = $this->createQueryBuilder('c')
-            ->select('c.id AS clientId, p.id AS id, p.name AS name, p.isArchived AS archived')
-            ->innerJoin('c.projects', 'p')
-            ->where('c.id IN (:ids)')
+        $projects = $this->createQueryBuilder('client')
+            ->select('client.id AS clientId, project.id AS id, project.name AS name, project.isArchived AS archived')
+            ->innerJoin('client.projects', 'project')
+            ->where('client.id IN (:ids)')
             ->setParameter('ids', array_column($rows, 'id'))
-            ->orderBy('p.name', 'ASC')
+            ->orderBy('project.name', 'ASC')
             ->getQuery()
             ->getArrayResult();
         $byClient = [];
@@ -73,12 +73,12 @@ class ClientRepository extends ServiceEntityRepository
         }
 
         // Try exact (case-insensitive) email or name
-        $qb = $this->createQueryBuilder('c')
-            ->where('LOWER(c.contactEmail) = :k OR LOWER(c.name) = :k')
+        $queryBuilder = $this->createQueryBuilder('client')
+            ->where('LOWER(client.contactEmail) = :lookupValue OR LOWER(client.name) = :lookupValue')
             ->setMaxResults(1)
-            ->setParameter('k', mb_strtolower($key));
+            ->setParameter('lookupValue', mb_strtolower($key));
 
-        return $qb->getQuery()->getOneOrNullResult();
+        return $queryBuilder->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -88,8 +88,8 @@ class ClientRepository extends ServiceEntityRepository
      */
     public function findRecentForTerminal(int $limit = 5): array
     {
-        return $this->createQueryBuilder('c')
-            ->orderBy('c.id', 'DESC')
+        return $this->createQueryBuilder('client')
+            ->orderBy('client.id', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

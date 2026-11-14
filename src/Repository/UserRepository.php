@@ -39,29 +39,29 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      *
      * @return array<int,array{id:int,email:string,username:string,roles:array<int,string>}>
      */
-    public function fetchListRowsSearched(int $limit = 50, ?string $q = null, ?bool $isActive = true): array
+    public function fetchListRowsSearched(int $limit = 50, ?string $searchTerm = null, ?bool $isActive = true): array
     {
-        $qb = $this->createQueryBuilder('u')
+        $queryBuilder = $this->createQueryBuilder('user')
             ->select(
-                'u.id AS id',
-                'u.email AS email',
-                "COALESCE(u.username, '') AS username",
-                'u.roles AS roles',
-                'u.isActive AS active',
+                'user.id AS id',
+                'user.email AS email',
+                "COALESCE(user.username, '') AS username",
+                'user.roles AS roles',
+                'user.isActive AS active',
             )
-            ->orderBy('u.id', 'ASC')
+            ->orderBy('user.id', 'ASC')
             ->setMaxResults($limit);
 
-        if ($q !== null && $q !== '') {
-            $qb->andWhere('LOWER(u.email) LIKE :q OR LOWER(u.username) LIKE :q')
-                ->setParameter('q', '%'.mb_strtolower($q).'%');
+        if ($searchTerm !== null && $searchTerm !== '') {
+            $queryBuilder->andWhere('LOWER(user.email) LIKE :searchTerm OR LOWER(user.username) LIKE :searchTerm')
+                ->setParameter('searchTerm', '%'.mb_strtolower($searchTerm).'%');
         }
 
         if ($isActive !== null) {
-            $qb->andWhere('u.isActive = :act')->setParameter('act', $isActive);
+            $queryBuilder->andWhere('user.isActive = :isActive')->setParameter('isActive', $isActive);
         }
 
-        $rows = $qb->getQuery()->getArrayResult();
+        $rows = $queryBuilder->getQuery()->getArrayResult();
 
         return $this->normalizeListRows($rows);
     }
@@ -72,29 +72,29 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function findOneByIdEmailOrUsername(string $idEmailOrUsername): ?User
     {
         if (ctype_digit($idEmailOrUsername)) {
-            $u = $this->find((int) $idEmailOrUsername);
-            if ($u instanceof User) {
-                return $u;
+            $user = $this->find((int) $idEmailOrUsername);
+            if ($user instanceof User) {
+                return $user;
             }
         }
 
         $key = mb_strtolower($idEmailOrUsername);
 
         // Exact email (case-insensitive)
-        $qb = $this->createQueryBuilder('u')
-            ->where('LOWER(u.email) = :k')
-            ->setParameter('k', $key)
+        $queryBuilder = $this->createQueryBuilder('user')
+            ->where('LOWER(user.email) = :lookupValue')
+            ->setParameter('lookupValue', $key)
             ->setMaxResults(1);
 
-        $u = $qb->getQuery()->getOneOrNullResult();
-        if ($u instanceof User) {
-            return $u;
+        $user = $queryBuilder->getQuery()->getOneOrNullResult();
+        if ($user instanceof User) {
+            return $user;
         }
 
         // Exact username (case-insensitive)
-        return $this->createQueryBuilder('u')
-            ->where('LOWER(u.username) = :k')
-            ->setParameter('k', $key)
+        return $this->createQueryBuilder('user')
+            ->where('LOWER(user.username) = :lookupValue')
+            ->setParameter('lookupValue', $key)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
@@ -106,15 +106,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function findOneByIdOrEmailInsensitive(string $idOrEmail): ?User
     {
         if (ctype_digit($idOrEmail)) {
-            $u = $this->find((int) $idOrEmail);
-            if ($u instanceof User) return $u;
+            $user = $this->find((int) $idOrEmail);
+            if ($user instanceof User) return $user;
         }
 
         $key = mb_strtolower($idOrEmail);
 
-        return $this->createQueryBuilder('u')
-            ->where('LOWER(u.email) = :k')
-            ->setParameter('k', $key)
+        return $this->createQueryBuilder('user')
+            ->where('LOWER(user.email) = :lookupValue')
+            ->setParameter('lookupValue', $key)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
@@ -132,18 +132,18 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     private function normalizeListRows(array $rows): array
     {
-        foreach ($rows as &$r) {
-            $r['id'] = (int) $r['id'];
-            $r['email'] = trim((string) ($r['email'] ?? ''));
-            $r['username'] = trim((string) ($r['username'] ?? ''));
-            if (!is_array($r['roles'])) {
-                $decoded = json_decode((string) $r['roles'], true);
-                $r['roles'] = is_array($decoded) ? $decoded : [];
+        foreach ($rows as &$userRow) {
+            $userRow['id'] = (int) $userRow['id'];
+            $userRow['email'] = trim((string) ($userRow['email'] ?? ''));
+            $userRow['username'] = trim((string) ($userRow['username'] ?? ''));
+            if (!is_array($userRow['roles'])) {
+                $decoded = json_decode((string) $userRow['roles'], true);
+                $userRow['roles'] = is_array($decoded) ? $decoded : [];
             }
-            $r['roles'] = array_values(array_unique(array_map('strval', $r['roles'])));
-            $r['active'] = (bool) ($r['active'] ?? false);
+            $userRow['roles'] = array_values(array_unique(array_map('strval', $userRow['roles'])));
+            $userRow['active'] = (bool) ($userRow['active'] ?? false);
         }
-        unset($r);
+        unset($userRow);
 
         /** @var array<int,array{id:int,email:string,username:string,roles:array<int,string>}> $rows */
         return $rows;

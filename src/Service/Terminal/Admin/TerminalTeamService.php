@@ -34,7 +34,7 @@ final class TerminalTeamService
         private readonly UserRepository $userRepository,
         private readonly TerminalStateService $state,
         private readonly Security $security,
-        private readonly EntityManagerInterface $em,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -44,29 +44,12 @@ final class TerminalTeamService
 
     public function list(array $flags = []): array
     {
-        $q = isset($flags['q']) ? trim((string) $flags['q']) : null;
+        $searchTerm = isset($flags['q']) ? trim((string) $flags['q']) : null;
         $limit = isset($flags['limit']) ? max(1, (int) $flags['limit']) : 50;
-
-        $qb = $this->teamRepository->createQueryBuilder('t')
-            ->leftJoin('t.users', 'u')->addSelect('u')
-            ->leftJoin('t.projects', 'p')->addSelect('p')
-            ->orderBy('t.name', 'ASC')
-            ->setMaxResults($limit);
-
-        if ($q) {
-            if (ctype_digit($q)) {
-                $qb->andWhere('t.id = :id OR LOWER(t.name) LIKE :q OR LOWER(p.name) LIKE :q')
-                    ->setParameter('id', (int) $q)
-                    ->setParameter('q', '%' . mb_strtolower($q) . '%');
-            } else {
-                $qb->andWhere('LOWER(t.name) LIKE :q OR LOWER(p.name) LIKE :q')
-                    ->setParameter('q', '%' . mb_strtolower($q) . '%');
-            }
-        }
 
         $rows = array_map(
             fn (Team $team): array => $this->teamListRow($team),
-            $qb->getQuery()->getResult(),
+            $this->teamRepository->findForTerminalList($searchTerm, $limit),
         );
 
         return [
@@ -85,7 +68,7 @@ final class TerminalTeamService
                     ['key' => 'projectNames', 'label' => 'Project names'],
                 ],
                 'rows' => $rows,
-                'search' => $q,
+                'search' => $searchTerm,
                 'shownCount' => count($rows),
                 'limit' => $limit,
             ],
@@ -96,9 +79,9 @@ final class TerminalTeamService
     // Show Team
     // -----------------------------------------------------
 
-    public function show(array $args = []): array
+    public function show(array $arguments = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return $this->error(
@@ -153,9 +136,9 @@ final class TerminalTeamService
     // Update Team
     // -----------------------------------------------------
 
-    public function update(array $args = [], array $flags = []): array
+    public function update(array $arguments = [], array $flags = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return $this->error(
@@ -190,7 +173,7 @@ final class TerminalTeamService
             );
         }
 
-        $this->em->flush();
+        $this->entityManager->flush();
 
         return $this->teamShowPayload('Team updated', $team);
     }
@@ -199,9 +182,9 @@ final class TerminalTeamService
     // Delete Team
     // -----------------------------------------------------
 
-    public function delete(array $args = [], array $flags = []): array
+    public function delete(array $arguments = [], array $flags = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return $this->error(
@@ -225,8 +208,8 @@ final class TerminalTeamService
 
         $name = $team->getName();
 
-        $this->em->remove($team);
-        $this->em->flush();
+        $this->entityManager->remove($team);
+        $this->entityManager->flush();
 
         return [
             'success' => true,
@@ -243,10 +226,10 @@ final class TerminalTeamService
     // Add User To Team
     // -----------------------------------------------------
 
-    public function addUser(array $args = [], array $flags = []): array
+    public function addUser(array $arguments = [], array $flags = []): array
     {
-        $teamIdentifier = $args[0] ?? null;
-        $userIdentifier = $args[1] ?? $flags['user'] ?? null;
+        $teamIdentifier = $arguments[0] ?? null;
+        $userIdentifier = $arguments[1] ?? $flags['user'] ?? null;
 
         if (!$teamIdentifier || !$userIdentifier) {
             return $this->error('Missing input', 'Usage: teams:add-user <teamId|name> <userId|email>');
@@ -268,7 +251,7 @@ final class TerminalTeamService
         }
 
         $team->addUser($user);
-        $this->em->flush();
+        $this->entityManager->flush();
 
         return $this->teamShowPayload('User added to team', $team);
     }
@@ -277,10 +260,10 @@ final class TerminalTeamService
     // Remove User From Team
     // -----------------------------------------------------
 
-    public function removeUser(array $args = [], array $flags = []): array
+    public function removeUser(array $arguments = [], array $flags = []): array
     {
-        $teamIdentifier = $args[0] ?? null;
-        $userIdentifier = $args[1] ?? $flags['user'] ?? null;
+        $teamIdentifier = $arguments[0] ?? null;
+        $userIdentifier = $arguments[1] ?? $flags['user'] ?? null;
 
         if (!$teamIdentifier || !$userIdentifier) {
             return $this->error('Missing input', 'Usage: teams:remove-user <teamId|name> <userId|email>');
@@ -302,7 +285,7 @@ final class TerminalTeamService
         }
 
         $team->removeUser($user);
-        $this->em->flush();
+        $this->entityManager->flush();
 
         return $this->teamShowPayload('User removed from team', $team);
     }
@@ -470,8 +453,8 @@ final class TerminalTeamService
             $team->addUser($user);
         }
 
-        $this->em->persist($team);
-        $this->em->flush();
+        $this->entityManager->persist($team);
+        $this->entityManager->flush();
 
         return ['success' => true, 'team' => $team];
     }

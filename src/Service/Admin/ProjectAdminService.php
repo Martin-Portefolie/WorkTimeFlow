@@ -14,7 +14,7 @@ final class ProjectAdminService
         private readonly ClientRepository $clients,
         private readonly RateRepository $rates,
         private readonly TeamRepository $teams,
-        private readonly EntityManagerInterface $em,
+        private readonly EntityManagerInterface $entityManager,
     ) {}
 
     public function list(): array
@@ -77,8 +77,8 @@ final class ProjectAdminService
             if (!in_array($team, $teams, true)) $project->removeTeam($team);
         }
         foreach ($teams as $team) $project->addTeam($team);
-        if ($project->getId() === null) $this->em->persist($project);
-        $this->em->flush();
+        if ($project->getId() === null) $this->entityManager->persist($project);
+        $this->entityManager->flush();
     }
 
     private function text(array $data, string $key): string

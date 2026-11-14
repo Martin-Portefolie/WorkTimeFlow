@@ -19,7 +19,7 @@ final class TerminalUserService
         private readonly UserRepository $userRepository,
         private readonly TerminalStateService $state,
         private readonly Security $security,
-        private readonly EntityManagerInterface $em,
+        private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly MailerInterface $mailer,
         private readonly RouterInterface $router,
@@ -30,13 +30,13 @@ final class TerminalUserService
     // Show User
     // -----------------------------------------------------
 
-    public function show(array $args = []): array
+    public function show(array $arguments = []): array
     {
         // -----------------------------------------------------
         // Resolve identifier
         // -----------------------------------------------------
 
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return [
@@ -95,21 +95,21 @@ final class TerminalUserService
     // List Users
     // -----------------------------------------------------
 
-    public function list(array $args = []): array
+    public function list(array $arguments = []): array
     {
 
         // -----------------------------------------------------
         // Search query
         // -----------------------------------------------------
 
-        $q = $args['q'] ?? null;
+        $searchTerm = $arguments['q'] ?? null;
 
         // -----------------------------------------------------
         // Limit
         // -----------------------------------------------------
 
-        $limit = isset($args['limit'])
-            ? (int) $args['limit']
+        $limit = isset($arguments['limit'])
+            ? (int) $arguments['limit']
             : 25;
 
         // -----------------------------------------------------
@@ -118,11 +118,11 @@ final class TerminalUserService
 
         $isActive = true;
 
-        if (isset($args['inactive'])) {
+        if (isset($arguments['inactive'])) {
             $isActive = false;
         }
 
-        if (isset($args['all'])) {
+        if (isset($arguments['all'])) {
             $isActive = null;
         }
 
@@ -133,7 +133,7 @@ final class TerminalUserService
 
         $rows = $this->userRepository->fetchListRowsSearched(
             $limit,
-            $q,
+            $searchTerm,
             $isActive,
         );
 
@@ -187,7 +187,7 @@ final class TerminalUserService
     // Add User
     // -----------------------------------------------------
 
-    public function add(array $args = []): array
+    public function add(array $arguments = []): array
     {
         $userId = $this->currentUserId();
 
@@ -209,27 +209,27 @@ final class TerminalUserService
 // Activate User
 // -----------------------------------------------------
 
-    public function activate(array $args = []): array
+    public function activate(array $arguments = []): array
     {
-        return $this->toggleActive($args, true);
+        return $this->toggleActive($arguments, true);
     }
 
 // -----------------------------------------------------
 // Deactivate User
 // -----------------------------------------------------
 
-    public function deactivate(array $args = []): array
+    public function deactivate(array $arguments = []): array
     {
-        return $this->toggleActive($args, false);
+        return $this->toggleActive($arguments, false);
     }
 
     // -----------------------------------------------------
     // Update User
     // -----------------------------------------------------
 
-    public function update(array $args = [], array $flags = []): array
+    public function update(array $arguments = [], array $flags = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return [
@@ -303,14 +303,14 @@ final class TerminalUserService
 
             try {
                 $roles = $this->validateRoles($roles);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $exception) {
                 return [
                     'success' => false,
                     'view' => 'terminals/admin/terminal_commands/users.html.twig',
                     'vars' => [
                         'view' => 'error',
                         'title' => 'Invalid roles',
-                        'message' => $e->getMessage(),
+                        'message' => $exception->getMessage(),
                     ],
                 ];
             }
@@ -331,7 +331,7 @@ final class TerminalUserService
             ];
         }
 
-        $this->em->flush();
+        $this->entityManager->flush();
 
         return [
             'success' => true,
@@ -354,9 +354,9 @@ final class TerminalUserService
     // Delete User
     // -----------------------------------------------------
 
-    public function delete(array $args = [], array $flags = []): array
+    public function delete(array $arguments = [], array $flags = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return [
@@ -398,8 +398,8 @@ final class TerminalUserService
 
         $email = $user->getEmail();
 
-        $this->em->remove($user);
-        $this->em->flush();
+        $this->entityManager->remove($user);
+        $this->entityManager->flush();
 
         return [
             'success' => true,
@@ -416,9 +416,9 @@ final class TerminalUserService
 // Forgot password
 // -----------------------------------------------------
 
-    public function forgotPassword(array $args = [], array $flags = []): array
+    public function forgotPassword(array $arguments = [], array $flags = []): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return [
@@ -459,7 +459,7 @@ final class TerminalUserService
 
         $user->setPassword($hashedPassword);
 
-        $this->em->flush();
+        $this->entityManager->flush();
 
         // -----------------------------------------------------
         // Send reset email
@@ -483,14 +483,14 @@ final class TerminalUserService
 
         try {
             $this->mailer->send($email);
-        } catch (\Throwable $e) {
+        } catch (\Throwable $exception) {
             return [
                 'success' => false,
                 'view' => 'terminals/admin/terminal_commands/users.html.twig',
                 'vars' => [
                     'view' => 'error',
                     'title' => 'Mail delivery failed',
-                    'message' => $e->getMessage(),
+                    'message' => $exception->getMessage(),
                 ],
             ];
         }
@@ -658,13 +658,13 @@ final class TerminalUserService
 
             try {
                 $roles = $this->validateRoles($roles);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $exception) {
                 return $this->prompt(
                     step: 3,
                     total: 4,
                     label: 'Enter roles (comma separated). Leave empty for ROLE_USER',
                     example: 'ROLE_USER,ROLE_ADMIN',
-                    error: $e->getMessage(),
+                    error: $exception->getMessage(),
                 );
             }
 
@@ -723,8 +723,8 @@ final class TerminalUserService
 
             $user->setPassword($hashed);
 
-            $this->em->persist($user);
-            $this->em->flush();
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
 
             $email = (new TemplatedEmail())
                 ->from('noreply@worktimeflow.test')
@@ -800,9 +800,9 @@ final class TerminalUserService
 // Toggle user active state
 // -----------------------------------------------------
 
-    private function toggleActive(array $args, bool $active): array
+    private function toggleActive(array $arguments, bool $active): array
     {
-        $identifier = $args[0] ?? null;
+        $identifier = $arguments[0] ?? null;
 
         if (!$identifier) {
             return [
@@ -838,7 +838,7 @@ final class TerminalUserService
 
         $user->setIsActive($active);
 
-        $this->em->flush();
+        $this->entityManager->flush();
 
         return [
             'success' => true,

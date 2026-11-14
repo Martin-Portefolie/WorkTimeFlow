@@ -13,17 +13,17 @@
     {% set rateCommands = [] %}
     {% set teamCommands = [] %}
 
-    {% for it in aliases %}
-        {% if it.cmd starts with 'users:' %}
-            {% set userCommands = userCommands|merge([it]) %}
-        {% elseif it.cmd starts with 'clients:' %}
-            {% set clientCommands = clientCommands|merge([it]) %}
-        {% elseif it.cmd starts with 'company:' %}
-            {% set companyCommands = companyCommands|merge([it]) %}
-        {% elseif it.cmd starts with 'rates:' %}
-            {% set rateCommands = rateCommands|merge([it]) %}
-        {% elseif it.cmd starts with 'teams:' %}
-            {% set teamCommands = teamCommands|merge([it]) %}
+    {% for commandItem in aliases %}
+        {% if commandItem.cmd starts with 'users:' %}
+            {% set userCommands = userCommands|merge([commandItem]) %}
+        {% elseif commandItem.cmd starts with 'clients:' %}
+            {% set clientCommands = clientCommands|merge([commandItem]) %}
+        {% elseif commandItem.cmd starts with 'company:' %}
+            {% set companyCommands = companyCommands|merge([commandItem]) %}
+        {% elseif commandItem.cmd starts with 'rates:' %}
+            {% set rateCommands = rateCommands|merge([commandItem]) %}
+        {% elseif commandItem.cmd starts with 'teams:' %}
+            {% set teamCommands = teamCommands|merge([commandItem]) %}
         {% endif %}
     {% endfor %}
 
@@ -45,32 +45,32 @@
             </thead>
 
             <tbody>
-            {% for it in userCommands %}
+            {% for commandItem in userCommands %}
                 <tr class="text-zinc-300">
                     <td class="border border-zinc-800 px-2 py-1">
-                        <code class="text-emerald-400">{{ it.cmd }}</code>
+                        <code class="text-emerald-400">{{ commandItem.cmd }}</code>
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1">
-                        <code class="text-amber-300">{{ it.alias }}</code>
+                        <code class="text-amber-300">{{ commandItem.alias }}</code>
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
-                        {% if it.usage %}
-                            <code class="text-zinc-400">{{ it.usage }}</code>
+                        {% if commandItem.usage %}
+                            <code class="text-zinc-400">{{ commandItem.usage }}</code>
                         {% else %}
                             <span class="text-zinc-700">—</span>
                         {% endif %}
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
-                        {{ it.desc }}
+                        {{ commandItem.desc }}
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1">
-                        {% if it.flags is not empty %}
+                        {% if commandItem.flags is not empty %}
                             <div class="flex flex-col gap-0.5">
-                                {% for flag in it.flags %}
+                                {% for flag in commandItem.flags %}
                                     <code class="text-sky-400 bg-zinc-800/60 px-1 py-0.5 rounded text-[10px]">
                                         {{ flag }}
                                     </code>
@@ -104,32 +104,32 @@
             </thead>
 
             <tbody>
-            {% for it in clientCommands %}
+            {% for commandItem in clientCommands %}
                 <tr class="text-zinc-300">
                     <td class="border border-zinc-800 px-2 py-1">
-                        <code class="text-emerald-400">{{ it.cmd }}</code>
+                        <code class="text-emerald-400">{{ commandItem.cmd }}</code>
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1">
-                        <code class="text-amber-300">{{ it.alias }}</code>
+                        <code class="text-amber-300">{{ commandItem.alias }}</code>
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
-                        {% if it.usage %}
-                            <code class="text-zinc-400">{{ it.usage }}</code>
+                        {% if commandItem.usage %}
+                            <code class="text-zinc-400">{{ commandItem.usage }}</code>
                         {% else %}
                             <span class="text-zinc-700">—</span>
                         {% endif %}
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
-                        {{ it.desc }}
+                        {{ commandItem.desc }}
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1">
-                        {% if it.flags is not empty %}
+                        {% if commandItem.flags is not empty %}
                             <div class="flex flex-col gap-0.5">
-                                {% for flag in it.flags %}
+                                {% for flag in commandItem.flags %}
                                     <code class="text-sky-400 bg-zinc-800/60 px-1 py-0.5 rounded text-[10px]">
                                         {{ flag }}
                                     </code>
@@ -163,32 +163,32 @@
             </thead>
 
             <tbody>
-            {% for it in companyCommands %}
+            {% for commandItem in companyCommands %}
                 <tr class="text-zinc-300">
                     <td class="border border-zinc-800 px-2 py-1">
-                        <code class="text-emerald-400">{{ it.cmd }}</code>
+                        <code class="text-emerald-400">{{ commandItem.cmd }}</code>
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1">
-                        <code class="text-amber-300">{{ it.alias }}</code>
+                        <code class="text-amber-300">{{ commandItem.alias }}</code>
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
-                        {% if it.usage %}
-                            <code class="text-zinc-400">{{ it.usage }}</code>
+                        {% if commandItem.usage %}
+                            <code class="text-zinc-400">{{ commandItem.usage }}</code>
                         {% else %}
                             <span class="text-zinc-700">—</span>
                         {% endif %}
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
-                        {{ it.desc }}
+                        {{ commandItem.desc }}
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1">
-                        {% if it.flags is not empty %}
+                        {% if commandItem.flags is not empty %}
                             <div class="flex flex-col gap-0.5">
-                                {% for flag in it.flags %}
+                                {% for flag in commandItem.flags %}
                                     <code class="text-sky-400 bg-zinc-800/60 px-1 py-0.5 rounded text-[10px]">
                                         {{ flag }}
                                     </code>
@@ -222,32 +222,32 @@
             </thead>
 
             <tbody>
-            {% for it in rateCommands %}
+            {% for commandItem in rateCommands %}
                 <tr class="text-zinc-300">
                     <td class="border border-zinc-800 px-2 py-1">
-                        <code class="text-emerald-400">{{ it.cmd }}</code>
+                        <code class="text-emerald-400">{{ commandItem.cmd }}</code>
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1">
-                        <code class="text-amber-300">{{ it.alias }}</code>
+                        <code class="text-amber-300">{{ commandItem.alias }}</code>
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
-                        {% if it.usage %}
-                            <code class="text-zinc-400">{{ it.usage }}</code>
+                        {% if commandItem.usage %}
+                            <code class="text-zinc-400">{{ commandItem.usage }}</code>
                         {% else %}
                             <span class="text-zinc-700">—</span>
                         {% endif %}
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
-                        {{ it.desc }}
+                        {{ commandItem.desc }}
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1">
-                        {% if it.flags is not empty %}
+                        {% if commandItem.flags is not empty %}
                             <div class="flex flex-col gap-0.5">
-                                {% for flag in it.flags %}
+                                {% for flag in commandItem.flags %}
                                     <code class="text-sky-400 bg-zinc-800/60 px-1 py-0.5 rounded text-[10px]">
                                         {{ flag }}
                                     </code>
@@ -281,32 +281,32 @@
             </thead>
 
             <tbody>
-            {% for it in teamCommands %}
+            {% for commandItem in teamCommands %}
                 <tr class="text-zinc-300">
                     <td class="border border-zinc-800 px-2 py-1">
-                        <code class="text-emerald-400">{{ it.cmd }}</code>
+                        <code class="text-emerald-400">{{ commandItem.cmd }}</code>
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1">
-                        <code class="text-amber-300">{{ it.alias }}</code>
+                        <code class="text-amber-300">{{ commandItem.alias }}</code>
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
-                        {% if it.usage %}
-                            <code class="text-zinc-400">{{ it.usage }}</code>
+                        {% if commandItem.usage %}
+                            <code class="text-zinc-400">{{ commandItem.usage }}</code>
                         {% else %}
                             <span class="text-zinc-700">—</span>
                         {% endif %}
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1 text-zinc-500">
-                        {{ it.desc }}
+                        {{ commandItem.desc }}
                     </td>
 
                     <td class="border border-zinc-800 px-2 py-1">
-                        {% if it.flags is not empty %}
+                        {% if commandItem.flags is not empty %}
                             <div class="flex flex-col gap-0.5">
-                                {% for flag in it.flags %}
+                                {% for flag in commandItem.flags %}
                                     <code class="text-sky-400 bg-zinc-800/60 px-1 py-0.5 rounded text-[10px]">
                                         {{ flag }}
                                     </code>

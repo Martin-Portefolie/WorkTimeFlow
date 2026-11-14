@@ -29,8 +29,8 @@ class RateRepository extends ServiceEntityRepository
      */
     public function findPreviewForTerminal(int $limit = 5): array
     {
-        return $this->createQueryBuilder('r')
-            ->orderBy('r.id', 'ASC')  // stable order for numeric [0],[1],[2]
+        return $this->createQueryBuilder('rate')
+            ->orderBy('rate.id', 'ASC')  // stable order for numeric [0],[1],[2]
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

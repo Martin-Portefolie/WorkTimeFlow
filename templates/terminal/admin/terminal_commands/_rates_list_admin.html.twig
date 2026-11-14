@@ -27,17 +27,17 @@
                 </tr>
                 </thead>
                 <tbody class="text-zinc-300">
-                {% for r in rows %}
+                {% for rateRow in rows %}
                     <tr class="hover:bg-zinc-900/40">
                         <td class="border border-dotted border-zinc-700 px-3 py-1 text-zinc-400">
-                            {{ r.id }}
+                            {{ rateRow.id }}
                         </td>
                         <td class="border border-dotted border-zinc-700 px-3 py-1 truncate"
-                            title="{{ r.name }}">
-                            {{ r.name ?: '—' }}
+                            title="{{ rateRow.name }}">
+                            {{ rateRow.name ?: '—' }}
                         </td>
                         <td class="border border-dotted border-zinc-700 px-3 py-1 text-right">
-                            {{ r.value ?: '—' }}
+                            {{ rateRow.value ?: '—' }}
                         </td>
                     </tr>
                 {% endfor %}

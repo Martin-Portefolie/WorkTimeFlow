@@ -81,17 +81,17 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for r in rates %}
+                            {% for rate in rates %}
                                 <tr>
                                     <td class="border border-dotted border-zinc-700 px-2 py-1 text-zinc-400">
-                                        {{ r.id }}
+                                        {{ rate.id }}
                                     </td>
                                     <td class="border border-dotted border-zinc-700 px-2 py-1 truncate"
-                                        title="{{ r.name }}">
-                                        {{ r.name ?: '—' }}
+                                        title="{{ rate.name }}">
+                                        {{ rate.name ?: '—' }}
                                     </td>
                                     <td class="border border-dotted border-zinc-700 px-2 py-1 text-right">
-                                        {{ r.value ?: '—' }}
+                                        {{ rate.value ?: '—' }}
                                     </td>
                                 </tr>
                             {% endfor %}

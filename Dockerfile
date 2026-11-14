@@ -1,5 +1,6 @@
 FROM dunglas/frankenphp:php8.5
 WORKDIR /app
+COPY docker/php.ini /usr/local/etc/php/conf.d/zz-app.ini
 
 # Refuse base images without the October 2026 PHP security fixes.
 RUN php -r 'exit(version_compare(PHP_VERSION, "8.5.12", ">=") ? 0 : 1);'

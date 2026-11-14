@@ -18,7 +18,7 @@ final class TerminalTodoService
 
     public function list(array $flags = []): array
     {
-        $q = isset($flags['q']) ? trim((string) $flags['q']) : null;
+        $searchTerm = isset($flags['q']) ? trim((string) $flags['q']) : null;
         $limit = isset($flags['limit']) ? max(1, (int) $flags['limit']) : 50;
 
         $project = null;
@@ -44,7 +44,7 @@ final class TerminalTodoService
                 'dateStart' => $todo->getDateStart()?->format('d/m/Y'),
                 'dateEnd' => $todo->getDateEnd()?->format('d/m/Y'),
             ],
-            $this->todoRepository->findForTerminalList($q, $project, $limit),
+            $this->todoRepository->findForTerminalList($searchTerm, $project, $limit),
         );
 
         return [
@@ -64,16 +64,16 @@ final class TerminalTodoService
                     ['key' => 'dateEnd', 'label' => 'End date'],
                 ],
                 'rows' => $rows,
-                'search' => $q,
+                'search' => $searchTerm,
                 'shownCount' => count($rows),
                 'limit' => $limit,
             ],
         ];
     }
 
-    public function show(array $args = []): array
+    public function show(array $arguments = []): array
     {
-        $identifier = trim((string) ($args[0] ?? ''));
+        $identifier = trim((string) ($arguments[0] ?? ''));
 
         if ($identifier === '') {
             return $this->error('Missing todo identifier', 'Usage: todos:show <id|name>');

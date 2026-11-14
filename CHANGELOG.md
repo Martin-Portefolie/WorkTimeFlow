@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - search feature
 
 ### Changed
+- Local Docker dev serves assets live through AssetMapper (no compiled `public/assets` outside prod), and a `tailwind` compose service rebuilds the CSS when templates or assets change.
+- Use descriptive variable and query-alias names in the active admin/terminal implementation and its tests; keep project/team list queries in repositories.
 - Compare architecture checks against the pull request base instead of the retired alpha branch, and generate the user test password hash dynamically.
 - Upgrade to PHP 8.5 and Symfony 8.1 with refreshed Composer dependencies; CI uses PHP 8.5.12 and Docker builds reject older PHP security patches.
 - Show project deadlines and overdue warnings directly in compact rows; use purple information buttons, amber editing accents and green save buttons.

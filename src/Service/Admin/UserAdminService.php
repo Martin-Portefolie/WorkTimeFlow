@@ -14,7 +14,7 @@ final class UserAdminService
 {
     public function __construct(
         private readonly UserRepository $users,
-        private readonly EntityManagerInterface $em,
+        private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly MailerInterface $mailer,
         private readonly UrlGeneratorInterface $router,
@@ -35,7 +35,7 @@ final class UserAdminService
             throw new \InvalidArgumentException('user.self_access');
         }
         $user->setUsername($username)->setEmail($email)->setRoles($roles)->setIsActive($active);
-        $this->em->flush();
+        $this->entityManager->flush();
     }
 
     public function create(array $data): User
@@ -57,10 +57,10 @@ final class UserAdminService
                 'login_url' => $this->router->generate('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL),
             ]);
 
-        $this->em->wrapInTransaction(function () use ($user, $email): void {
-            $this->em->persist($user);
+        $this->entityManager->wrapInTransaction(function () use ($user, $email): void {
+            $this->entityManager->persist($user);
             // Check database constraints before handing the welcome email to the mailer.
-            $this->em->flush();
+            $this->entityManager->flush();
             try {
                 $this->mailer->send($email);
             } catch (\Throwable $exception) {

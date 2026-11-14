@@ -34,9 +34,9 @@
     {% if clientsPreview is defined and clientsPreview is not empty %}
         <div class="mt-2 text-[11px] text-zinc-400">
             Recent clients (type id or exact name):
-            {% for c in clientsPreview %}
+            {% for client in clientsPreview %}
                 <div>
-                    #{{ c.id }} — {{ c.name }}
+                    #{{ client.id }} — {{ client.name }}
                 </div>
             {% endfor %}
         </div>
@@ -46,9 +46,9 @@
     {% if teamsPreview is defined and teamsPreview is not empty %}
         <div class="mt-2 text-[11px] text-zinc-400">
             Recent teams (type ids or exact names, comma separated):
-            {% for t in teamsPreview %}
+            {% for team in teamsPreview %}
                 <div>
-                    #{{ t.id }} — {{ t.name }}
+                    #{{ team.id }} — {{ team.name }}
                 </div>
             {% endfor %}
         </div>
@@ -57,9 +57,9 @@
     {% if ratesPreview is defined and ratesPreview is not empty %}
         <div class="mt-2 text-[11px] text-zinc-400">
             Available rates (type id or exact name):
-            {% for r in ratesPreview %}
+            {% for rate in ratesPreview %}
                 <div>
-                    #{{ r.id }} — {{ r.name }} ({{ r.value }})
+                    #{{ rate.id }} — {{ rate.name }} ({{ rate.value }})
                 </div>
             {% endfor %}
         </div>

@@ -33,30 +33,30 @@ final class ArgsParser
      */
     public static function parse(array $tokens): array
     {
-        $args  = [];  // Positional arguments, e.g. "123"
+        $arguments  = [];  // Positional arguments, e.g. "123"
         $flags = [];  // Named flags, e.g. ["emails" => "alice@example.com"]
 
-        foreach ($tokens as $t) {
+        foreach ($tokens as $token) {
             // If it starts with "--", treat it as a flag
-            if (str_starts_with($t, '--')) {
-                $t = substr($t, 2); // remove leading "--"
+            if (str_starts_with($token, '--')) {
+                $token = substr($token, 2); // remove leading "--"
 
                 // Case: --key=value
-                if (str_contains($t, '=')) {
-                    [$k, $v] = explode('=', $t, 2);
-                    $flags[$k] = $v;
+                if (str_contains($token, '=')) {
+                    [$flagName, $flagValue] = explode('=', $token, 2);
+                    $flags[$flagName] = $flagValue;
                 }
                 // Case: --flag (no value)
                 else {
-                    $flags[$t] = true;
+                    $flags[$token] = true;
                 }
             }
             // Otherwise it’s a positional arg
             else {
-                $args[] = $t;
+                $arguments[] = $token;
             }
         }
 
-        return ['args' => $args, 'flags' => $flags];
+        return ['args' => $arguments, 'flags' => $flags];
     }
 }

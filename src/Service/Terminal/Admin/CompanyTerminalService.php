@@ -26,8 +26,8 @@ final class CompanyTerminalService
     public function __construct(
         private CompanyRepository       $companies,
         private RateRepository          $rates,
-        private EntityManagerInterface  $em,
-        private TerminalStateService    $wiz,
+        private EntityManagerInterface  $entityManager,
+        private TerminalStateService    $wizardState,
         private Security                $security,
     ) {}
 
@@ -72,13 +72,13 @@ final class CompanyTerminalService
      */
     public function companySetNameCommand(array $tokens): array
     {
-        ['args' => $args, 'flags' => $flags] = ArgsParser::parse($tokens);
+        ['args' => $arguments, 'flags' => $flags] = ArgsParser::parse($tokens);
         if ($tokens !== []) {
             if (!isset($flags['name']) || !is_string($flags['name']) || count($flags) !== 1) {
                 return ['output' => 'Usage: company:set-name --name="Company name"', 'success' => false];
             }
             // This command has no positional arguments: remaining words belong to the name.
-            $name = trim(implode(' ', [$flags['name'], ...$args]));
+            $name = trim(implode(' ', [$flags['name'], ...$arguments]));
             if (strlen($name) >= 2 && in_array($name[0], ['"', "'"], true) && $name[-1] === $name[0]) {
                 $name = substr($name, 1, -1);
             }
@@ -87,7 +87,7 @@ final class CompanyTerminalService
 
         // Interactive wizard mode (single-step)
         $userId = $this->currentUserKey();
-        $this->wiz->set($userId, [
+        $this->wizardState->set($userId, [
             'mode' => self::WZ_COMPANY_SET_NAME,
             'step' => 0,
             'data' => [],
@@ -130,11 +130,11 @@ final class CompanyTerminalService
 
         $rateEntities = $this->rates->findBy(['company' => $company], ['name' => 'ASC', 'id' => 'ASC']);
 
-        $rows = array_map(static function (Rate $r): array {
+        $rows = array_map(static function (Rate $rate): array {
             return [
-                'id'    => (string) $r->getId(),
-                'name'  => (string) $r->getName(),
-                'value' => (string) $r->getValue(),
+                'id'    => (string) $rate->getId(),
+                'name'  => (string) $rate->getName(),
+                'value' => (string) $rate->getValue(),
             ];
         }, $rateEntities);
 
@@ -159,7 +159,7 @@ final class CompanyTerminalService
      */
     public function ratesAddCommand(array $tokens): array
     {
-        ['args' => $args, 'flags' => $flags] = ArgsParser::parse($tokens);
+        ['args' => $arguments, 'flags' => $flags] = ArgsParser::parse($tokens);
 
         // If flags present → non-interactive
         if (!empty($flags)) {
@@ -168,20 +168,20 @@ final class CompanyTerminalService
 
         // Interactive wizard
         $userId = $this->currentUserKey();
-        $this->wiz->set($userId, [
+        $this->wizardState->set($userId, [
             'mode' => self::WZ_RATES_ADD,
             'step' => 0,
             'data' => [],
         ]);
 
-        $s     = self::RATES_ADD_STEPS[0];
+        $currentStep     = self::RATES_ADD_STEPS[0];
         $total = count(self::RATES_ADD_STEPS);
 
         return [
             'view'    => 'terminal/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
             'vars'    => [
-                'label'   => $s['label'],
-                'example' => $s['example'] ?? null,
+                'label'   => $currentStep['label'],
+                'example' => $currentStep['example'] ?? null,
                 'step'    => 1,
                 'total'   => $total,
             ],
@@ -198,13 +198,13 @@ final class CompanyTerminalService
      */
     public function ratesUpdateCommand(array $tokens): array
     {
-        ['args' => $args, 'flags' => $flags] = ArgsParser::parse($tokens);
+        ['args' => $arguments, 'flags' => $flags] = ArgsParser::parse($tokens);
 
-        if (!isset($args[0])) {
+        if (!isset($arguments[0])) {
             return ['output' => 'Usage: rates:update <id> [--name=... --value=...]', 'success' => false];
         }
 
-        $id = (int) $args[0];
+        $id = (int) $arguments[0];
         if ($id <= 0) {
             return ['output' => 'Invalid rate id.', 'success' => false];
         }
@@ -235,7 +235,7 @@ final class CompanyTerminalService
             return ['output' => 'Nothing to update.', 'success' => false];
         }
 
-        $this->em->flush();
+        $this->entityManager->flush();
 
         return ['output' => 'Updated: ' . implode(', ', $changed), 'success' => true, 'ratesChanged' => true];
     }
@@ -248,13 +248,13 @@ final class CompanyTerminalService
      */
     public function ratesDeleteCommand(array $tokens): array
     {
-        ['args' => $args, 'flags' => $flags] = ArgsParser::parse($tokens);
+        ['args' => $arguments, 'flags' => $flags] = ArgsParser::parse($tokens);
 
-        if (!isset($args[0])) {
+        if (!isset($arguments[0])) {
             return ['output' => 'Usage: rates:delete <id>', 'success' => false];
         }
 
-        $id = (int) $args[0];
+        $id = (int) $arguments[0];
         if ($id <= 0) {
             return ['output' => 'Invalid rate id.', 'success' => false];
         }
@@ -266,13 +266,13 @@ final class CompanyTerminalService
         }
 
         $name = $rate->getName();
-        $rid  = $rate->getId();
+        $rateId  = $rate->getId();
 
-        $this->em->remove($rate);
-        $this->em->flush();
+        $this->entityManager->remove($rate);
+        $this->entityManager->flush();
 
         return [
-            'output'  => sprintf('Rate id=%d (%s) deleted.', $rid, (string) $name),
+            'output'  => sprintf('Rate id=%d (%s) deleted.', $rateId, (string) $name),
             'ratesChanged' => true,
             'success' => true,
         ];
@@ -290,29 +290,29 @@ final class CompanyTerminalService
     public function handleInteractive(string $rawInput): ?array
     {
         $userId = $this->currentUserKey();
-        $state  = $this->wiz->get($userId);
+        $state  = $this->wizardState->get($userId);
         if (!$state) {
             return null; // no wizard active
         }
 
-        $t = trim($rawInput);
+        $trimmedInput = trim($rawInput);
 
         // Allow restarting rates-add wizard by typing the command again
-        if ($t === 'rates:add') {
-            $this->wiz->set($userId, [
+        if ($trimmedInput === 'rates:add') {
+            $this->wizardState->set($userId, [
                 'mode' => self::WZ_RATES_ADD,
                 'step' => 0,
                 'data' => [],
             ]);
 
-            $s     = self::RATES_ADD_STEPS[0];
+            $currentStep     = self::RATES_ADD_STEPS[0];
             $total = count(self::RATES_ADD_STEPS);
 
             return [
                 'view'    => 'terminal/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
                 'vars'    => [
-                    'label'   => $s['label'],
-                    'example' => $s['example'] ?? null,
+                    'label'   => $currentStep['label'],
+                    'example' => $currentStep['example'] ?? null,
                     'step'    => 1,
                     'total'   => $total,
                 ],
@@ -322,8 +322,8 @@ final class CompanyTerminalService
         }
 
         // Allow restarting company:set-name wizard by typing the command again
-        if ($t === 'company:set-name') {
-            $this->wiz->set($userId, [
+        if ($trimmedInput === 'company:set-name') {
+            $this->wizardState->set($userId, [
                 'mode' => self::WZ_COMPANY_SET_NAME,
                 'step' => 0,
                 'data' => [],
@@ -343,46 +343,46 @@ final class CompanyTerminalService
         }
 
         // Cancel keyword
-        if ($t === 'cancel') {
-            $this->wiz->clear($userId);
+        if ($trimmedInput === 'cancel') {
+            $this->wizardState->clear($userId);
             return ['output' => 'Canceled.', 'success' => true];
         }
 
         // Route to the active wizard handler
         return match ($state['mode'] ?? null) {
-            self::WZ_RATES_ADD        => $this->handleRatesAddStep($state, $t, $userId),
-            self::WZ_COMPANY_SET_NAME => $this->handleCompanySetNameStep($state, $t, $userId),
+            self::WZ_RATES_ADD        => $this->handleRatesAddStep($state, $trimmedInput, $userId),
+            self::WZ_COMPANY_SET_NAME => $this->handleCompanySetNameStep($state, $trimmedInput, $userId),
             default                   => null,
         };
     }
 
     private function handleRatesAddStep(array $state, string $rawInput, string $userId): array
     {
-        $i     = (int) ($state['step'] ?? 0);
+        $stepIndex     = (int) ($state['step'] ?? 0);
         $steps = self::RATES_ADD_STEPS;
 
         // Save answer from previous step
-        if ($i < count($steps)) {
-            $key = $steps[$i]['key'];
-            $val = ($rawInput === '') ? null : trim($rawInput);
-            $state['data'][$key] = $val;
-            $i++;
+        if ($stepIndex < count($steps)) {
+            $key = $steps[$stepIndex]['key'];
+            $stepValue = ($rawInput === '') ? null : trim($rawInput);
+            $state['data'][$key] = $stepValue;
+            $stepIndex++;
         }
 
         // More steps? ask next question
-        if ($i < count($steps)) {
-            $state['step'] = $i;
-            $this->wiz->set($userId, $state);
+        if ($stepIndex < count($steps)) {
+            $state['step'] = $stepIndex;
+            $this->wizardState->set($userId, $state);
 
-            $s     = $steps[$i];
+            $currentStep     = $steps[$stepIndex];
             $total = count($steps);
 
             return [
                 'view'    => 'terminal/admin/terminal_commands/partials/_step-by-step_prompt.html.twig',
                 'vars'    => [
-                    'label'   => $s['label'],
-                    'example' => $s['example'] ?? null,
-                    'step'    => $i + 1,
+                    'label'   => $currentStep['label'],
+                    'example' => $currentStep['example'] ?? null,
+                    'step'    => $stepIndex + 1,
                     'total'   => $total,
                 ],
                 'success' => true,
@@ -391,7 +391,7 @@ final class CompanyTerminalService
         }
 
         $response = $this->ratesAddNonInteractive($state['data'] ?? []);
-        $this->wiz->clear($userId);
+        $this->wizardState->clear($userId);
         return $response;
     }
 
@@ -416,8 +416,8 @@ final class CompanyTerminalService
         $rate->setValue($value);
         $rate->setCompany($company);
 
-        $this->em->persist($rate);
-        $this->em->flush();
+        $this->entityManager->persist($rate);
+        $this->entityManager->flush();
 
         return [
             'view'    => 'terminal/admin/terminal_commands/_rate_created_summary.html.twig',
@@ -435,7 +435,7 @@ final class CompanyTerminalService
     private function handleCompanySetNameStep(array $state, string $rawInput, string $userId): array
     {
         $response = $this->companySetNameNonInteractive($rawInput);
-        $this->wiz->clear($userId);
+        $this->wizardState->clear($userId);
         return $response;
     }
 
@@ -448,10 +448,10 @@ final class CompanyTerminalService
         $company = $this->findCompany();
         if (!$company) {
             $company = new Company();
-            $this->em->persist($company);
+            $this->entityManager->persist($company);
         }
         $company->setName($name);
-        $this->em->flush();
+        $this->entityManager->flush();
         return [
             'output' => sprintf('Company name set to "%s".', htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')),
             'companyName' => $company->getName(),
@@ -479,8 +479,8 @@ final class CompanyTerminalService
 
         $company = new Company();
         // Name can be null initially – admin can set it later.
-        $this->em->persist($company);
-        $this->em->flush();
+        $this->entityManager->persist($company);
+        $this->entityManager->flush();
 
         return $company;
     }

@@ -24,14 +24,14 @@ final class UserAdminServiceTest extends TestCase
         (new \ReflectionProperty(User::class, 'id'))->setValue($other, 2);
         $users = $this->createMock(UserRepository::class);
         $users->expects(self::once())->method('findOneByIdOrEmailInsensitive')->with('taken@example.test')->willReturn($other);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::never())->method('flush');
-        $service = new UserAdminService($users, $em, $this->createStub(UserPasswordHasherInterface::class), $this->createStub(MailerInterface::class), $this->createStub(UrlGeneratorInterface::class));
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('flush');
+        $service = new UserAdminService($users, $entityManager, $this->createStub(UserPasswordHasherInterface::class), $this->createStub(MailerInterface::class), $this->createStub(UrlGeneratorInterface::class));
         try {
             $service->update($user, ['username' => 'Changed', 'email' => ' TAKEN@example.test '], new User());
             self::fail('Duplicate email accepted.');
-        } catch (\InvalidArgumentException $e) {
-            self::assertSame('user.email_taken', $e->getMessage());
+        } catch (\InvalidArgumentException $exception) {
+            self::assertSame('user.email_taken', $exception->getMessage());
         }
         self::assertSame('Original', $user->getUsername());
         self::assertSame('original@example.test', $user->getEmail());
@@ -65,11 +65,11 @@ final class UserAdminServiceTest extends TestCase
             self::assertSame('https://example.test/da/login', $email->getContext()['login_url']);
             return true;
         }));
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::once())->method('persist')->with(self::isInstanceOf(User::class));
-        $em->expects(self::once())->method('flush');
-        $em->method('wrapInTransaction')->willReturnCallback(static fn (callable $work) => $work());
-        $user = (new UserAdminService($users, $em, $hasher, $mailer, $router))->create([
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('persist')->with(self::isInstanceOf(User::class));
+        $entityManager->expects(self::once())->method('flush');
+        $entityManager->method('wrapInTransaction')->willReturnCallback(static fn (callable $work) => $work());
+        $user = (new UserAdminService($users, $entityManager, $hasher, $mailer, $router))->create([
             'username' => ' New user ', 'email' => ' NEW@example.test ', 'password' => 'ignored-input',
         ] + $access);
         self::assertSame('New user', $user->getUsername());
@@ -91,9 +91,9 @@ final class UserAdminServiceTest extends TestCase
         $users->method('findOneByIdOrEmailInsensitive')->willReturn($user);
         $hasher = $this->createMock(UserPasswordHasherInterface::class);
         $hasher->expects(self::never())->method('hashPassword');
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::once())->method('flush');
-        (new UserAdminService($users, $em, $hasher, $this->createStub(MailerInterface::class), $this->createStub(UrlGeneratorInterface::class)))->update($user, [
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('flush');
+        (new UserAdminService($users, $entityManager, $hasher, $this->createStub(MailerInterface::class), $this->createStub(UrlGeneratorInterface::class)))->update($user, [
             'username' => ' Changed ', 'email' => ' ORIGINAL@example.test ',
             'password' => 'ignored',
         ], new User());
@@ -109,19 +109,19 @@ final class UserAdminServiceTest extends TestCase
     {
         $users = $this->createStub(UserRepository::class);
         $users->method('findOneByIdOrEmailInsensitive')->willReturn(null);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::once())->method('wrapInTransaction')->willReturnCallback(static function (callable $work): void {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('wrapInTransaction')->willReturnCallback(static function (callable $work): void {
             try {
                 $work();
                 self::fail('Mail failure must abort the transaction.');
-            } catch (UserWelcomeMailException $e) {
-                self::assertSame('Mail unavailable', $e->getPrevious()->getMessage());
-                throw $e;
+            } catch (UserWelcomeMailException $exception) {
+                self::assertSame('Mail unavailable', $exception->getPrevious()->getMessage());
+                throw $exception;
             }
         });
         $mailer = $this->createMock(MailerInterface::class);
         $mailer->expects(self::once())->method('send')->willThrowException(new \RuntimeException('Mail unavailable'));
-        $service = new UserAdminService($users, $em, $this->createStub(UserPasswordHasherInterface::class), $mailer, $this->createStub(UrlGeneratorInterface::class));
+        $service = new UserAdminService($users, $entityManager, $this->createStub(UserPasswordHasherInterface::class), $mailer, $this->createStub(UrlGeneratorInterface::class));
         $this->expectException(UserWelcomeMailException::class);
         $service->create(['username' => 'Test user', 'email' => 'test@example.test']);
     }
@@ -129,11 +129,11 @@ final class UserAdminServiceTest extends TestCase
     public function testAdminCanChangeAnotherUsersAccess(): void
     {
         $user = (new User())->setUsername('Member')->setEmail('member@example.test')->setIsActive(false);
-        $repo = $this->createStub(UserRepository::class);
-        $repo->method('findOneByIdOrEmailInsensitive')->willReturn(null);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::exactly(2))->method('flush');
-        $service = new UserAdminService($repo, $em, $this->createStub(UserPasswordHasherInterface::class), $this->createStub(MailerInterface::class), $this->createStub(UrlGeneratorInterface::class));
+        $repository = $this->createStub(UserRepository::class);
+        $repository->method('findOneByIdOrEmailInsensitive')->willReturn(null);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::exactly(2))->method('flush');
+        $service = new UserAdminService($repository, $entityManager, $this->createStub(UserPasswordHasherInterface::class), $this->createStub(MailerInterface::class), $this->createStub(UrlGeneratorInterface::class));
         $actor = new User();
         $service->update($user, ['role' => 'ROLE_ADMIN', 'active' => '1'], $actor);
         self::assertContains('ROLE_ADMIN', $user->getRoles());
@@ -146,17 +146,17 @@ final class UserAdminServiceTest extends TestCase
     public function testSelfProtectionRejectsChangesBeforeMutatingAnyFields(): void
     {
         $user = (new User())->setUsername('Admin')->setEmail('admin@example.test')->setRoles(['ROLE_ADMIN']);
-        $repo = $this->createStub(UserRepository::class);
-        $repo->method('findOneByIdOrEmailInsensitive')->willReturn(null);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::never())->method('flush');
-        $service = new UserAdminService($repo, $em, $this->createStub(UserPasswordHasherInterface::class), $this->createStub(MailerInterface::class), $this->createStub(UrlGeneratorInterface::class));
+        $repository = $this->createStub(UserRepository::class);
+        $repository->method('findOneByIdOrEmailInsensitive')->willReturn(null);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('flush');
+        $service = new UserAdminService($repository, $entityManager, $this->createStub(UserPasswordHasherInterface::class), $this->createStub(MailerInterface::class), $this->createStub(UrlGeneratorInterface::class));
         foreach ([['role' => 'ROLE_USER'], ['active' => '0']] as $change) {
             try {
                 $service->update($user, ['username' => 'Must not persist'] + $change, $user);
                 self::fail('Self lockout was allowed.');
-            } catch (\InvalidArgumentException $e) {
-                self::assertSame('user.self_access', $e->getMessage());
+            } catch (\InvalidArgumentException $exception) {
+                self::assertSame('user.self_access', $exception->getMessage());
             }
             self::assertSame('Admin', $user->getUsername());
             self::assertContains('ROLE_ADMIN', $user->getRoles());
@@ -182,10 +182,10 @@ final class UserAdminServiceTest extends TestCase
     {
         $users = $this->createStub(UserRepository::class);
         $users->method('findOneByIdOrEmailInsensitive')->willReturn(null);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::never())->method('persist');
-        $em->expects(self::never())->method('flush');
-        $service = new UserAdminService($users, $em, $this->createStub(UserPasswordHasherInterface::class), $this->createStub(MailerInterface::class), $this->createStub(UrlGeneratorInterface::class));
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('persist');
+        $entityManager->expects(self::never())->method('flush');
+        $service = new UserAdminService($users, $entityManager, $this->createStub(UserPasswordHasherInterface::class), $this->createStub(MailerInterface::class), $this->createStub(UrlGeneratorInterface::class));
         $data = ['username' => 'Test user', 'email' => 'valid@example.test', 'password' => bin2hex(random_bytes(16))];
         $data[$field] = $value;
         $this->expectExceptionMessage('user.invalid.' . $field);

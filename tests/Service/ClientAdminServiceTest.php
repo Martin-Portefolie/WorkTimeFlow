@@ -23,17 +23,17 @@ final class ClientAdminServiceTest extends TestCase
             ->setAdress('Old street')->setCity('Aarhus');
     }
 
-    private function service(EntityManagerInterface $em): ClientAdminService
+    private function service(EntityManagerInterface $entityManager): ClientAdminService
     {
-        return new ClientAdminService($this->createStub(ClientRepository::class), $em);
+        return new ClientAdminService($this->createStub(ClientRepository::class), $entityManager);
     }
 
     public function testUpdateNormalizesValuesWithoutChangingUnsubmittedFields(): void
     {
         $client = $this->client();
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::once())->method('flush');
-        $this->service($em)->update($client, [
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('flush');
+        $this->service($entityManager)->update($client, [
             'name' => ' New client ', 'contactEmail' => ' CONTACT@EXAMPLE.TEST ',
             'contactPhone' => '+1 (212) 555-0100', 'adress' => ' ', 'postalCode' => ' 0123 ',
             '_token' => 'ignored',
@@ -62,13 +62,13 @@ final class ClientAdminServiceTest extends TestCase
 
     public function testCreatesClientWithNormalizedDetails(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $persisted = null;
-        $em->expects(self::once())->method('persist')->willReturnCallback(
+        $entityManager->expects(self::once())->method('persist')->willReturnCallback(
             static function (object $entity) use (&$persisted): void { $persisted = $entity; },
         );
-        $em->expects(self::once())->method('flush');
-        $client = $this->service($em)->create([
+        $entityManager->expects(self::once())->method('flush');
+        $client = $this->service($entityManager)->create([
             'name' => ' New client ', 'contactPerson' => ' Alice ',
             'contactEmail' => ' ALICE@EXAMPLE.TEST ', 'contactPhone' => '+45 12 34 56 78',
             'adress' => '', 'postalCode' => '0123', 'city' => 'Aarhus', 'country' => 'Danmark',
@@ -83,11 +83,11 @@ final class ClientAdminServiceTest extends TestCase
 
     public function testCreateRejectsMissingRequiredFieldsBeforePersisting(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::never())->method('persist');
-        $em->expects(self::never())->method('flush');
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('persist');
+        $entityManager->expects(self::never())->method('flush');
         $this->expectExceptionMessage('client.invalid.contactEmail');
-        $this->service($em)->create(['name' => 'New client', 'contactPerson' => 'Alice']);
+        $this->service($entityManager)->create(['name' => 'New client', 'contactPerson' => 'Alice']);
     }
 
     public function testTerminalUpdateUsesSharedValidationAndReturnsTheUpdatedClientForGui(): void
@@ -95,11 +95,11 @@ final class ClientAdminServiceTest extends TestCase
         $client = $this->client();
         $clients = $this->createStub(ClientRepository::class);
         $clients->method('findOneByIdNameOrEmail')->willReturn($client);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::once())->method('flush');
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('flush');
         $terminal = new TerminalClientService(
             $clients, new TerminalStateService(new ArrayAdapter()), $this->createStub(Security::class),
-            $em, new ClientAdminService($clients, $em), new Translator('en'),
+            $entityManager, new ClientAdminService($clients, $entityManager), new Translator('en'),
         );
         $invalid = $terminal->update(['1'], ['name' => 'Changed', 'phone' => 'bad']);
         self::assertFalse($invalid['success']);
@@ -116,10 +116,10 @@ final class ClientAdminServiceTest extends TestCase
     public function testInvalidInputDoesNotPartiallyMutateTheEntity(string $field, mixed $value): void
     {
         $client = $this->client();
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::never())->method('flush');
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('flush');
         try {
-            $this->service($em)->update($client, array_replace(['name' => 'Changed'], [$field => $value]));
+            $this->service($entityManager)->update($client, array_replace(['name' => 'Changed'], [$field => $value]));
             self::fail('Invalid input accepted');
         } catch (\InvalidArgumentException $exception) {
             self::assertSame('client.invalid.' . $field, $exception->getMessage());
